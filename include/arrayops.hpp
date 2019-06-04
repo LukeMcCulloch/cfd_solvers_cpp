@@ -29,6 +29,24 @@ operator+(const Array2D<T>& a, const Array2D<T>& b) {
 
 
 
+// subtraction of two Array2Ds
+template <class T>
+Array2D<T> 
+operator-(const Array2D<T>& a, const Array2D<T>& b) {
+	assert(a.nrows == b.nrows);
+	assert(a.ncols == b.ncols);
+
+    Array2D<T> result(a.nrows,a.ncols);
+
+    int size = a.storage_size;
+    for(size_t i=0; i < size; i++) {
+    	result.array[i] = a.array[i] - b.array[i];
+    }
+    return result;
+}
+
+
+
 // multiplication of scalar and Array2D
 template<typename T>
 Array2D<T> 

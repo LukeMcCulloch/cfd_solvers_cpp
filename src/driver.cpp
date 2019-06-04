@@ -109,20 +109,37 @@ class Solver;
 
 
 // use an array of structs (may be inefficient//)
+// struct cell_data{
+//     float xc;  // Cell-center coordinate
+//     float u[3];   // Conservative variables = [rho, rho*u, rho*E]
+//     float u0[3];  // Conservative variables at the previous time step
+//     float w[3];   // Primitive variables = [rho, u, p]
+//     float dw[3];  // Slope (difference) of primitive variables
+//     float res[3]; // Residual = f_{j+1/2) - f_{j-1/2)
+// };
+
+
+// use an array of structs (may be inefficient//)
 struct cell_data{
     float xc;  // Cell-center coordinate
-    float u[3];   // Conservative variables = [rho, rho*u, rho*E]
-    float u0[3];  // Conservative variables at the previous time step
-    float w[3];   // Primitive variables = [rho, u, p]
-    float dw[3];  // Slope (difference) of primitive variables
-    float res[3]; // Residual = f_{j+1/2) - f_{j-1/2)
+    Array2D<float>* u;   // Conservative variables = [rho, rho*u, rho*E]
+    Array2D<float>* u0;  // Conservative variables at the previous time step
+    Array2D<float>* w;   // Primitive variables = [rho, u, p]
+    Array2D<float>* dw;  // Slope (difference) of primitive variables
+    Array2D<float>* res; // Residual = f_{j+1/2) - f_{j-1/2)
+
+    cell_data(){
+        u = new Array2D<float>(3,1);
+        u0 = new Array2D<float>(3,1);
+        w = new Array2D<float>(3,1);
+        dw = new Array2D<float>(3,1);
+        res = new Array2D<float>(3,1);
+    }
 };
 
 
 
-
 class Solver{
-
 
 public:
 
@@ -136,7 +153,9 @@ public:
     void initialize( int ncells, 
                 float dx, float xmin, const float gamma);
     float timestep(float cfl, float dx, float gamma, int ncells);
-    void w2u( float w[3], float u[3] );
+    //void w2u( float w[3], float u[3] );
+    void w2u( Array2D<float>*& w, Array2D<float>*& u );
+    float minmod(float a, float b);
 
     struct constants{
         const float  zero = 0.0;
@@ -240,16 +259,31 @@ void Solver::Euler1D(){
         t = t + dt;                 //Update the current time.
         nsteps = nsteps + 1;                //Count the number of time steps.
 
-        //---------------------------------------------------
-        // Runge-Kutta Stages
-        //
-        // Two-stage Runge-Kutta scheme:
-        //  1. u^*     = u^n - dt/dx*Res(u^n)
-        //  2. u^{n+1} = 1/2*u^n + 1/2*[u^*- dt/dx*Res(u^*)]
-        //---------------------------------------------------
-        //rk_stages : do istage = 1, 2
+//---------------------------------------------------
+// Runge-Kutta Stages
+//
+// Two-stage Runge-Kutta scheme:
+//  1. u^*     = u^n - dt/dx*Res(u^n)
+//  2. u^{n+1} = 1/2*u^n + 1/2*[u^*- dt/dx*Res(u^*)]
+//---------------------------------------------------
         for ( int istage = 0; istage < 2; ++istage ) {
-        } //end rk stages
+
+            //(1) Residual computation: compute cell(:)%res(1:3).
+
+            // Compute the slopes (as difference) at every cell.
+            // NB: for uniform meshes, difference (du) can be used in place of gradient (du/dx).
+            for ( int j = 1; j < ncells+1; ++j ) {
+
+                //dwl = cell[j].w   - cell[j-1].w // diff( w_{j}   , w_{j-1} )
+                //dwr = cell[j+1].w -   cell[j].w // diff( w_{j+1} , w_{j}   )
+
+                //    Apply a slope limiter.
+                //    (minmod: zero if opposite sign, otherwise the one of smaller magnitude.)
+                for (int i = 0; i < 3; ++i){
+                //    cell[j].dw[i] = minimod( dwl[i], dwr[i] );
+                }
+            }//end reconstruction, j
+        } //end rk stages, istage
     } //end time stepping
 }
 
@@ -291,15 +325,43 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 
     max_speed = -one;
 
-    for ( int i = 1; i < ncells; ++i ) {
-        u = cell[i].w[1];                          //Velocity
-        c = sqrt(gamma*cell[i].w[2]/cell[i].w[0]); //Speed of sound
+    for ( int i = 1; i < ncells+1; ++i ) {
+        u = cell[i].w->array[1,0];                          //Velocity
+        c = sqrt(gamma*cell[i].w->array[2,0]/cell[i].w->array[0,0]); //Speed of sound
         max_speed = max( max_speed, abs(u)+c );
 
         dt = cfl*dx/max_speed; //CFL condition: dt = CFL*dx/max_wavespeed, CFL <= 1.
     }
     return dt;
 }
+
+//***************************************************************************
+// Minmod limiter
+// --------------------------------------------------------------------------
+//  Input: two real values, a and b
+// Output: minmod of a and b.
+// --------------------------------------------------------------------------
+// 
+//***************************************************************************
+ float Solver::minmod(float a, float b){
+
+    float minmod;
+
+    //Local parameter
+    float zero = 0.0;
+
+    if (a*b <= zero) {
+        minmod = zero;               // a>0 and b<0; or a<0 and b>0
+    }else if (abs(a)<abs(b)) {
+        minmod = a;                  // |a| < |b|
+    }else if (abs(b)<abs(a)) {
+        minmod = b;                  // |a| > |b|
+    }else{
+        minmod = a;                  // Here, a=b, so just take a or b.
+    }
+    return minmod;
+}
+//--------------------------------------------------------------------------------
 
 //********************************************************************************
 //* Compute U from W
@@ -310,7 +372,7 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 //* ------------------------------------------------------------------------------
 //* 
 //********************************************************************************
-void Solver::w2u( float w[3], float u[3] ) {
+void Solver::w2u( Array2D<float>*& w, Array2D<float>*& u ) {
 
     float gamma = 1.4;
     float half = 0.5;
@@ -318,7 +380,7 @@ void Solver::w2u( float w[3], float u[3] ) {
 
     u[0] = w[0];
     u[1] = w[0]*w[1];
-    u[2] = w[2]/(gamma-one)+half*w[0]*w[1]*w[1];
+    u[2] = (w->array[2,0]/(gamma-one))+half*w->array[0]*w->array[1]*w->array[1];
     return;
 }
 //--------------------------------------------------------------------------------
