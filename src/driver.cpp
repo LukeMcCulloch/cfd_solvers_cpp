@@ -109,6 +109,35 @@ void oned_euler(){
     const float   one = 1.0;
     const float  half = 0.5;
     const float gamma = 1.4;  //Ratio of specific heats for air
+
+    float                     xmin, xmax; //Left and right ends of the domain
+    float                     dx;         //Cell spacing (uniform grid)
+    float                     t, tf;      //Current time and final time
+    float                     cfl, dt;    //CFL number and global time step
+    int                       ncells;     //Total number of cells
+    int                       nsteps;     //Number of time steps
+    int                       itime;      //Index for time stepping
+    int                       istage;     //Index for Runge-Kutta stages
+    int                       i, j;
+
+    //Local variables used for computing numerical fluxes.
+    Array2D<float>  dwl(3,1), dwr(3,1); //Slopes between j and j-1, j and j+1
+    Array2D<float>  wL(3,1), wR(3,1);   //Extrapolated states at a face
+    Array2D<float>  flux(3,1);          //Numerical flux
+
+//--------------------------------------------------------------------------------
+// 0. Input parameters and initial condition.
+
+//Parameters
+  ncells =  80;   // Number of cells
+      tf = 1.7;   // Final time
+     cfl = 0.8;   // CFL number
+    xmin =-5.0;   // Left boundary coordinate
+    xmax = 5.0;   // Right boundary coordinate
+
+    
+    //Array2D<cell_data> cell(ncells+1,1);//experimental
+    struct cell_data cell[ncells+1];      //Array of cell-data
 }
 
 
