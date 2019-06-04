@@ -24,13 +24,13 @@
 //
 // - t=0                               - t=tf
 // Density                             Density
-//   ****************|                 *********\
+//  [] ***************|                [] ********\
 //                   |                           \
 //                   |                            \
-//                   |                             ****|
+//                   |                            [] ***|
 //                   |                                 |
-//                   |                                 ****|
-//                   ***************                       ***********
+//                   |                                [] ***|
+//                  [] **************                      [] **********
 //
 // Methods employed:
 //   - Roe's flux
@@ -77,8 +77,13 @@
 //
 //*******************************************************************************
 
+//=================================
 #include <iostream>     // std::cout, std::fixed
-//#include <iomanip>      // std::setprecision - only works for output :(
+//#include <iomanip>    // std::setprecision - only works for output :(
+#include <math.h>       // sqrt 
+//=================================
+#include <cstring>
+#include <string.h>
 
 //======================================
 // my simple array class template (type)
@@ -96,30 +101,50 @@ using namespace std;
 //======================================
 //fwd declarations
 struct cell_data; 
-void initialize( cell_data* cell, int ncells, 
-                float dx, float xmin, const float gamma );
-//float* w2u( float w[3] );
-void w2u( float w[3], float u[3]  );
+class Solver;
+// void initialize( cell_data* cell, int ncells, 
+//                 float dx, float xmin, const float gamma );
+// void w2u( float w[3], float u[3]  );
 
 
-// use an array of structs (very inefficient//)
+
+// use an array of structs (may be inefficient//)
 struct cell_data{
-  float xc;  // Cell-center coordinate
-  float u[3];   // Conservative variables = [rho, rho*u, rho*E]
-  float u0[3];  // Conservative variables at the previous time step
-  float w[3];   // Primitive variables = [rho, u, p]
-  float dw[3];  // Slope (difference) of primitive variables
-  float res[3]; // Residual = f_{j+1/2) - f_{j-1/2)
+    float xc;  // Cell-center coordinate
+    float u[3];   // Conservative variables = [rho, rho*u, rho*E]
+    float u0[3];  // Conservative variables at the previous time step
+    float w[3];   // Primitive variables = [rho, u, p]
+    float dw[3];  // Slope (difference) of primitive variables
+    float res[3]; // Residual = f_{j+1/2) - f_{j-1/2)
 };
 
-struct constants{
-    const float  zero = 0.0;
-    const float   one = 1.0;
-    const float  half = 0.5;
-    const float gamma = 1.4;  //Ratio of specific heats for air
-};
 
-void Euler1D(){
+
+
+class Solver{
+
+
+public:
+
+    //constructor
+    Solver();
+    // destructor
+    ~Solver();
+
+
+    void Euler1D();
+    void initialize( int ncells, 
+                float dx, float xmin, const float gamma);
+    float timestep(float cfl, float dx, float gamma, int ncells);
+    void w2u( float w[3], float u[3] );
+
+    struct constants{
+        const float  zero = 0.0;
+        const float   one = 1.0;
+        const float  half = 0.5;
+        const float gamma = 1.4;  //Ratio of specific heats for air
+    };
+
     //Numeric parameters: [Note: no Fortran-like way to handle precision?]
     //const int p2 = 10;
     const float  zero = 0.0;
@@ -138,56 +163,100 @@ void Euler1D(){
     int   i, j;
 
     //Local variables used for computing numerical fluxes.
-    Array2D<float>  dwl(3,1), dwr(3,1); //Slopes between j and j-1, j and j+1
-    Array2D<float>  wL(3,1), wR(3,1);   //Extrapolated states at a face
-    Array2D<float>  flux(3,1);          //Numerical flux
+    Array2D<float>*  dwl; //Slopes between j and j-1, j and j+1
+    Array2D<float>*  dwr; //Slopes between j and j-1, j and j+1
+    Array2D<float>*  wL;   //Extrapolated states at a face
+    Array2D<float>*  wR;   //Extrapolated states at a face
+    Array2D<float>*  flux;          //Numerical flux
+
+    struct cell_data* cell;
+
+};
+
+Solver::Solver(){
 
 //--------------------------------------------------------------------------------
 // 0. Input parameters and initial condition.
 
-//Parameters
-  ncells =  80;   // Number of cells
+    printf("\n Custom Parameters\n");
+//custom Parameters
+    ncells =  80;   // Number of cells
       tf = 1.7;   // Final time
      cfl = 0.8;   // CFL number
     xmin =-5.0;   // Left boundary coordinate
     xmax = 5.0;   // Right boundary coordinate
 
     
+    printf("\n Cell Struct array\n");
 // Allocate the cell array: 2 ghost cells, 0 on the left and ncells+1 on the right.
 //  E.g., data in cell j is accessed by cell(j)%xc, cell(j)%u, cell(j)%w, etc.
     //Array2D<cell_data> cell(ncells+1,1);//experimental
-    struct cell_data cell[ncells+1];      //Array of cell-data
+    cell = new cell_data[ncells+1];      //Array of cell-data
 
 // Cell spacing (grid is uniform)
-  dx = (xmax-xmin)/float(ncells);
+    dx = (xmax-xmin)/float(ncells);
 
+
+    printf("\n Initialize solver\n");
 // The initial condition for Sod's shock tube problem (I Do Like CFD, VOL.1, page 199).
 // [Note: Change these data (and tf) to solve different problems.]
-    initialize(cell, ncells, dx, xmin, gamma);
+    initialize(ncells, dx, xmin, gamma);
 
+    
+    printf("\n local arrays\n");
+    //Local variables used for computing numerical fluxes.
+    dwl = new Array2D<float>(3,1); 
+    dwr = new Array2D<float>(3,1); 
+    wL = new Array2D<float>(3,1); 
+    wR = new Array2D<float>(3,1); 
+    flux = new Array2D<float>(3,1); 
+}
+
+
+
+Solver::~Solver(){
+    delete[] cell;
+    delete[] dwl;
+    delete[] dwr;
+    delete[] wL;
+    delete[] wR;
+    delete[] flux;
+}
+
+void Solver::Euler1D(){
+    
 //--------------------------------------------------------------------------------
 // Time stepping loop to reach t = tf 
 //--------------------------------------------------------------------------------
-
-    t = zero; //Initialize the current time.
+    printf("\nEuler1D\n");
+    t = zero;      //Initialize the current time.
     nsteps = 0;    //Initialize the number of time steps.
     //50000 is large enough to reach tf=1.7.
-    for ( int itime = 0; itime < 50000; ++i ) {
-        if (t==tf) exit;                   //Finish if the final time is reached.
-        //dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
+    for ( int itime = 0; itime < 500; ++i ) {
+        if (t==tf) break;                   //Finish if the final time is reached.
+        //dt = 1.;
+        dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
         if (t+dt > tf) dt =  tf - t;        //Adjust dt to finish exactly at t=tf.
         t = t + dt;                 //Update the current time.
         nsteps = nsteps + 1;                //Count the number of time steps.
 
-    }
+        //---------------------------------------------------
+        // Runge-Kutta Stages
+        //
+        // Two-stage Runge-Kutta scheme:
+        //  1. u^*     = u^n - dt/dx*Res(u^n)
+        //  2. u^{n+1} = 1/2*u^n + 1/2*[u^*- dt/dx*Res(u^*)]
+        //---------------------------------------------------
+        //rk_stages : do istage = 1, 2
+        for ( int istage = 0; istage < 2; ++istage ) {
+        } //end rk stages
+    } //end time stepping
 }
 
 
-void initialize( cell_data* cell, int ncells, 
-                float dx, float xmin, const float gamma){
-    /* 
-        The initial condition for Sod's shock tube problem
-    */
+void Solver::initialize( int ncells, float dx, float xmin, const float gamma){
+    //
+    //The initial condition for Sod's shock tube problem
     for ( int i = 0; i < ncells+2; ++i ) {
         if (i <= ncells/2) {
             cell[i].w[0] = 1.0;   //Density  on the left
@@ -199,15 +268,11 @@ void initialize( cell_data* cell, int ncells,
             cell[i].w[2] = 0.1;   //Pressure on the right
         }
 
-        //cell[i].u  = w2u( cell[i].w );      //Compute the conservative variables
-        w2u( cell[i].w, cell[i].u );
+        w2u( cell[i].w, cell[i].u );        //Compute the conservative variables
         cell[i].xc = xmin+float(i-1)*dx;    //Cell center coordinate
     }
     return;
 }
-
-
-
 //******************************************************************************
 // Compute the global time step dt restricted by a given CFL number.
 //
@@ -217,26 +282,24 @@ void initialize( cell_data* cell, int ncells,
 // ------------------------------------------------------------------------------
 //
 //******************************************************************************
-// float timestep(cfl,dx,gamma,ncells){
+float Solver::timestep(float cfl, float dx, float gamma, int ncells){
+    float dt;             //Output
+    //Local variables
+    float one = 1.0;
+    float u, c, max_speed;
+    int   i;
 
-//     real(p2), intent(in) :: cfl, dx, gamma !Input
-//     integer , intent(in) :: ncells         !Input
-//     real(p2)             ::  dt            !Output
-//     //Local variables
-//     real(p2) :: u, c, max_speed
-//     integer  :: i
+    max_speed = -one;
 
-//     max_speed = -one
+    for ( int i = 1; i < ncells; ++i ) {
+        u = cell[i].w[1];                          //Velocity
+        c = sqrt(gamma*cell[i].w[2]/cell[i].w[0]); //Speed of sound
+        max_speed = max( max_speed, abs(u)+c );
 
-//     do i = 1, ncells
-//         u = cell(i)%w(2)                          !Velocity
-//         c = sqrt(gamma*cell(i)%w(3)/cell(i)%w(1)) !Speed of sound
-//         max_speed = max( max_speed, abs(u)+c )
-//         end do
-
-//         dt = cfl*dx/max_speed !CFL condition: dt = CFL*dx/max_wavespeed, CFL <= 1.
-//     return dt
-// }
+        dt = cfl*dx/max_speed; //CFL condition: dt = CFL*dx/max_wavespeed, CFL <= 1.
+    }
+    return dt;
+}
 
 //********************************************************************************
 //* Compute U from W
@@ -247,21 +310,7 @@ void initialize( cell_data* cell, int ncells,
 //* ------------------------------------------------------------------------------
 //* 
 //********************************************************************************
-// float* w2u( float w[3] ) {
-
-//     float gamma = 1.4;
-//     float half = 0.5;
-//     float one  = 1.0;
-//     float u[3];
-
-//     u[0] = w[0];
-//     u[1] = w[0]*w[1];
-//     u[2] = w[2]/(gamma-one)+half*w[0]*w[1]*w[1];
-//     return *u;
-// }
-//--------------------------------------------------------------------------------
-//********************************************************************************
-void w2u( float w[3], float u[3] ) {
+void Solver::w2u( float w[3], float u[3] ) {
 
     float gamma = 1.4;
     float half = 0.5;
@@ -276,6 +325,7 @@ void w2u( float w[3], float u[3] ) {
 
 
 int main(){
-    Euler1D();
+    Solver solver;
+    solver.Euler1D();
     return 0;
 }
