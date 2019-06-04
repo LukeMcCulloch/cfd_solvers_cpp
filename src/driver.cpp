@@ -90,19 +90,28 @@
 // my simple vector class template 
 #include "../include/vector.h"
 
+//======================================
 using namespace std;
 
+//======================================
+//fwd declarations
+struct cell_data; 
+void initialize( cell_data* cell, int ncells, 
+                float dx, float xmin);
+float w2u(float w[3], float gamma[3]);
 
+
+// use an array of structs (very inefficient//)
 struct cell_data{
   float xc;  // Cell-center coordinate
-  float u;   // Conservative variables = [rho, rho*u, rho*E]
-  float u0;  // Conservative variables at the previous time step
-  float w;   // Primitive variables = [rho, u, p]
-  float dw;  // Slope (difference) of primitive variables
-  float res; // Residual = f_{j+1/2) - f_{j-1/2)
+  float u[3];   // Conservative variables = [rho, rho*u, rho*E]
+  float u0[3];  // Conservative variables at the previous time step
+  float w[3];   // Primitive variables = [rho, u, p]
+  float dw[3];  // Slope (difference) of primitive variables
+  float res[3]; // Residual = f_{j+1/2) - f_{j-1/2)
 };
 
-void oned_euler(){
+void Euler1D(){
     //Numeric parameters: [Note: no Fortran-like way to handle precision?]
     //const int p2 = 10;
     const float  zero = 0.0;
@@ -110,15 +119,15 @@ void oned_euler(){
     const float  half = 0.5;
     const float gamma = 1.4;  //Ratio of specific heats for air
 
-    float                     xmin, xmax; //Left and right ends of the domain
-    float                     dx;         //Cell spacing (uniform grid)
-    float                     t, tf;      //Current time and final time
-    float                     cfl, dt;    //CFL number and global time step
-    int                       ncells;     //Total number of cells
-    int                       nsteps;     //Number of time steps
-    int                       itime;      //Index for time stepping
-    int                       istage;     //Index for Runge-Kutta stages
-    int                       i, j;
+    float xmin, xmax; //Left and right ends of the domain
+    float dx;         //Cell spacing (uniform grid)
+    float t, tf;      //Current time and final time
+    float cfl, dt;    //CFL number and global time step
+    int   ncells;     //Total number of cells
+    int   nsteps;     //Number of time steps
+    int   itime;      //Index for time stepping
+    int   istage;     //Index for Runge-Kutta stages
+    int   i, j;
 
     //Local variables used for computing numerical fluxes.
     Array2D<float>  dwl(3,1), dwr(3,1); //Slopes between j and j-1, j and j+1
@@ -136,11 +145,73 @@ void oned_euler(){
     xmax = 5.0;   // Right boundary coordinate
 
     
+// Allocate the cell array: 2 ghost cells, 0 on the left and ncells+1 on the right.
+//  E.g., data in cell j is accessed by cell(j)%xc, cell(j)%u, cell(j)%w, etc.
     //Array2D<cell_data> cell(ncells+1,1);//experimental
     struct cell_data cell[ncells+1];      //Array of cell-data
+
+// Cell spacing (grid is uniform)
+  dx = (xmax-xmin)/float(ncells);
+
+// The initial condition for Sod's shock tube problem (I Do Like CFD, VOL.1, page 199).
+// [Note: Change these data (and tf) to solve different problems.]
+    initialize(cell, ncells, dx, xmin);
+
+//--------------------------------------------------------------------------------
+// Time stepping loop to reach t = tf 
+//--------------------------------------------------------------------------------
+
+    t = zero; //Initialize the current time.
 }
 
 
+void initialize( cell_data* cell, int ncells, 
+                float dx, float xmin){
+    /* 
+        The initial condition for Sod's shock tube problem
+    */
+    for ( int i = 0; i < ncells+2; ++i ) {
+        if (i <= ncells/2) {
+            cell[i].w[0] = 1.0;   //Density  on the left
+            cell[i].w[1] = 0.0;   //Velocity on the left
+            cell[i].w[2] = 1.0;   //Pressure on the left
+        } else {
+            cell[i].w[0] = 0.125; //Density  on the right
+            cell[i].w[1] = 0.0;   //Velocity on the right
+            cell[i].w[2] = 0.1;   //Pressure on the right
+        }
+
+        //cell[i].u  = w2u(cell[i].w,gamma)  //Compute the conservative variables
+        cell[i].xc = xmin+float(i-1)*dx;    //Cell center coordinate
+    }
+    return;
+}
+
+
+//********************************************************************************
+//* Compute U from W
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:  w = primitive variables (rho, u, p, 0, 0)
+//* Output:  u = conservative variables (rho, rho*u, rho*E, 0, 0)
+//* ------------------------------------------------------------------------------
+//* 
+//********************************************************************************
+float w2u(float w[3], float gamma) {
+
+    float half = 0.5;
+    float one  = 1.0;
+    float u[3];
+
+    u[0] = w[0];
+    u[1] = w[0]*w[1];
+    u[2] = w[2]/(gamma-one)+half*w[0]*w[1]*w[1];
+    return *u;
+}
+//--------------------------------------------------------------------------------
+
+
 int main(){
+    Euler1D();
     return 0;
 }
