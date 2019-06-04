@@ -170,6 +170,16 @@ void Euler1D(){
 //--------------------------------------------------------------------------------
 
     t = zero; //Initialize the current time.
+    nsteps = 0;    //Initialize the number of time steps.
+    //50000 is large enough to reach tf=1.7.
+    for ( int itime = 0; itime < 50000; ++i ) {
+        if (t==tf) exit;                   //Finish if the final time is reached.
+        //dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
+        if (t+dt > tf) dt =  tf - t;        //Adjust dt to finish exactly at t=tf.
+        t = t + dt;                 //Update the current time.
+        nsteps = nsteps + 1;                //Count the number of time steps.
+
+    }
 }
 
 
@@ -196,6 +206,37 @@ void initialize( cell_data* cell, int ncells,
     return;
 }
 
+
+
+//******************************************************************************
+// Compute the global time step dt restricted by a given CFL number.
+//
+// ------------------------------------------------------------------------------
+//  Input: CFL number
+// Output: Global time step, dt.
+// ------------------------------------------------------------------------------
+//
+//******************************************************************************
+// float timestep(cfl,dx,gamma,ncells){
+
+//     real(p2), intent(in) :: cfl, dx, gamma !Input
+//     integer , intent(in) :: ncells         !Input
+//     real(p2)             ::  dt            !Output
+//     //Local variables
+//     real(p2) :: u, c, max_speed
+//     integer  :: i
+
+//     max_speed = -one
+
+//     do i = 1, ncells
+//         u = cell(i)%w(2)                          !Velocity
+//         c = sqrt(gamma*cell(i)%w(3)/cell(i)%w(1)) !Speed of sound
+//         max_speed = max( max_speed, abs(u)+c )
+//         end do
+
+//         dt = cfl*dx/max_speed !CFL condition: dt = CFL*dx/max_wavespeed, CFL <= 1.
+//     return dt
+// }
 
 //********************************************************************************
 //* Compute U from W
