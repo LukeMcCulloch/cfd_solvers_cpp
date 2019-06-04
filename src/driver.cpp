@@ -1,7 +1,7 @@
 //*******************************************************************************
 // One-dimensional Euler solver for a Sod's shock tube problem.
 //
-//        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
+//        written by Dr. Katate Masatsuka (info[at]cfdbooks.com), 
 //        translated to C++ by Luke McCulloch
 //
 // the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
