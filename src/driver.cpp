@@ -93,6 +93,14 @@
 using namespace std;
 
 
+struct cell_data{
+  float xc;  // Cell-center coordinate
+  float u;   // Conservative variables = [rho, rho*u, rho*E]
+  float u0;  // Conservative variables at the previous time step
+  float w;   // Primitive variables = [rho, u, p]
+  float dw;  // Slope (difference) of primitive variables
+  float res; // Residual = f_{j+1/2) - f_{j-1/2)
+};
 
 void oned_euler(){
     //Numeric parameters: [Note: no Fortran-like way to handle precision?]
