@@ -182,12 +182,12 @@ public:
     int   i, j;
 
     //Local variables used for computing numerical fluxes.
-    Array2D<float>*  dwl; //Slopes between j and j-1, j and j+1
-    Array2D<float>*  dwr; //Slopes between j and j-1, j and j+1
-    Array2D<float>*  wL;   //Extrapolated states at a face
-    Array2D<float>*  wR;   //Extrapolated states at a face
-    Array2D<float>*  flux;          //Numerical flux
-
+    Array2D<float>  dwl = Array2D<float>(3,1);  //Slopes between j and j-1, j and j+1
+    Array2D<float>  dwr = Array2D<float>(3,1);  //Slopes between j and j-1, j and j+1
+    Array2D<float>  wL = Array2D<float>(3,1);   //Extrapolated states at a face
+    Array2D<float>  wR = Array2D<float>(3,1);   //Extrapolated states at a face
+    Array2D<float>  flux = Array2D<float>(3,1); //Numerical flux
+    
     struct cell_data* cell;
 
 };
@@ -224,22 +224,22 @@ Solver::Solver(){
     
     printf("\n local arrays\n");
     //Local variables used for computing numerical fluxes.
-    dwl = new Array2D<float>(3,1); 
-    dwr = new Array2D<float>(3,1); 
-    wL = new Array2D<float>(3,1); 
-    wR = new Array2D<float>(3,1); 
-    flux = new Array2D<float>(3,1); 
+    // dwl = new Array2D<float>(3,1); 
+    // dwr = new Array2D<float>(3,1); 
+    // wL = new Array2D<float>(3,1); 
+    // wR = new Array2D<float>(3,1); 
+    // flux = new Array2D<float>(3,1); 
 }
 
 
 
 Solver::~Solver(){
     delete[] cell;
-    delete[] dwl;
-    delete[] dwr;
-    delete[] wL;
-    delete[] wR;
-    delete[] flux;
+    // delete[] dwl;
+    // delete[] dwr;
+    // delete[] wL;
+    // delete[] wR;
+    // delete[] flux;
 }
 
 void Solver::Euler1D(){
@@ -291,20 +291,20 @@ void Solver::Euler1D(){
 void Solver::initialize( int ncells, float dx, float xmin, const float gamma){
     //
     //The initial condition for Sod's shock tube problem
-    for ( int i = 0; i < ncells+2; ++i ) {
-        if (i <= ncells/2) {
-            cell[i].w[0] = 1.0;   //Density  on the left
-            cell[i].w[1] = 0.0;   //Velocity on the left
-            cell[i].w[2] = 1.0;   //Pressure on the left
-        } else {
-            cell[i].w[0] = 0.125; //Density  on the right
-            cell[i].w[1] = 0.0;   //Velocity on the right
-            cell[i].w[2] = 0.1;   //Pressure on the right
-        }
+    // for ( int i = 0; i < ncells+2; ++i ) {
+    //     if (i <= ncells/2) {
+    //         cell[i].w[0] = 1.0;   //Density  on the left
+    //         cell[i].w[1] = 0.0;   //Velocity on the left
+    //         cell[i].w[2] = 1.0;   //Pressure on the left
+    //     } else {
+    //         cell[i].w[0] = 0.125; //Density  on the right
+    //         cell[i].w[1] = 0.0;   //Velocity on the right
+    //         cell[i].w[2] = 0.1;   //Pressure on the right
+    //     }
 
-        w2u( cell[i].w, cell[i].u );        //Compute the conservative variables
-        cell[i].xc = xmin+float(i-1)*dx;    //Cell center coordinate
-    }
+    //     //w2u( cell[i].w, cell[i].u );        //Compute the conservative variables
+    //     //cell[i].xc = xmin+float(i-1)*dx;    //Cell center coordinate
+    // }
     return;
 }
 //******************************************************************************
@@ -388,6 +388,6 @@ void Solver::w2u( Array2D<float>*& w, Array2D<float>*& u ) {
 
 int main(){
     Solver solver;
-    solver.Euler1D();
+    //solver.Euler1D();
     return 0;
 }
