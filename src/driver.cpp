@@ -155,6 +155,9 @@ public:
     Array2D<float> roe_flux(Array2D<float>&  wL, Array2D<float>&  wR);
     Array2D<float> euler_physical_flux(Array2D<float>& w);
 
+    //print;
+    void output();
+
     struct constants{
         const float  zero = 0.0;
         const float   one = 1.0;
@@ -651,33 +654,29 @@ Array2D<float> Solver::euler_physical_flux(Array2D<float>& w){
 //* ------------------------------------------------------------------------------
 //*
 //********************************************************************************
-//  void Solver::output(){
+    void Solver::output(){
 
-//     //Local parameters
-//     float one = 1.0;
-//     //Local variables
-//     float entropy;
-//     int i, os;
+    float entropy;
 
-    
-//     const int bdim = 132;
-//     char buff[bdim];
+    ofstream outfile;
+    outfile.open ("solution.dat");
+    for (int i=0; i<ncells; ++i){
+        entropy = log( cell[i].w(2)* pow( cell[i].w(0) , (-gamma)) / (gamma-one) );
+        outfile << cell[i].xc << '\t'
+                << cell[i].w(0) << '\t' 
+                << cell[i].w(1) << '\t'
+                << cell[i].w(2) << '\t'
+                << entropy <<  "\n";
+    }
+    outfile.close();
 
-//     open(unit=1, file = "solution.dat", status="unknown", iostat=os)
-
-//     do i = 1, ncells
-//     entropy = log(cell(i)%w(3)*cell(i)%w(1)**(-gamma))/(gamma-one) 
-//     write(1,'(5es25.15)') cell(i)%xc, cell(i)%w(1), cell(i)%w(2), cell(i)%w(3), entropy
-//     end do 
-
-//     close(1)
-
-// }
+}
 //--------------------------------------------------------------------------------
 
 
 int main(){
     Solver solver;
     solver.Euler1D();
+    solver.output();
     return 0;
 }
