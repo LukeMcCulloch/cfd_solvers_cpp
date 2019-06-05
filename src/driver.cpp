@@ -102,40 +102,7 @@ using namespace std;
 //fwd declarations
 struct cell_data; 
 class Solver;
-// void initialize( cell_data* cell, int ncells, 
-//                 float dx, float xmin, const float gamma );
-// void w2u( float w[3], float u[3]  );
 
-
-
-// use an array of structs (may be inefficient//)
-// struct cell_data{
-//     float xc;  // Cell-center coordinate
-//     float u[3];   // Conservative variables = [rho, rho*u, rho*E]
-//     float u0[3];  // Conservative variables at the previous time step
-//     float w[3];   // Primitive variables = [rho, u, p]
-//     float dw[3];  // Slope (difference) of primitive variables
-//     float res[3]; // Residual = f_{j+1/2) - f_{j-1/2)
-// };
-
-
-// use an array of structs (may be inefficient//)
-// struct cell_data{
-//     float xc;  // Cell-center coordinate
-//     Array2D<float>* u;   // Conservative variables = [rho, rho*u, rho*E]
-//     Array2D<float>* u0;  // Conservative variables at the previous time step
-//     Array2D<float>* w;   // Primitive variables = [rho, u, p]
-//     Array2D<float>* dw;  // Slope (difference) of primitive variables
-//     Array2D<float>* res; // Residual = f_{j+1/2) - f_{j-1/2)
-
-//     cell_data(){
-//         u = new Array2D<float>(3,1);
-//         u0 = new Array2D<float>(3,1);
-//         w = new Array2D<float>(3,1);
-//         dw = new Array2D<float>(3,1);
-//         res = new Array2D<float>(3,1);
-//     }
-// };
 
 
 // use an array of structs (may be inefficient//)
@@ -165,9 +132,19 @@ public:
     void initialize( int ncells, 
                 float dx, float xmin, const float gamma);
     float timestep(float cfl, float dx, float gamma, int ncells);
-    //void w2u( float w[3], float u[3] );
-    void w2u( Array2D<float>& w, Array2D<float>& u );
+    
+    // limiter:
     float minmod(float a, float b);
+    
+    // transforms:
+    void w2u_efficient( Array2D<float>& w, Array2D<float>& u );
+    void u2w_efficient( Array2D<float>& u, Array2D<float>& w );
+    Array2D<float> u2w( Array2D<float>& u);
+    Array2D<float> w2u( Array2D<float>& w);
+    
+    //flux:
+    Array2D<float> roe_flux(Array2D<float>&  wL, Array2D<float>&  wR);
+    Array2D<float> euler_physical_flux(Array2D<float>& w);
 
     struct constants{
         const float  zero = 0.0;
@@ -195,7 +172,6 @@ public:
 
     //Local variables used for computing numerical fluxes.
     // init arrays here
-    // https://stackoverflow.com/questions/11490988/c-compile-time-error-expected-identifier-before-numeric-constant
     Array2D<float>  dwl = Array2D<float>(3,1);  //Slopes between j and j-1, j and j+1
     Array2D<float>  dwr = Array2D<float>(3,1);  //Slopes between j and j-1, j and j+1
     Array2D<float>  wL = Array2D<float>(3,1);   //Extrapolated states at a face
@@ -253,11 +229,6 @@ Solver::Solver(){
 
 Solver::~Solver(){
     delete[] cell;
-    // delete[] dwl; //raw arrays only
-    // delete[] dwr;
-    // delete[] wL;
-    // delete[] wR;
-    // delete[] flux;
 }
 
 void Solver::Euler1D(){
@@ -271,8 +242,8 @@ void Solver::Euler1D(){
     //50000 is large enough to reach tf=1.7.
     for ( int itime = 0; itime < 50000; ++i ) {
         if (t==tf) break;                   //Finish if the final time is reached.
-        //dt = 1.;
         dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
+        printf("\n%f, %f",t,dt);
         if (t+dt > tf) dt =  tf - t;        //Adjust dt to finish exactly at t=tf.
         t = t + dt;                 //Update the current time.
         nsteps = nsteps + 1;                //Count the number of time steps.
@@ -326,11 +297,11 @@ void Solver::Euler1D(){
 
         for (int j = 1; j < ncells; ++j){
 
-            wL = cell[j  ].w + half*cell[j  ].dw //State extrapolated to j+1/2 from j
-            wR = cell[j+1].w - half*cell[j+1].dw //State extrapolated to j+1/2 from j+1
-            flux = roe_flux(wL,wR,gamma)           //Numerical flux at j+1/2
-            cell[j  ].res = cell[j  ]res + flux   //Add it to the left cell.
-            cell[j+1].res = cell[j+1]res - flux   //Subtract from the right cell.
+            wL = cell[j  ].w + half*cell[j  ].dw; //State extrapolated to j+1/2 from j
+            wR = cell[j+1].w - half*cell[j+1].dw; //State extrapolated to j+1/2 from j+1
+            flux = roe_flux(wL,wR);           //Numerical flux at j+1/2
+            //cell[j  ].res = cell[j  ].res + flux;   //Add it to the left cell.
+            //cell[j+1].res = cell[j+1].res - flux;   //Subtract from the right cell.
 
         }
 
@@ -364,7 +335,8 @@ void Solver::initialize( int ncells, float dx, float xmin, const float gamma){
             cell[i].w(2) = 0.1;   //Pressure on the right
         }
 
-        w2u( cell[i].w, cell[i].u );        //Compute the conservative variables
+        //w2u( cell[i].w, cell[i].u );        //Compute the conservative variables
+        cell[i].u = w2u( cell[i].w ); 
         cell[i].xc = xmin+float(i-1)*dx;    //Cell center coordinate
     }
     return;
@@ -434,7 +406,7 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 //* ------------------------------------------------------------------------------
 //* 
 //********************************************************************************
-void Solver::w2u( Array2D<float>& w, Array2D<float>& u ) {
+void Solver::w2u_efficient( Array2D<float>& w, Array2D<float>& u ) {
 
     float gamma = 1.4;
     float half = 0.5;
@@ -444,6 +416,18 @@ void Solver::w2u( Array2D<float>& w, Array2D<float>& u ) {
     u(1) = w(0)*w(1);
     u(2) = ( w(2)/(gamma-one) ) + half*w(0)*w(1)*w(1);
     return;
+}
+Array2D<float> Solver::w2u( Array2D<float>& w) {
+
+    float gamma = 1.4;
+    float half = 0.5;
+    float one  = 1.0;
+    Array2D<float> u(3,1);
+
+    u(0) = w(0);
+    u(1) = w(0)*w(1);
+    u(2) = ( w(2)/(gamma-one) ) + half*w(0)*w(1)*w(1);
+    return u;
 }
 //--------------------------------------------------------------------------------
 
@@ -456,16 +440,29 @@ void Solver::w2u( Array2D<float>& w, Array2D<float>& u ) {
 // ------------------------------------------------------------------------------
 // 
 //*******************************************************************************
- function u2w(u,gamma) result(w)
- implicit none
- float u(3), gamma !Input
- float             :: w(3)        !output
-
-  w(1) = u(1)
-  w(2) = u(2)/u(1)
-  w(3) = (gamma-one)*( u(3) - half*w(1)*w(2)*w(2) )
-
- end function u2w
+void Solver::u2w_efficient( Array2D<float>& u, Array2D<float>& w ) {
+     
+    float gamma = 1.4;
+    float half = 0.5;
+    float one  = 1.0;
+    
+    w(0) = u(0);
+    w(1) = u(1)/u(0);
+    w(2) = (gamma-one)*( u(2) - half*w(0)*w(1)*w(1) );
+    return;
+}
+Array2D<float>  Solver::u2w( Array2D<float>& u ) {
+     
+    float gamma = 1.4;
+    float half = 0.5;
+    float one  = 1.0;
+    Array2D<float> w(3,1);
+    
+    w(0) = u(0);
+    w(1) = u(1)/u(0);
+    w(2) = (gamma-one)*( u(2) - half*w(0)*w(1)*w(1) );
+    return w;
+}
 //--------------------------------------------------------------------------------
 
 
@@ -474,7 +471,7 @@ void Solver::w2u( Array2D<float>& w, Array2D<float>& u ) {
 // -- Roe's Flux Function without entropy fix---
 //
 // P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference
-// Schemes, Journal of Computational Physics, 43, pp. 357-372.
+// Schemes, Journal of Computational Physics, 43, pp. 357-372. (1981)
 //
 // ------------------------------------------------------------------------------
 //  Input:   wL(1:3) =  left state (rhoL, uL, pL)
@@ -485,100 +482,153 @@ void Solver::w2u( Array2D<float>& w, Array2D<float>& u ) {
 // 
 // Katate Masatsuka, December 2010. http://www.cfdbooks.com
 //*******************************************************************************
- float* roe_flux(wL,wR,gamma) result(flux)
+Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
 
- implicit none
- float wL(3), wR(3), gamma //  Input (conservative variables rho*[1, v, E])
- float flux(3)             // Output (numerical flux across L and R states)
+    //  Input:   wL(3), wR(3) =   Input (conservative variables rho*[1, v, E])
+    Array2D<float> flux(3,1);  // Output (numerical flux across L and R states)
 
-//Local parameters
- float    zero = 0.0
- float     one = 1.0
- float    four = 4.0
- float    half = 0.5
- float quarter = 0.25
-//Local variables
- float uL(3), uR(3)
- float rhoL, rhoR, vL, vR, pL, pR   // Primitive variables.
- float aL, aR, HL, HR               // Speeds of sound.
- float RT,rho,v,H,a                 // Roe-averages
- float drho,du,dP,dV(3)
- float ws(3),Da, R(3,3)
- integer :: j, k
+    //Local parameters
+    float    zero = 0.0;
+    float     one = 1.0;
+    float    four = 4.0;
+    float    half = 0.5;
+    float quarter = 0.25;
+    //Local variables
+    Array2D<float> uL(3,1), uR(3,1);
+    float rhoL, rhoR, vL, vR, pL, pR;   // Primitive variables.
+    float aL, aR, HL, HR;               // Speeds of sound.
+    float RT,rho,v,H,a;                 // Roe-averages
+    float drho,du,dP;
+    float Da;
+    Array2D<float> ws(3,1), R(3,3),dV(3,1);
+    int j, k;
 
-    uL = w2u(wL,gamma)
-    uR = w2u(wR,gamma)
+    printf("\n w2u \n");
+    //w2u(wL,uL);
+    //w2u(wR,uR);
+    uL = w2u(wL);
+    uR = w2u(wR);
 
+    printf("\n left state \n");
 //Primitive and other variables.
 //  Left state
-    rhoL = wL(1)
-      vL = wL(2)
-      pL = wL(3)
-      aL = sqrt(gamma*pL/rhoL)
-      HL = ( uL(3) + pL ) / rhoL
+    rhoL = wL(0);
+      vL = wL(1);
+      pL = wL(2);
+      aL = sqrt(gamma*pL/rhoL);
+      HL = ( uL(2) + pL ) / rhoL;
+    printf("\n right state \n");
 //  Right state
-    rhoR = wR(1)
-      vR = wR(2)
-      pR = wR(3)
-      aR = sqrt(gamma*pR/rhoR)
-      HR = ( uR(3) + pR ) / rhoR
+    rhoR = wR(0);
+      vR = wR(1);
+      pR = wR(2);
+      aR = sqrt(gamma*pR/rhoR);
+      HR = ( uR(2) + pR ) / rhoR;
 
+    printf("\n Roe Averages \n");
 //First compute the Roe Averages **************************
     RT = sqrt(rhoR/rhoL);
-   rho = RT*rhoL
-     v = (vL+RT*vR)/(one+RT)
-     H = (HL+RT*HR)/(one+RT)
-     a = sqrt( (gamma-one)*(H-half*v*v) )
+   rho = RT*rhoL;
+     v = (vL+RT*vR)/(one+RT);
+     H = (HL+RT*HR)/(one+RT);
+     a = sqrt( (gamma-one)*(H-half*v*v) );
 
+    printf("\n diff primitive variables \n");
 //Differences in primitive variables.
-   drho = rhoR - rhoL
-     du =   vR - vL
-     dP =   pR - pL
+   drho = rhoR - rhoL;
+     du =   vR - vL;
+     dP =   pR - pL;
 
+
+    printf("\n wave strength characteristic variables \n");
 //Wave strength (Characteristic Variables).
-   dV(1) =  half*(dP-rho*a*du)/(a*a)
-   dV(2) = -( dP/(a*a) - drho )
-   dV(3) =  half*(dP+rho*a*du)/(a*a)
+   dV(0) =  half*(dP-rho*a*du)/(a*a);
+   dV(1) = -( dP/(a*a) - drho );
+   dV(2) =  half*(dP+rho*a*du)/(a*a);
 
+    printf("\n abs wave speeds (eigenvalues) \n");
 //Absolute values of the wave speeds (Eigenvalues)
-   ws(1) = abs(v-a)
-   ws(2) = abs(v  )
-   ws(3) = abs(v+a)
+   ws(0) = abs(v-a);
+   ws(1) = abs(v  );
+   ws(2) = abs(v+a);
 
+
+
+    printf("\n abs wave speeds (eigenvalues) \n");
 //Modified wave speeds for nonlinear fields (the so-called entropy fix, which
 //is often implemented to remove non-physical expansion shocks).
 //There are various ways to implement the entropy fix. This is just one
 //example. Try turn this off. The solution may be more accurate.
-   Da = max(zero, four*((vR-aR)-(vL-aL)) )
-   if (ws(1) < half*Da) { ws(1) = ws(1)*ws(1)/Da + quarter*Da }
-   Da = max(zero, four*((vR+aR)-(vL+aL)) )
-   if (ws(3) < half*Da) { ws(3) = ws(3)*ws(3)/Da + quarter*Da }
+   Da = max(zero, four*((vR-aR)-(vL-aL)) );
+   if (ws(0) < half*Da) { ws(0) = ws(0)*ws(0)/Da + quarter*Da; }
+   Da = max(zero, four*((vR+aR)-(vL+aL)) );
+   if (ws(2) < half*Da) { ws(2) = ws(2)*ws(2)/Da + quarter*Da; }
 
+
+
+    printf("\n Right Eigenvectors \n");
 //Right eigenvectors
-   R(1,1) = one
-   R(2,1) = v - a
-   R(3,1) = H - v*a
+   R(0,0) = one;
+   R(1,0) = v - a;
+   R(2,0) = H - v*a;
 
-   R(1,2) = one
-   R(2,2) = v
-   R(3,2) = half*v*v
+   R(0,1) = one;
+   R(1,1) = v;
+   R(2,1) = half*v*v;
 
-   R(1,3) = one
-   R(2,3) = v + a
-   R(3,3) = H + v*a
+   R(0,2) = one;
+   R(1,2) = v + a;
+   R(2,2) = H + v*a;
 
+    printf("\n Average Flux \n");
 //Compute the average flux.
-   flux = half*( euler_physical_flux(wL) + euler_physical_flux(wR) )
+   flux = half*( euler_physical_flux(wL) + euler_physical_flux(wR) );
 
+
+    printf("\n dissipation term \n");
 //Add the matrix dissipation term to complete the Roe flux.
-  do j = 1, 3
-   do k = 1, 3
-    flux(j) = flux(j) - half*ws(k)*dV(k)*R(j,k) 
-   end do
-  end do
-
+    for (j=0; j<3; ++j){
+        for (k=0; k<3; ++k){
+            flux(j) = flux(j) - half*ws(k)*dV(k)*R(j,k) ;
+        }
+   }
+    return flux;
 } //end roe_flux
 //--------------------------------------------------------------------------------
+
+//*******************************************************************************
+// Physical flux of the Euler equations (inviscid part only).
+//
+// ------------------------------------------------------------------------------
+//  Input:     w(1:5) = primitive variables (rho, u, p, 0, 0)
+//
+// Output:  flux(1:5) = physical inviscid flux (rho, rho*u, rho*H, 0, 0)
+// ------------------------------------------------------------------------------
+//
+//*******************************************************************************
+//function euler_physical_flux(w) result(flux)
+Array2D<float> Solver::euler_physical_flux(Array2D<float>& w){
+
+    Array2D<float> flux(3,1); //Output
+
+    //Local parameters
+    const float half = 0.5;
+    //Local variables
+    float rho, u, p;
+    float a2;
+
+    rho = w(0);
+      u = w(1);
+      p = w(2);
+
+    a2 = gamma*p/rho;
+
+    flux(0) = rho*u;
+    flux(1) = rho*u*u + p;
+    flux(2) = rho*u*( a2/(gamma-one) + half*u*u ); // H = a2/(gamma-one) + half*u*u
+    return flux;
+}//end function euler_physical_flux
+//-------------------------------------------------------------------------------
 
 
 int main(){
