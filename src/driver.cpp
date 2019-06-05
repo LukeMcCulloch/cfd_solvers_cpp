@@ -120,21 +120,33 @@ class Solver;
 
 
 // use an array of structs (may be inefficient//)
+// struct cell_data{
+//     float xc;  // Cell-center coordinate
+//     Array2D<float>* u;   // Conservative variables = [rho, rho*u, rho*E]
+//     Array2D<float>* u0;  // Conservative variables at the previous time step
+//     Array2D<float>* w;   // Primitive variables = [rho, u, p]
+//     Array2D<float>* dw;  // Slope (difference) of primitive variables
+//     Array2D<float>* res; // Residual = f_{j+1/2) - f_{j-1/2)
+
+//     cell_data(){
+//         u = new Array2D<float>(3,1);
+//         u0 = new Array2D<float>(3,1);
+//         w = new Array2D<float>(3,1);
+//         dw = new Array2D<float>(3,1);
+//         res = new Array2D<float>(3,1);
+//     }
+// };
+
+
+// use an array of structs (may be inefficient//)
 struct cell_data{
     float xc;  // Cell-center coordinate
-    Array2D<float>* u;   // Conservative variables = [rho, rho*u, rho*E]
-    Array2D<float>* u0;  // Conservative variables at the previous time step
-    Array2D<float>* w;   // Primitive variables = [rho, u, p]
-    Array2D<float>* dw;  // Slope (difference) of primitive variables
-    Array2D<float>* res; // Residual = f_{j+1/2) - f_{j-1/2)
+    Array2D<float> u  = Array2D<float>(3,1);  // Conservative variables = [rho, rho*u, rho*E]
+    Array2D<float> u0 = Array2D<float>(3,1);  // Conservative variables at the previous time step
+    Array2D<float> w  = Array2D<float>(3,1);  // Primitive variables = [rho, u, p]
+    Array2D<float> dw = Array2D<float>(3,1);  // Slope (difference) of primitive variables
+    Array2D<float> res= Array2D<float>(3,1);  // Residual = f_{j+1/2) - f_{j-1/2)
 
-    cell_data(){
-        u = new Array2D<float>(3,1);
-        u0 = new Array2D<float>(3,1);
-        w = new Array2D<float>(3,1);
-        dw = new Array2D<float>(3,1);
-        res = new Array2D<float>(3,1);
-    }
 };
 
 
@@ -154,7 +166,7 @@ public:
                 float dx, float xmin, const float gamma);
     float timestep(float cfl, float dx, float gamma, int ncells);
     //void w2u( float w[3], float u[3] );
-    void w2u( Array2D<float>*& w, Array2D<float>*& u );
+    void w2u( Array2D<float>& w, Array2D<float>& u );
     float minmod(float a, float b);
 
     struct constants{
@@ -182,13 +194,15 @@ public:
     int   i, j;
 
     //Local variables used for computing numerical fluxes.
+    // init arrays here
+    // https://stackoverflow.com/questions/11490988/c-compile-time-error-expected-identifier-before-numeric-constant
     Array2D<float>  dwl = Array2D<float>(3,1);  //Slopes between j and j-1, j and j+1
     Array2D<float>  dwr = Array2D<float>(3,1);  //Slopes between j and j-1, j and j+1
     Array2D<float>  wL = Array2D<float>(3,1);   //Extrapolated states at a face
     Array2D<float>  wR = Array2D<float>(3,1);   //Extrapolated states at a face
     Array2D<float>  flux = Array2D<float>(3,1); //Numerical flux
-    
-    struct cell_data* cell;
+
+    cell_data* cell;
 
 };
 
@@ -209,8 +223,8 @@ Solver::Solver(){
     printf("\n Cell Struct array\n");
 // Allocate the cell array: 2 ghost cells, 0 on the left and ncells+1 on the right.
 //  E.g., data in cell j is accessed by cell(j)%xc, cell(j)%u, cell(j)%w, etc.
-    //Array2D<cell_data> cell(ncells+1,1);//experimental
-    cell = new cell_data[ncells+1];      //Array of cell-data
+    //Array2D<cell_data> cell(ncells+1,1); //experimental
+    cell = new cell_data[ncells+2];      //Array of cell-data
 
 // Cell spacing (grid is uniform)
     dx = (xmax-xmin)/float(ncells);
@@ -224,6 +238,10 @@ Solver::Solver(){
     
     printf("\n local arrays\n");
     //Local variables used for computing numerical fluxes.
+    // done already via 
+    // https://stackoverflow.com/questions/11490988/
+    //    c-compile-time-error-expected-identifier-before-numeric-constant
+    // 
     // dwl = new Array2D<float>(3,1); 
     // dwr = new Array2D<float>(3,1); 
     // wL = new Array2D<float>(3,1); 
@@ -235,7 +253,7 @@ Solver::Solver(){
 
 Solver::~Solver(){
     delete[] cell;
-    // delete[] dwl;
+    // delete[] dwl; //raw arrays only
     // delete[] dwr;
     // delete[] wL;
     // delete[] wR;
@@ -251,7 +269,7 @@ void Solver::Euler1D(){
     t = zero;      //Initialize the current time.
     nsteps = 0;    //Initialize the number of time steps.
     //50000 is large enough to reach tf=1.7.
-    for ( int itime = 0; itime < 500; ++i ) {
+    for ( int itime = 0; itime < 50000; ++i ) {
         if (t==tf) break;                   //Finish if the final time is reached.
         //dt = 1.;
         dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
@@ -259,13 +277,13 @@ void Solver::Euler1D(){
         t = t + dt;                 //Update the current time.
         nsteps = nsteps + 1;                //Count the number of time steps.
 
-//---------------------------------------------------
-// Runge-Kutta Stages
-//
-// Two-stage Runge-Kutta scheme:
-//  1. u^*     = u^n - dt/dx*Res(u^n)
-//  2. u^{n+1} = 1/2*u^n + 1/2*[u^*- dt/dx*Res(u^*)]
-//---------------------------------------------------
+        //---------------------------------------------------
+        // Runge-Kutta Stages
+        //
+        // Two-stage Runge-Kutta scheme:
+        //  1. u^*     = u^n - dt/dx*Res(u^n)
+        //  2. u^{n+1} = 1/2*u^n + 1/2*[u^*- dt/dx*Res(u^*)]
+        //---------------------------------------------------
         for ( int istage = 0; istage < 2; ++istage ) {
 
             //(1) Residual computation: compute cell(:)%res(1:3).
@@ -274,37 +292,80 @@ void Solver::Euler1D(){
             // NB: for uniform meshes, difference (du) can be used in place of gradient (du/dx).
             for ( int j = 1; j < ncells+1; ++j ) {
 
-                //dwl = cell[j].w   - cell[j-1].w // diff( w_{j}   , w_{j-1} )
-                //dwr = cell[j+1].w -   cell[j].w // diff( w_{j+1} , w_{j}   )
+                dwl = cell[j].w   - cell[j-1].w; // diff( w_{j}   , w_{j-1} )
+                dwr = cell[j+1].w -   cell[j].w; // diff( w_{j+1} , w_{j}   )
 
                 //    Apply a slope limiter.
                 //    (minmod: zero if opposite sign, otherwise the one of smaller magnitude.)
                 for (int i = 0; i < 3; ++i){
-                //    cell[j].dw[i] = minimod( dwl[i], dwr[i] );
+                    cell[j].dw(i) = minmod( dwl(i), dwr(i) );
                 }
-            }//end reconstruction, j
+            }//end reconst
+
+            // init the residuals:
+            for (int j = 1; j < ncells+1; ++j){
+                cell[j].res = zero;
+            }
+
+        // Compute the residuals: residual_j = flux_{j+1/2} - flux_{j-1/2}.
+        // Here, compute the flux at j+1/2 and add it to the left cell and subtract
+        // from the right cell. Only the internal faces are considered; the left
+        // and right most faces are considered later.
+
+        //     j+1/2
+        //   | wL|   |
+        //   |  /|wR |
+        //   | / |\  |
+        //   |/  | \ |
+        //   |   |  \|
+        //   |   |   |
+        //     j  j+1
+        //
+
+        // flux comparison
+
+        // for (int j = 1; j < ncells; ++j){
+        //     wL = cell(j  )%w + half*cell(j  )%dw //State extrapolated to j+1/2 from j
+        //     wR = cell(j+1)%w - half*cell(j+1)%dw //State extrapolated to j+1/2 from j+1
+        //     flux = roe_flux(wL,wR,gamma)           //Numerical flux at j+1/2
+        //     cell(j  )%res = cell(j  )%res + flux   //Add it to the left cell.
+        //     cell(j+1)%res = cell(j+1)%res - flux   //Subtract from the right cell.
+
+        // }
+
         } //end rk stages, istage
+//---------------------------------------------------
+// End of Runge-Kutta Stages
+//---------------------------------------------------
     } //end time stepping
+//--------------------------------------------------------------------------------
+// End of time stepping
+//--------------------------------------------------------------------------------
+
 }
+//********************************************************************************
+// End of program
+//********************************************************************************
+
 
 
 void Solver::initialize( int ncells, float dx, float xmin, const float gamma){
     //
     //The initial condition for Sod's shock tube problem
-    // for ( int i = 0; i < ncells+2; ++i ) {
-    //     if (i <= ncells/2) {
-    //         cell[i].w[0] = 1.0;   //Density  on the left
-    //         cell[i].w[1] = 0.0;   //Velocity on the left
-    //         cell[i].w[2] = 1.0;   //Pressure on the left
-    //     } else {
-    //         cell[i].w[0] = 0.125; //Density  on the right
-    //         cell[i].w[1] = 0.0;   //Velocity on the right
-    //         cell[i].w[2] = 0.1;   //Pressure on the right
-    //     }
+    for ( int i = 0; i < ncells+2; ++i ) {
+        if (i <= ncells/2) {
+            cell[i].w(0) = 1.0;   //Density  on the left
+            cell[i].w(1) = 0.0;   //Velocity on the left
+            cell[i].w(2) = 1.0;   //Pressure on the left
+        } else {
+            cell[i].w(0) = 0.125; //Density  on the right
+            cell[i].w(1) = 0.0;   //Velocity on the right
+            cell[i].w(2) = 0.1;   //Pressure on the right
+        }
 
-    //     //w2u( cell[i].w, cell[i].u );        //Compute the conservative variables
-    //     //cell[i].xc = xmin+float(i-1)*dx;    //Cell center coordinate
-    // }
+        w2u( cell[i].w, cell[i].u );        //Compute the conservative variables
+        cell[i].xc = xmin+float(i-1)*dx;    //Cell center coordinate
+    }
     return;
 }
 //******************************************************************************
@@ -326,8 +387,8 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
     max_speed = -one;
 
     for ( int i = 1; i < ncells+1; ++i ) {
-        u = cell[i].w->array[1,0];                          //Velocity
-        c = sqrt(gamma*cell[i].w->array[2,0]/cell[i].w->array[0,0]); //Speed of sound
+        u = cell[i].w(1);                          //Velocity
+        c = sqrt(gamma*cell[i].w(2)/cell[i].w(0)); //Speed of sound
         max_speed = max( max_speed, abs(u)+c );
 
         dt = cfl*dx/max_speed; //CFL condition: dt = CFL*dx/max_wavespeed, CFL <= 1.
@@ -372,15 +433,15 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 //* ------------------------------------------------------------------------------
 //* 
 //********************************************************************************
-void Solver::w2u( Array2D<float>*& w, Array2D<float>*& u ) {
+void Solver::w2u( Array2D<float>& w, Array2D<float>& u ) {
 
     float gamma = 1.4;
     float half = 0.5;
     float one  = 1.0;
 
-    u[0] = w[0];
-    u[1] = w[0]*w[1];
-    u[2] = (w->array[2,0]/(gamma-one))+half*w->array[0]*w->array[1]*w->array[1];
+    u(0) = w(0);
+    u(1) = w(0)*w(1);
+    u(2) = ( w(2)/(gamma-one) ) + half*w(0)*w(1)*w(1);
     return;
 }
 //--------------------------------------------------------------------------------
@@ -388,6 +449,6 @@ void Solver::w2u( Array2D<float>*& w, Array2D<float>*& u ) {
 
 int main(){
     Solver solver;
-    //solver.Euler1D();
+    solver.Euler1D();
     return 0;
 }
