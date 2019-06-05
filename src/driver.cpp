@@ -88,7 +88,7 @@
 //=================================
 #include <iostream>     // std::cout, std::fixed
 #include <fstream>      // write to file
-//#include <iomanip>    // std::setprecision - only works for output :(
+#include <iomanip>    // std::setprecision - only works for output :(
 #include <math.h>       // sqrt 
 //=================================
 #include <cstring>
@@ -122,7 +122,6 @@ struct cell_data{
     Array2D<float> w  = Array2D<float>(3,1);  // Primitive variables = [rho, u, p]
     Array2D<float> dw = Array2D<float>(3,1);  // Slope (difference) of primitive variables
     Array2D<float> res= Array2D<float>(3,1);  // Residual = f_{j+1/2) - f_{j-1/2)
-
 };
 
 
@@ -224,18 +223,6 @@ Solver::Solver(){
 // [Note: Change these data (and tf) to solve different problems.]
     initialize(ncells, dx, xmin, gamma);
 
-    
-    printf("\n local arrays\n");
-    //Local variables used for computing numerical fluxes.
-    // done already via 
-    // https://stackoverflow.com/questions/11490988/
-    //    c-compile-time-error-expected-identifier-before-numeric-constant
-    // 
-    // dwl = new Array2D<float>(3,1); 
-    // dwr = new Array2D<float>(3,1); 
-    // wL = new Array2D<float>(3,1); 
-    // wR = new Array2D<float>(3,1); 
-    // flux = new Array2D<float>(3,1); 
 }
 
 
@@ -246,6 +233,7 @@ Solver::~Solver(){
 
 void Solver::Euler1D(){
     
+//output();
 //--------------------------------------------------------------------------------
 // Time stepping loop to reach t = tf 
 //--------------------------------------------------------------------------------
@@ -253,14 +241,21 @@ void Solver::Euler1D(){
     t = zero;      //Initialize the current time.
     nsteps = 0;    //Initialize the number of time steps.
     //50000 is large enough to reach tf=1.7.
-    for ( int itime = 0; itime < 50000; ++i ) {
-        if (t==tf) break;                   //Finish if the final time is reached.
+    for ( int itime = 0; itime < 50000; ++itime ) {
+    //for ( int itime = 0; itime < 1; ++itime ) {
+        if (t==tf) { 
+            printf("\n breaking \n");
+            break;
+        }                //Finish if the final time is reached.
         dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
-        //printf("\n.f, .f",t,dt);
-        if (t+dt > tf) dt =  tf - t;        //Adjust dt to finish exactly at t=tf.
-        t = t + dt;                 //Update the current time.
+        printf("\n%f, %f",t,dt);
+        if (t+dt > tf){ 
+            dt =  tf - t;  
+        }    //Adjust dt to finish exactly at t=tf.
+        t = t + dt;                         //Update the current time.
         nsteps = nsteps + 1;                //Count the number of time steps.
 
+        //printf("\nRK step \n");
         //---------------------------------------------------
         // Runge-Kutta Stages
         //
@@ -305,7 +300,6 @@ void Solver::Euler1D(){
             //   |   |   |
             //     j  j+1
             //
-
             // flux comparison
 
             for (int j = 1; j < ncells; ++j){
@@ -324,7 +318,7 @@ void Solver::Euler1D(){
             wR = cell[1].w - half*cell[1].dw;  //State extrapolated to j-1/2 from j=1
             wL = wR;                           //The same state
             flux = roe_flux(wL,wR);      //Use Roe flux to compute the flux.
-            cell[0].res = cell[0].res - flux;  //Subtract the flux: -flux_{j-1/2}.
+            cell[1].res = cell[1].res - flux;  //Subtract the flux: -flux_{j-1/2}.
 
 
             //  Right most face: right face of cell i=ncells.
@@ -338,16 +332,15 @@ void Solver::Euler1D(){
             if (istage==0){ 
                 //  1st Stage of Runge-Kutta: save u^n as u0(:); u^* is stored at u(:).
                 //stage01_update : do j = 1, ncells
-                for (int j = 1; j < ncells; ++j){
+                for (int j = 1; j < ncells+1; ++j){
                     cell[j].u0 = cell[j].u;            //Save the solution at n for 2nd stage.
                     cell[j].u  = cell[j].u - (dt/dx)*cell[j].res;
                     cell[j].w  = u2w(cell[j].u); //Update primitive variables
                 }//end do stage01_update
-
             }else{
                 //  2nd Stage of Runge-Kutta:
                 //stage02_update : do j = 1, ncells
-                for (int j = 1; j < ncells; ++j){
+                for (int j = 1; j < ncells+1; ++j){
                     cell[j].u = cell[j].u - (dt/dx)*cell[j].res;
                     cell[j].u = half*(cell[j].u0 + cell[j].u ); //sends things to nan
                     cell[j].w = u2w(cell[j].u);  //Update primitive variables
@@ -413,7 +406,7 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 
     max_speed = -one;
 
-    for ( int i = 1; i < ncells+1; ++i ) {
+    for ( int i = 1; i < ncells; ++i ) {
         u = cell[i].w(1);                          //Velocity
         c = sqrt(gamma*cell[i].w(2)/cell[i].w(0)); //Speed of sound
         max_speed = max( max_speed, abs(u)+c );
@@ -434,9 +427,6 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
  float Solver::minmod(float a, float b){
 
     float minmod;
-
-    //Local parameter
-    float zero = 0.0;
 
     if (a*b <= zero) {
         minmod = zero;               // a>0 and b<0; or a<0 and b>0
@@ -462,10 +452,6 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 //********************************************************************************
 void Solver::w2u_efficient( Array2D<float>& w, Array2D<float>& u ) {
 
-    float gamma = 1.4;
-    float half = 0.5;
-    float one  = 1.0;
-
     u(0) = w(0);
     u(1) = w(0)*w(1);
     u(2) = ( w(2)/(gamma-one) ) + half*w(0)*w(1)*w(1);
@@ -473,9 +459,6 @@ void Solver::w2u_efficient( Array2D<float>& w, Array2D<float>& u ) {
 }
 Array2D<float> Solver::w2u( Array2D<float>& w) {
 
-    float gamma = 1.4;
-    float half = 0.5;
-    float one  = 1.0;
     Array2D<float> u(3,1);
 
     u(0) = w(0);
@@ -496,9 +479,6 @@ Array2D<float> Solver::w2u( Array2D<float>& w) {
 //*******************************************************************************
 void Solver::u2w_efficient( Array2D<float>& u, Array2D<float>& w ) {
      
-    float gamma = 1.4;
-    float half = 0.5;
-    float one  = 1.0;
     
     w(0) = u(0);
     w(1) = u(1)/u(0);
@@ -507,9 +487,6 @@ void Solver::u2w_efficient( Array2D<float>& u, Array2D<float>& w ) {
 }
 Array2D<float>  Solver::u2w( Array2D<float>& u ) {
      
-    float gamma = 1.4;
-    float half = 0.5;
-    float one  = 1.0;
     Array2D<float> w(3,1);
     
     w(0) = u(0);
@@ -701,13 +678,13 @@ Array2D<float> Solver::euler_physical_flux(Array2D<float>& w){
 
     ofstream outfile;
     outfile.open ("solution.dat");
-    for (int i=0; i<ncells; ++i){
-        entropy = log( cell[i].w(2)* pow( cell[i].w(0) , (-gamma)) / (gamma-one) );
-        outfile << cell[i].xc << '\t'
-                << cell[i].w(0) << '\t' 
-                << cell[i].w(1) << '\t'
-                << cell[i].w(2) << '\t'
-                << entropy <<  "\n";
+    for (int i=1; i<ncells+1; ++i){
+        entropy = log( cell[i].w(2)* pow(cell[i].w(0) , (-gamma)) ) / (gamma-one);
+        outfile << std::setprecision(16) << cell[i].xc << '\t'
+                << std::setprecision(16) << cell[i].w(0) << '\t' 
+                << std::setprecision(16) << cell[i].w(1) << '\t'
+                << std::setprecision(16) << cell[i].w(2) << '\t'
+                << std::setprecision(16) << entropy <<  "\n";
     }
     outfile.close();
 

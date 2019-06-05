@@ -30,3 +30,4 @@ subplot(2,2,4)
 hold on; axis('square'); hold on; grid; title('Entropy/R_{gas}')
 xlabel('x'); ylabel('Entropy/R_{gas}'); plot(x,s,'ko');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+fid.close();
