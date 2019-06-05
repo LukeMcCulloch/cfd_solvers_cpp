@@ -77,7 +77,7 @@
 // 12-29-10: Some compiler warnings fixed.
 //
 //*******************************************************************************
-//#define CHECKPT {printf("Checkpoint: %s, line %d\n",__FILE__,__LINE__);\
+//#define CHECKPT {printf("Checkpoint: .s, line .d\n",__FILE__,__LINE__);\
 //fflush(stdout);}
 #ifdef DEBUG_BUILD
 #  define DEBUG(x) fprintf(stderr, x)
@@ -211,7 +211,7 @@ Solver::Solver(){
     
     printf("\n Cell Struct array\n");
 // Allocate the cell array: 2 ghost cells, 0 on the left and ncells+1 on the right.
-//  E.g., data in cell j is accessed by cell(j)%xc, cell(j)%u, cell(j)%w, etc.
+//  E.g., data in cell j is accessed by cell[j].xc, cell[j].u, cell[j].w, etc.
     //Array2D<cell_data> cell(ncells+1,1); //experimental
     cell = new cell_data[ncells+2];      //Array of cell-data
 
@@ -256,7 +256,7 @@ void Solver::Euler1D(){
     for ( int itime = 0; itime < 50000; ++i ) {
         if (t==tf) break;                   //Finish if the final time is reached.
         dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
-        //printf("\n%f, %f",t,dt);
+        //printf("\n.f, .f",t,dt);
         if (t+dt > tf) dt =  tf - t;        //Adjust dt to finish exactly at t=tf.
         t = t + dt;                 //Update the current time.
         nsteps = nsteps + 1;                //Count the number of time steps.
@@ -270,7 +270,7 @@ void Solver::Euler1D(){
         //---------------------------------------------------
         for ( int istage = 0; istage < 2; ++istage ) {
 
-            //(1) Residual computation: compute cell(:)%res(1:3).
+            //(1) Residual computation: compute cell(:).res(1:3).
 
             // Compute the slopes (as difference) at every cell.
             // NB: for uniform meshes, difference (du) can be used in place of gradient (du/dx).
@@ -291,41 +291,82 @@ void Solver::Euler1D(){
                 cell[j].res = zero;
             }
 
-        // Compute the residuals: residual_j = flux_{j+1/2} - flux_{j-1/2}.
-        // Here, compute the flux at j+1/2 and add it to the left cell and subtract
-        // from the right cell. Only the internal faces are considered; the left
-        // and right most faces are considered later.
+            // Compute the residuals: residual_j = flux_{j+1/2} - flux_{j-1/2}.
+            // Here, compute the flux at j+1/2 and add it to the left cell and subtract
+            // from the right cell. Only the internal faces are considered; the left
+            // and right most faces are considered later.
 
-        //     j+1/2
-        //   | wL|   |
-        //   |  /|wR |
-        //   | / |\  |
-        //   |/  | \ |
-        //   |   |  \|
-        //   |   |   |
-        //     j  j+1
-        //
+            //     j+1/2
+            //   | wL|   |
+            //   |  /|wR |
+            //   | / |\  |
+            //   |/  | \ |
+            //   |   |  \|
+            //   |   |   |
+            //     j  j+1
+            //
 
-        // flux comparison
+            // flux comparison
 
-        for (int j = 1; j < ncells; ++j){
+            for (int j = 1; j < ncells; ++j){
+                wL = cell[j  ].w + half*cell[j  ].dw; //State extrapolated to j+1/2 from j
+                wR = cell[j+1].w - half*cell[j+1].dw; //State extrapolated to j+1/2 from j+1
+                flux = roe_flux(wL,wR);           //Numerical flux at j+1/2
+                cell[j  ].res = cell[j  ].res + flux;   //Add it to the left cell.
+                cell[j+1].res = cell[j+1].res - flux;   //Subtract from the right cell.
+            }
+            
+            // Add boundary fluxes: left end and right end.
+            // For the problem considered here, it suffices to simply copy the state
+            //  from inside the domain to the ghost cell (no gradient condition).
 
-            wL = cell[j  ].w + half*cell[j  ].dw; //State extrapolated to j+1/2 from j
-            wR = cell[j+1].w - half*cell[j+1].dw; //State extrapolated to j+1/2 from j+1
-            flux = roe_flux(wL,wR);           //Numerical flux at j+1/2
-            //cell[j  ].res = cell[j  ].res + flux;   //Add it to the left cell.
-            //cell[j+1].res = cell[j+1].res - flux;   //Subtract from the right cell.
+            //  Left most face: left face of cell i=1.
+            wR = cell[1].w - half*cell[1].dw;  //State extrapolated to j-1/2 from j=1
+            wL = wR;                           //The same state
+            flux = roe_flux(wL,wR);      //Use Roe flux to compute the flux.
+            cell[0].res = cell[0].res - flux;  //Subtract the flux: -flux_{j-1/2}.
 
-        }
 
-        } //end rk stages, istage
-//---------------------------------------------------
-// End of Runge-Kutta Stages
-//---------------------------------------------------
-    } //end time stepping
-//--------------------------------------------------------------------------------
-// End of time stepping
-//--------------------------------------------------------------------------------
+            //  Right most face: right face of cell i=ncells.
+            wL = cell[ncells].w + half*cell[ncells].dw; //State extrapolated to ncells+1/2 from j=ncells
+            wR = wL;                                    //The same state
+            flux = roe_flux(wL,wR);               //Use Roe flux to compute the flux.
+            cell[ncells].res = cell[ncells].res + flux; //Add the flux: +flux_{j+1/2}.
+
+            //(2) Solution update
+
+            if (istage==0){ 
+                //  1st Stage of Runge-Kutta: save u^n as u0(:); u^* is stored at u(:).
+                //stage01_update : do j = 1, ncells
+                for (int j = 1; j < ncells; ++j){
+                    cell[j].u0 = cell[j].u;            //Save the solution at n for 2nd stage.
+                    cell[j].u  = cell[j].u - (dt/dx)*cell[j].res;
+                    cell[j].w  = u2w(cell[j].u); //Update primitive variables
+                }//end do stage01_update
+
+            }else{
+                //  2nd Stage of Runge-Kutta:
+                //stage02_update : do j = 1, ncells
+                for (int j = 1; j < ncells; ++j){
+                    cell[j].u = cell[j].u - (dt/dx)*cell[j].res;
+                    cell[j].u = half*(cell[j].u0 + cell[j].u ); //sends things to nan
+                    cell[j].w = u2w(cell[j].u);  //Update primitive variables
+                }//end do stage02_update
+
+            }
+
+            // Copy the solutions to the ghost cells.
+            // In this program, the ghost cell values are used only in the reconstruction.
+            cell[0].w        = cell[1].w;
+            cell[ncells+1].w = cell[ncells].w;
+        } 
+        //---------------------------------------------------
+        // End of Runge-Kutta Stages
+        //---------------------------------------------------
+    } 
+    //--------------------------------------------------------------------------------
+    // End of time stepping
+    //--------------------------------------------------------------------------------
 
 }
 //********************************************************************************
