@@ -74,7 +74,6 @@
 // Katate Masatsuka, December 2010. http://www.cfdbooks.com
 //
 //
-// 12-29-10: Some compiler warnings fixed.
 //
 //*******************************************************************************
 //#define CHECKPT {printf("Checkpoint: .s, line .d\n",__FILE__,__LINE__);\
