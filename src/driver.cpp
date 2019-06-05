@@ -324,14 +324,15 @@ void Solver::Euler1D(){
 
         // flux comparison
 
-        // for (int j = 1; j < ncells; ++j){
-        //     wL = cell(j  )%w + half*cell(j  )%dw //State extrapolated to j+1/2 from j
-        //     wR = cell(j+1)%w - half*cell(j+1)%dw //State extrapolated to j+1/2 from j+1
-        //     flux = roe_flux(wL,wR,gamma)           //Numerical flux at j+1/2
-        //     cell(j  )%res = cell(j  )%res + flux   //Add it to the left cell.
-        //     cell(j+1)%res = cell(j+1)%res - flux   //Subtract from the right cell.
+        for (int j = 1; j < ncells; ++j){
 
-        // }
+            wL = cell[j  ].w + half*cell[j  ].dw //State extrapolated to j+1/2 from j
+            wR = cell[j+1].w - half*cell[j+1].dw //State extrapolated to j+1/2 from j+1
+            flux = roe_flux(wL,wR,gamma)           //Numerical flux at j+1/2
+            cell[j  ].res = cell[j  ]res + flux   //Add it to the left cell.
+            cell[j+1].res = cell[j+1]res - flux   //Subtract from the right cell.
+
+        }
 
         } //end rk stages, istage
 //---------------------------------------------------
@@ -444,6 +445,139 @@ void Solver::w2u( Array2D<float>& w, Array2D<float>& u ) {
     u(2) = ( w(2)/(gamma-one) ) + half*w(0)*w(1)*w(1);
     return;
 }
+//--------------------------------------------------------------------------------
+
+//*******************************************************************************
+// Compute U from W
+//
+// ------------------------------------------------------------------------------
+//  Input:  u = conservative variables (rho, rho*u, rho*E, 0, 0)
+// Output:  w = primitive variables (rho, u, p, 0, 0)
+// ------------------------------------------------------------------------------
+// 
+//*******************************************************************************
+ function u2w(u,gamma) result(w)
+ implicit none
+ float u(3), gamma !Input
+ float             :: w(3)        !output
+
+  w(1) = u(1)
+  w(2) = u(2)/u(1)
+  w(3) = (gamma-one)*( u(3) - half*w(1)*w(2)*w(2) )
+
+ end function u2w
+//--------------------------------------------------------------------------------
+
+
+
+//*******************************************************************************
+// -- Roe's Flux Function without entropy fix---
+//
+// P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference
+// Schemes, Journal of Computational Physics, 43, pp. 357-372.
+//
+// ------------------------------------------------------------------------------
+//  Input:   wL(1:3) =  left state (rhoL, uL, pL)
+//           wR(1:3) = right state (rhoR, uR, pR)
+//
+// Output:  flux(1:3) = numerical flux for the Euler equations (the Roe flux)
+// ------------------------------------------------------------------------------
+// 
+// Katate Masatsuka, December 2010. http://www.cfdbooks.com
+//*******************************************************************************
+ float* roe_flux(wL,wR,gamma) result(flux)
+
+ implicit none
+ float wL(3), wR(3), gamma //  Input (conservative variables rho*[1, v, E])
+ float flux(3)             // Output (numerical flux across L and R states)
+
+//Local parameters
+ float    zero = 0.0
+ float     one = 1.0
+ float    four = 4.0
+ float    half = 0.5
+ float quarter = 0.25
+//Local variables
+ float uL(3), uR(3)
+ float rhoL, rhoR, vL, vR, pL, pR   // Primitive variables.
+ float aL, aR, HL, HR               // Speeds of sound.
+ float RT,rho,v,H,a                 // Roe-averages
+ float drho,du,dP,dV(3)
+ float ws(3),Da, R(3,3)
+ integer :: j, k
+
+    uL = w2u(wL,gamma)
+    uR = w2u(wR,gamma)
+
+//Primitive and other variables.
+//  Left state
+    rhoL = wL(1)
+      vL = wL(2)
+      pL = wL(3)
+      aL = sqrt(gamma*pL/rhoL)
+      HL = ( uL(3) + pL ) / rhoL
+//  Right state
+    rhoR = wR(1)
+      vR = wR(2)
+      pR = wR(3)
+      aR = sqrt(gamma*pR/rhoR)
+      HR = ( uR(3) + pR ) / rhoR
+
+//First compute the Roe Averages **************************
+    RT = sqrt(rhoR/rhoL);
+   rho = RT*rhoL
+     v = (vL+RT*vR)/(one+RT)
+     H = (HL+RT*HR)/(one+RT)
+     a = sqrt( (gamma-one)*(H-half*v*v) )
+
+//Differences in primitive variables.
+   drho = rhoR - rhoL
+     du =   vR - vL
+     dP =   pR - pL
+
+//Wave strength (Characteristic Variables).
+   dV(1) =  half*(dP-rho*a*du)/(a*a)
+   dV(2) = -( dP/(a*a) - drho )
+   dV(3) =  half*(dP+rho*a*du)/(a*a)
+
+//Absolute values of the wave speeds (Eigenvalues)
+   ws(1) = abs(v-a)
+   ws(2) = abs(v  )
+   ws(3) = abs(v+a)
+
+//Modified wave speeds for nonlinear fields (the so-called entropy fix, which
+//is often implemented to remove non-physical expansion shocks).
+//There are various ways to implement the entropy fix. This is just one
+//example. Try turn this off. The solution may be more accurate.
+   Da = max(zero, four*((vR-aR)-(vL-aL)) )
+   if (ws(1) < half*Da) { ws(1) = ws(1)*ws(1)/Da + quarter*Da }
+   Da = max(zero, four*((vR+aR)-(vL+aL)) )
+   if (ws(3) < half*Da) { ws(3) = ws(3)*ws(3)/Da + quarter*Da }
+
+//Right eigenvectors
+   R(1,1) = one
+   R(2,1) = v - a
+   R(3,1) = H - v*a
+
+   R(1,2) = one
+   R(2,2) = v
+   R(3,2) = half*v*v
+
+   R(1,3) = one
+   R(2,3) = v + a
+   R(3,3) = H + v*a
+
+//Compute the average flux.
+   flux = half*( euler_physical_flux(wL) + euler_physical_flux(wR) )
+
+//Add the matrix dissipation term to complete the Roe flux.
+  do j = 1, 3
+   do k = 1, 3
+    flux(j) = flux(j) - half*ws(k)*dV(k)*R(j,k) 
+   end do
+  end do
+
+} //end roe_flux
 //--------------------------------------------------------------------------------
 
 
