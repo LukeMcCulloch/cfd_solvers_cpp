@@ -55,6 +55,7 @@
 //      end do
 // 
 //     Use the matlab program, oned_euler_v1.m, to plot the solutions.
+//     Use the python program, oned_euler_v1.py, to plot the solutions.
 //
 //
 //  Note: Explore other shock tube problems by changing the initial condition
@@ -76,9 +77,17 @@
 // 12-29-10: Some compiler warnings fixed.
 //
 //*******************************************************************************
+//#define CHECKPT {printf("Checkpoint: %s, line %d\n",__FILE__,__LINE__);\
+//fflush(stdout);}
+#ifdef DEBUG_BUILD
+#  define DEBUG(x) fprintf(stderr, x)
+#else
+#  define DEBUG(x) do {} while (0)
+#endif
 
 //=================================
 #include <iostream>     // std::cout, std::fixed
+#include <fstream>      // write to file
 //#include <iomanip>    // std::setprecision - only works for output :(
 #include <math.h>       // sqrt 
 //=================================
@@ -188,6 +197,7 @@ Solver::Solver(){
 // 0. Input parameters and initial condition.
 
     printf("\n Custom Parameters\n");
+    //DEBUG("\n Custom Parameters\n");
 //custom Parameters
     ncells =  80;   // Number of cells
       tf = 1.7;   // Final time
@@ -243,7 +253,7 @@ void Solver::Euler1D(){
     for ( int itime = 0; itime < 50000; ++i ) {
         if (t==tf) break;                   //Finish if the final time is reached.
         dt = timestep(cfl,dx,gamma,ncells); //Compute the global time step.
-        printf("\n%f, %f",t,dt);
+        //printf("\n%f, %f",t,dt);
         if (t+dt > tf) dt =  tf - t;        //Adjust dt to finish exactly at t=tf.
         t = t + dt;                 //Update the current time.
         nsteps = nsteps + 1;                //Count the number of time steps.
@@ -503,13 +513,13 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
     Array2D<float> ws(3,1), R(3,3),dV(3,1);
     int j, k;
 
-    printf("\n w2u \n");
+    DEBUG("\n w2u \n");
     //w2u(wL,uL);
     //w2u(wR,uR);
     uL = w2u(wL);
     uR = w2u(wR);
 
-    printf("\n left state \n");
+    DEBUG("\n left state \n");
 //Primitive and other variables.
 //  Left state
     rhoL = wL(0);
@@ -517,7 +527,7 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
       pL = wL(2);
       aL = sqrt(gamma*pL/rhoL);
       HL = ( uL(2) + pL ) / rhoL;
-    printf("\n right state \n");
+    DEBUG("\n right state \n");
 //  Right state
     rhoR = wR(0);
       vR = wR(1);
@@ -525,7 +535,7 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
       aR = sqrt(gamma*pR/rhoR);
       HR = ( uR(2) + pR ) / rhoR;
 
-    printf("\n Roe Averages \n");
+    DEBUG("\n Roe Averages \n");
 //First compute the Roe Averages **************************
     RT = sqrt(rhoR/rhoL);
    rho = RT*rhoL;
@@ -533,20 +543,20 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
      H = (HL+RT*HR)/(one+RT);
      a = sqrt( (gamma-one)*(H-half*v*v) );
 
-    printf("\n diff primitive variables \n");
+    DEBUG("\n diff primitive variables \n");
 //Differences in primitive variables.
    drho = rhoR - rhoL;
      du =   vR - vL;
      dP =   pR - pL;
 
 
-    printf("\n wave strength characteristic variables \n");
+    DEBUG("\n wave strength characteristic variables \n");
 //Wave strength (Characteristic Variables).
    dV(0) =  half*(dP-rho*a*du)/(a*a);
    dV(1) = -( dP/(a*a) - drho );
    dV(2) =  half*(dP+rho*a*du)/(a*a);
 
-    printf("\n abs wave speeds (eigenvalues) \n");
+    DEBUG("\n abs wave speeds (eigenvalues) \n");
 //Absolute values of the wave speeds (Eigenvalues)
    ws(0) = abs(v-a);
    ws(1) = abs(v  );
@@ -554,7 +564,7 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
 
 
 
-    printf("\n abs wave speeds (eigenvalues) \n");
+    DEBUG("\n entropy fix \n");
 //Modified wave speeds for nonlinear fields (the so-called entropy fix, which
 //is often implemented to remove non-physical expansion shocks).
 //There are various ways to implement the entropy fix. This is just one
@@ -566,7 +576,7 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
 
 
 
-    printf("\n Right Eigenvectors \n");
+    DEBUG("\n Right Eigenvectors \n");
 //Right eigenvectors
    R(0,0) = one;
    R(1,0) = v - a;
@@ -580,12 +590,12 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
    R(1,2) = v + a;
    R(2,2) = H + v*a;
 
-    printf("\n Average Flux \n");
+    DEBUG("\n Average Flux \n");
 //Compute the average flux.
    flux = half*( euler_physical_flux(wL) + euler_physical_flux(wR) );
 
 
-    printf("\n dissipation term \n");
+    DEBUG("\n dissipation term \n");
 //Add the matrix dissipation term to complete the Roe flux.
     for (j=0; j<3; ++j){
         for (k=0; k<3; ++k){
@@ -629,6 +639,41 @@ Array2D<float> Solver::euler_physical_flux(Array2D<float>& w){
     return flux;
 }//end function euler_physical_flux
 //-------------------------------------------------------------------------------
+
+
+
+//********************************************************************************
+//* Write output data file
+//*
+//* ------------------------------------------------------------------------------
+//* Output:  Data file "solution.dat" containing for each cell the following:
+//*          cell-center coordinate, density, velocity, pressure, entropy
+//* ------------------------------------------------------------------------------
+//*
+//********************************************************************************
+//  void Solver::output(){
+
+//     //Local parameters
+//     float one = 1.0;
+//     //Local variables
+//     float entropy;
+//     int i, os;
+
+    
+//     const int bdim = 132;
+//     char buff[bdim];
+
+//     open(unit=1, file = "solution.dat", status="unknown", iostat=os)
+
+//     do i = 1, ncells
+//     entropy = log(cell(i)%w(3)*cell(i)%w(1)**(-gamma))/(gamma-one) 
+//     write(1,'(5es25.15)') cell(i)%xc, cell(i)%w(1), cell(i)%w(2), cell(i)%w(3), entropy
+//     end do 
+
+//     close(1)
+
+// }
+//--------------------------------------------------------------------------------
 
 
 int main(){
