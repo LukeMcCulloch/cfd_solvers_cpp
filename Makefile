@@ -42,15 +42,15 @@ EXECUTABLE = solver
 
 
 
-OBJECTS = driver.o #vector.o 
+OBJECTS = EulerShockTube1D.o #vector.o 
 
 
 
 
  
 
-$(BUILD_DIR)/solver: 	$(SRC_DIRS)/driver.o 
-	$(CXX) 	 $(SRC_DIRS)/driver.cpp   -o $(BUILD_DIR)/solver 
+$(BUILD_DIR)/solver: 	$(SRC_DIRS)/EulerShockTube1D.o 
+	$(CXX) 	 $(SRC_DIRS)/EulerShockTube1D.cpp   -o $(BUILD_DIR)/solver 
 
 
 
@@ -58,8 +58,8 @@ $(BUILD_DIR)/solver: 	$(SRC_DIRS)/driver.o
 
 
 # vanilla overloaded array testing:
-#$(BUILD_DIR)/driver.o: $(TEST_DIR)/driver.cpp 
-#	$(NXX) -g -c $(TEST_DIR)/driver.cpp
+#$(BUILD_DIR)/EulerShockTube1D.o: $(TEST_DIR)/EulerShockTube1D.cpp 
+#	$(NXX) -g -c $(TEST_DIR)/EulerShockTube1D.cpp
 
 
 
@@ -72,8 +72,8 @@ $(BUILD_DIR)/solver: 	$(SRC_DIRS)/driver.o
 
 
 # vanilla overloaded array testing:
-# $(BUILD_DIR)/driver.o: $(SRC_DIRS)/driver.cpp 
-# 	$(NXX) -g -c $(SRC_DIRS)/driver.cpp
+# $(BUILD_DIR)/EulerShockTube1D.o: $(SRC_DIRS)/EulerShockTube1D.cpp 
+# 	$(NXX) -g -c $(SRC_DIRS)/EulerShockTube1D.cpp
 
 
 # # expression template testing:
@@ -93,7 +93,7 @@ $(BUILD_DIR)/solver: 	$(SRC_DIRS)/driver.o
 
 
 
-$(OBJECTS): driver.o #vector.o
+$(OBJECTS): EulerShockTube1D.o #vector.o
 
 .PHONY: clean
 
