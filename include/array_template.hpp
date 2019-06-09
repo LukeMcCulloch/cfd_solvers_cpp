@@ -243,8 +243,14 @@ const T& Array2D<T>::operator()(int i) const {
 
 template <class T>
 Array2D<T> Array2D<T>::operator=(const Array2D& that) {
-	assert(that.nrows == nrows);
-	assert(that.ncols == ncols);
+    /*not using this check  allows delayed allocation 
+    of this array type when using it within another class*/
+	//assert(that.nrows == nrows);
+	//assert(that.ncols == ncols);
+    if (that.nrows != nrows){
+        printf( "\n nrows = %d, that.nrows = %d",nrows,that.nrows);
+    }
+
     int i;
     for(i=0; i < storage_size; i++) {
     	array[i] = that.array[i];

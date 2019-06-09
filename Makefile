@@ -42,7 +42,7 @@ EXECUTABLE = solver
 
 
 
-OBJECTS = EulerShockTube1D.o #vector.o 
+OBJECTS = EulerShockTube1D.o gridGen2D.o driver.o
 
 
 
@@ -50,7 +50,7 @@ OBJECTS = EulerShockTube1D.o #vector.o
  
 
 $(BUILD_DIR)/solver: 	$(SRC_DIRS)/EulerShockTube1D.o 
-	$(CXX) 	 $(SRC_DIRS)/EulerShockTube1D.cpp   -o $(BUILD_DIR)/solver 
+	$(CXX) 	 $(SRC_DIRS)/gridGen2D.cpp   $(SRC_DIRS)/EulerShockTube1D.cpp   $(SRC_DIRS)/driver.cpp    -o $(BUILD_DIR)/solver 
 
 
 
@@ -93,7 +93,7 @@ $(BUILD_DIR)/solver: 	$(SRC_DIRS)/EulerShockTube1D.o
 
 
 
-$(OBJECTS): EulerShockTube1D.o #vector.o
+$(OBJECTS): EulerShockTube1D.o gridGen2D.o driver.o
 
 .PHONY: clean
 

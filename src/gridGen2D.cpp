@@ -74,8 +74,8 @@
 #include <iomanip>    // std::setprecision - only works for output :(
 #include <math.h>       // sqrt 
 //=================================
-//#include <cstring>
-//#include <string.h>
+#include <cstring> //needed for memset
+#include <string.h>
 
 //======================================
 // my simple array class template (type)
@@ -93,7 +93,7 @@ using namespace std;
 //======================================
 //fwd declarations
 struct cell_data; 
-class Solver;
+class gridGen2D;
 
 
 
@@ -111,16 +111,71 @@ class gridGen2D{
 
 public:
 
+    //constructor
+    gridGen2D();
+    //destructor
+    ~gridGen2D();
+
+    //output
+    void output();
+
     //Input  - domain size and grid dimensions
-    float xmin, xmax            //Minimum x and Max x.
-    float ymin, ymax            //Minimum y and Max y
+    float xmin, xmax;            //Minimum x and Max x.
+    float ymin, ymax;            //Minimum y and Max y
 
     const float  zero = 0.0;    // minimum x and max x
     const float   one = 1.0;    // minimum y and max y
     int nx;                     // number of nodes in the x-direction
     int ny;                     // number of nodes in the y-direction
 
+    // int nx = 401;
+    // int ny = 401;
+
     //Output - grid files
+    // tria_grid_tecplot.dat
+    // quad_grid_tecplot.dat
+    // tria.dat
+    // quad.dat
+    // project.dat
+
+
+    // structured grid data
+    Array2D<float>  xs;  //Slopes between j and j-1, j and j+1
+    Array2D<float>  ys;  //Slopes between j and j-1, j and j+1
+
+    // structured grid data
+    //printf("\n build xs, ys \n");
+    //Array2D<float>  xs = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
+    //Array2D<float>  ys = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
+
+};
+//
+gridGen2D::~gridGen2D(){
+    //delete[] cell;
+}
+
+//
+// Default Constructor
+gridGen2D::gridGen2D(){
+
+    
+    //  Define the domain: here we define a unit square.
+    xmin = zero;
+    xmax = one;
+
+    ymin = zero;
+    ymax = one;
+
+    //  Define the grid size: the number of nodes in each direction.
+    //  NOTE: "ny" is better to be an odd number to place a node at the midpoint
+    //        on the left boundary, which will be a corner node in shock diffraction problem.
+    nx = 401;
+    ny = 401;
+
+    // // structured grid data
+    printf("\n build xs, ys \n");
+    xs = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
+    ys = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
 
 }
 
@@ -134,27 +189,28 @@ public:
 //* ------------------------------------------------------------------------------
 //*
 //********************************************************************************
-    void Solver::output(){
+    void gridGen2D::output(){
 
     float entropy;
 
-    ofstream outfile;
-    outfile.open ("tria_grid_tecplot.dat");
-    for (int i=1; i<ncells+1; ++i){
-        entropy = log( cell[i].w(2)* pow(cell[i].w(0) , (-gamma)) ) / (gamma-one);
-        outfile << std::setprecision(16) << cell[i].xc << '\t'
-                << std::setprecision(16) << cell[i].w(0) << '\t' 
-                << std::setprecision(16) << cell[i].w(1) << '\t'
-                << std::setprecision(16) << cell[i].w(2) << '\t'
-                << std::setprecision(16) << entropy <<  "\n";
-    }
-    outfile.close();
+    // ofstream outfile;
+    // outfile.open ("tria_grid_tecplot.dat");
+    // for (int i=1; i<ncells+1; ++i){
+    //     entropy = log( cell[i].w(2)* pow(cell[i].w(0) , (-gamma)) ) / (gamma-one);
+    //     outfile << std::setprecision(16) << cell[i].xc << '\t'
+    //             << std::setprecision(16) << cell[i].w(0) << '\t' 
+    //             << std::setprecision(16) << cell[i].w(1) << '\t'
+    //             << std::setprecision(16) << cell[i].w(2) << '\t'
+    //             << std::setprecision(16) << entropy <<  "\n";
+    // }
+    // outfile.close();
 
 }
 //--------------------------------------------------------------------------------
 
 
 
-int main(){
-    return 1;
+void driverGrid2D(){
+    gridGen2D Grid;
+    return;
 }
