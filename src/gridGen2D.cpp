@@ -134,7 +134,7 @@ public:
     void generate_quad_grid();
 
     //output
-    void write_tecplot_file();
+    void write_tecplot_file(const std::string& datafile);
     void write_grid_file();
 
 
@@ -337,7 +337,7 @@ void gridGen2D::build(){//build
     printf( "\n Number of triangles = %d", ntria);
     printf("\n");
     printf( "\nWriting a tecplot file for the triangular grid...");
-    write_tecplot_file();//datafile_tria_tec)
+    write_tecplot_file("tria_grid_tecplot.dat");//datafile_tria_tec)
     printf( "\n --> File generated:  tria_grid_tecplot.dat");//%d", tria_grid_tecplot);
 
     printf( "\nWriting a grid file for the triangular grid...");
@@ -354,7 +354,7 @@ void gridGen2D::build(){//build
     printf( "\n Number of quads =  %d", nquad);
     printf("\n");
     printf( "\nWriting a tecplot file for the quadrilateral grid...");
-    //call write_tecplot_file();//datafile_quad_tec)
+    write_tecplot_file("quad_grid_tecplot.dat");//datafile_quad_tec)
     printf( "\n --> File generated:  quad_grid_tecplot.dat");//%d", datafile_quad_tec);
 
     printf( "\nWriting a grid file for the quadrilateral grid...");
@@ -499,13 +499,14 @@ void gridGen2D::generate_quad_grid(){
 //*
 //********************************************************************************
     //void gridGen2D::write_tecplot_file(char* datafile){
-    void gridGen2D::write_tecplot_file(){
+    void gridGen2D::write_tecplot_file(const std::string& datafile){
 
         int os;
         // float entropy;
 
         ofstream outfile;
-        outfile.open ("tria_grid_tecplot.dat");
+        //outfile.open ("tria_grid_tecplot.dat");
+        outfile.open (datafile);
         outfile << "title = \"grid\" \n";
         outfile << "variables = \"x\" \"y\" \n";
         outfile << "zone N="  << nnodes << ",E= " << ntria+nquad << ",ET=quadrilateral,F=FEPOINT \n";
