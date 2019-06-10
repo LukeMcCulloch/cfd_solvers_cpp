@@ -113,8 +113,15 @@ public:
 
     //constructor
     gridGen2D();
+    // explicit constructor declaring size nrow,ncol:
+    explicit gridGen2D(int nx, int ny): 
+                    nx(nx), ny(ny){
+        build();
+    }
     //destructor
     ~gridGen2D();
+
+    void build();
 
     //output
     void output();
@@ -140,6 +147,23 @@ public:
     // structured grid data
     Array2D<float>*  xs;  //Slopes between j and j-1, j and j+1
     Array2D<float>*  ys;  //Slopes between j and j-1, j and j+1
+
+
+    //Local variables
+    int nnodes; //Total number of nodes
+    int  ntria; //Total number of triangles
+    int  nquad; //Total number of quadrilaterals
+    int  inode; //Local variables used in the 1D nodal array
+
+    
+    Array2D<int>* tria;      //Triangle connectivity data
+    Array2D<int>* quad;      //Quad connectivity data
+    Array2D<float>*  x;   //Nodal x coordinates, 1D array
+    Array2D<float>*  y;   //Nodal y coordinates, 1D array
+
+    float dx; //Uniform grid spacing in x-direction = (xmax-xmin)/nx
+    float dy; //Uniform grid spacing in y-direction = (ymax-ymin)/ny
+    int i, j, os;
 };
 //
 gridGen2D::~gridGen2D(){
@@ -150,7 +174,6 @@ gridGen2D::~gridGen2D(){
 //
 // Default Constructor
 gridGen2D::gridGen2D(){
-
     
     //  Define the domain: here we define a unit square.
     xmin = zero;
@@ -164,6 +187,10 @@ gridGen2D::gridGen2D(){
     //        on the left boundary, which will be a corner node in shock diffraction problem.
     nx = 401;
     ny = 401;
+    build();
+}
+// Default Constructor
+void gridGen2D::build(){//build
 
     // structured grid data
     xs = new Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
