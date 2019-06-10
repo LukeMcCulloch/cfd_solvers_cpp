@@ -239,7 +239,7 @@ void gridGen2D::build(){//build
         for (int i=0; i<nx; ++i) {   // Go to the right in x-direction.
         printf("\ni = %d, j = %d",i,j);
         (*xs)(i,j) = xmin + dx*float(i-1);
-        (*ys)(i,j) = ymin + dy*float(j-1);  array[i*ncols + j]
+        (*ys)(i,j) = ymin + dy*float(j-1);
 
         }
     }
