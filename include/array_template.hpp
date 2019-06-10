@@ -93,6 +93,7 @@ class Array2D{
         explicit Array2D(int numrows, int numcols): 
                         nrows(numrows), ncols(numcols){
             //cout << "building \n" << endl;
+            //buildWithParameters(numrows, numcols);
             build();
             //cout << "built \n" << endl;
             //initialize();
@@ -164,13 +165,13 @@ Array2D<T>::~Array2D(){
 
 template <class T>
 Array2D<T>::Array2D(){
-    nrows = 4;
-    ncols = 4;
+    //nrows = 4;
+    //ncols = 4;
     cout << "build \n" << endl;
-    build();
+    //build();
     // cout << "initialize\n" << endl;
 
-    memset(array, 0, nBytes);
+    //memset(array, 0, nBytes);
 };
 
 
@@ -182,6 +183,7 @@ void Array2D<T>::build(){
     storage_size = nrows*ncols;
     nBytes = storage_size * sizeof(T);
     array = new T[storage_size];
+    //printf("\n build  \n");
 
     int i = 0;
     for(i=0; i < storage_size; i++) {
@@ -195,6 +197,7 @@ template <class T>
 void Array2D<T>::buildWithParameters(int numrows, int numcols){
     nrows = numrows;
     ncols = numcols;
+    printf("\n build with parameters \n");
     build();
 };
 
@@ -211,7 +214,7 @@ Array2D<T>::Array2D(const Array2D& other)
     //printf("\narray copy constructor\n");
     int i = 0;
     for(i=0; i < storage_size; i++) {
-        array[i] = other.array[i];
+       array[i] = other.array[i];
     }
 };
 
@@ -245,11 +248,8 @@ template <class T>
 Array2D<T> Array2D<T>::operator=(const Array2D& that) {
     /*not using this check  allows delayed allocation 
     of this array type when using it within another class*/
-	//assert(that.nrows == nrows);
-	//assert(that.ncols == ncols);
-    if (that.nrows != nrows){
-        printf( "\n nrows = %d, that.nrows = %d",nrows,that.nrows);
-    }
+	assert(that.nrows == nrows);
+	assert(that.ncols == ncols);
 
     int i;
     for(i=0; i < storage_size; i++) {

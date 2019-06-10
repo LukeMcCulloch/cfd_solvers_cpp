@@ -10,7 +10,7 @@
 
 int main(){
 
-    if (false){
+    if (true){
         // Solver solver;
         // solver.Euler1D();
         // solver.output();

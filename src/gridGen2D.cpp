@@ -128,8 +128,6 @@ public:
     int nx;                     // number of nodes in the x-direction
     int ny;                     // number of nodes in the y-direction
 
-    // int nx = 401;
-    // int ny = 401;
 
     //Output - grid files
     // tria_grid_tecplot.dat
@@ -140,18 +138,13 @@ public:
 
 
     // structured grid data
-    Array2D<float>  xs;  //Slopes between j and j-1, j and j+1
-    Array2D<float>  ys;  //Slopes between j and j-1, j and j+1
-
-    // structured grid data
-    //printf("\n build xs, ys \n");
-    //Array2D<float>  xs = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
-    //Array2D<float>  ys = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
-
+    Array2D<float>*  xs;  //Slopes between j and j-1, j and j+1
+    Array2D<float>*  ys;  //Slopes between j and j-1, j and j+1
 };
 //
 gridGen2D::~gridGen2D(){
-    //delete[] cell;
+    delete xs;
+    delete ys;
 }
 
 //
@@ -172,10 +165,9 @@ gridGen2D::gridGen2D(){
     nx = 401;
     ny = 401;
 
-    // // structured grid data
-    printf("\n build xs, ys \n");
-    xs = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
-    ys = Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
+    // structured grid data
+    xs = new Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
+    ys = new Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
 
 }
 
