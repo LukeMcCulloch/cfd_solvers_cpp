@@ -227,10 +227,10 @@ void gridGen2D::build(){//build
     printf("Generating structured data...");
 
     //  Compute the grid spacing in x-direction
-    // dx = (xmax-xmin)/float(nx-1);
+    dx = (xmax-xmin)/float(nx-1);
 
     // //  Compute the grid spacing in y-direction
-    // dy = (ymax-ymin)/float(ny-1);
+    dy = (ymax-ymin)/float(ny-1);
 
     //  Generate nodes in the domain.
 
@@ -238,8 +238,8 @@ void gridGen2D::build(){//build
     for (int j=0; j<ny; ++j) {       // Go up in y-direction.
         for (int i=0; i<nx; ++i) {   // Go to the right in x-direction.
         printf("\ni = %d, j = %d",i,j);
-        (*xs)(i,j) = 1.;//xmin + dx*float(i-1);
-        (*ys)(i,j) = 1.;//ymin + dy*float(j-1);  array[i*ncols + j]
+        (*xs)(i,j) = xmin + dx*float(i-1);
+        (*ys)(i,j) = ymin + dy*float(j-1);  array[i*ncols + j]
 
         }
     }
