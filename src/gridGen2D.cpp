@@ -130,9 +130,11 @@ public:
     ~gridGen2D();
 
     void build();
+    void generate_tria_grid();
+    void generate_quad_grid();
 
     //output
-    void output();
+    void write_tecplot_file();
 
 
     //Input  - domain size and grid dimensions
@@ -179,10 +181,10 @@ gridGen2D::~gridGen2D(){
     printf("destruct");
     delete xs;
     delete ys;
-    // delete tria;
-    // delete quad;
-    // delete x;
-    // delete y;
+    delete tria;
+    delete quad;
+    delete x;
+    delete y;
 
 }
 
@@ -319,15 +321,15 @@ void gridGen2D::build(){//build
 // Allocate arrays of triangular and quad connectivity data.
 
 //   Number of quadrilaterals = (nx-1)(ny-1)
-//     quad = new Array2D<int>( (nx-1)*(ny-1) , 4 );
+    quad = new Array2D<int>( (nx-1)*(ny-1) , 4 );
 
 // //   Number of triangles = 2*(nx-1)*(ny-1)
-//     tria = new Array2D<int>( 2*(nx-1)*(ny-1) ,  3 );
+    tria = new Array2D<int>( 2*(nx-1)*(ny-1) ,  3 );
 
 // (1)Genearte a triangular grid
 
     printf( "\nGenerating triangular grid...");
-    //call generate_tria_grid
+    generate_tria_grid();
     printf("\n");
     printf( "\n Number of triangles = %d", ntria);
     printf("\n");
@@ -376,9 +378,111 @@ void gridGen2D::build(){//build
     printf( "\nSuccessfully completed. Stop.");
 
 
+}
 
+
+//********************************************************************************
+// This subroutine generates triangles by constructing the connectivity data.
+//********************************************************************************
+ void gridGen2D::generate_tria_grid(){
+//Local variables
+    int inode, i1, i2, i3, i4;
+
+// No quads
+    nquad = 0;
+     quad = 0;
+
+// Trianguler grid with right-up diagonals (i.e., / ).
+//
+//  inode+nx   inode+nx+1     i4      i3
+//       o--------o           o--------o
+//       |     .  |           |     .  |
+//       |   .    |     or    |   .    |
+//       | .      |           | .      |
+//       o--------o           o--------o
+//    inode    inode+1        i1      i2
+//
+// Triangle is defined by the counterclockwise ordering of nodes.
+// normals thus "point" out of a closed surface of such triangles
+
+    ntria = -1;
+
+    for (int j=0; j<ny-1; ++j) {
+        for (int i=0; i<nx-1; ++i) {
+
+            inode = i + (j-1)*nx;
+
+//     Define the local numbers (see figure above)
+            i1 = inode;
+            i2 = inode + 1;
+            i3 = inode + nx + 1;
+            i4 = inode + nx;
+
+            ntria = ntria + 1;
+            (*tria)(ntria,0) = i1;
+            (*tria)(ntria,1) = i2;
+            (*tria)(ntria,2) = i3;
+
+            ntria = ntria + 1;
+            (*tria)(ntria,0) = i1;
+            (*tria)(ntria,1) = i3;
+            (*tria)(ntria,2) = i4;
+        }
+    }
+
+ }
+//********************************************************************************
+
+
+//********************************************************************************
+// This subroutine generates quads by constructing the connectivity data.
+//********************************************************************************
+void gridGen2D::generate_quad_grid(){
+    //Local variables
+    int inode, i1, i2, i3, i4;
+
+    // No triangles
+    ntria = 0;
+     tria = 0;
+
+//
+//  inode+nx   inode+nx+1     i4      i3
+//       o--------o           o--------o
+//       |        |           |        |
+//       |        |     or    |        |
+//       |        |           |        |
+//       o--------o           o--------o
+//     inode   inode+1        i1      i2
+//
+// Quad is defined by the counterclockwise ordering of nodes.
+
+    // Quadrilateral grid
+
+    nquad = -1;
+
+    for (int j=0; j<ny-1; ++j) {
+        for (int i=0; i<nx-1; ++i) {
+
+            inode = i + (j-1)*nx;
+            //Define the local numbers (see figure above)
+            i1 = inode;
+            i2 = inode + 1;
+            i3 = inode + nx + 1;
+            i4 = inode + nx;
+
+            //Order the quad counterclockwise:
+            nquad = nquad + 1;
+            (*quad)(nquad,0) = i1;
+            (*quad)(nquad,1) = i2;
+            (*quad)(nquad,2) = i3;
+            (*quad)(nquad,3) = i4;
+        }
+    }
 
 }
+//********************************************************************************
+
+
 
 
 //********************************************************************************
@@ -390,7 +494,7 @@ void gridGen2D::build(){//build
 //* ------------------------------------------------------------------------------
 //*
 //********************************************************************************
-    void gridGen2D::output(){
+    void gridGen2D::write_tecplot_file(){
 
     float entropy;
 
