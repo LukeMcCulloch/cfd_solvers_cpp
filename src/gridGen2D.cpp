@@ -569,26 +569,34 @@ void gridGen2D::write_grid_file(const std::string& datafile) {//(char* datafile)
 
 //--------------------------------------------------------------------------------
 // Grid size: # of nodes, # of triangles, # of quadrilaterals
-    outfile <<  nnodes << ntria << nquad << "\n";
+    outfile <<  nnodes << '\t' << ntria << '\t' << nquad << "\n";
 
 //--------------------------------------------------------------------------------
 // Node data
     for (int i=0; i<nnodes; ++i) {
-        outfile <<  (*x)(i) <<(*y)(i) << "\n";
+        outfile <<  (*x)(i) << '\t' 
+                << (*y)(i) << "\n";
 ;    }
 
 //--------------------------------------------------------------------------------
 // Triangle connectivity
     if (ntria > 0) {
         for (int i=0; i<ntria; ++i) {
-            outfile <<  (*tria)(i,0) << (*tria)(i,1) << (*tria)(i,2) <<  "\n";
+            outfile <<  (*tria)(i,0) << '\t' 
+                    << (*tria)(i,1) << '\t' 
+                    << (*tria)(i,2) << '\t' 
+                    << "\n";
         }
     }
 
 // Quad connectivity
     if (nquad > 0) {
         for (int i=0; i<nquad; ++i) {
-            outfile <<  (*quad)(i,0) << (*quad)(i,1) << (*quad)(i,2) << (*quad)(i,3) <<  "\n";
+            outfile <<  (*quad)(i,0) << '\t' 
+                    << (*quad)(i,1) 
+                    << (*quad)(i,2) 
+                    << (*quad)(i,3) 
+                    <<  "\n";
         }
     }
 
@@ -653,9 +661,10 @@ void gridGen2D::write_grid_file(const std::string& datafile) {//(char* datafile)
 
 // // Right outflow boundary
 //     do j = 1, ny
-//     i = nx
-//         outfile <<  i + (j-1)*nx  << "\n";  
-//     }
+    for (int j=1; j<ny; ++j) {
+        i = nx;
+        outfile <<  i + (j-1)*nx  << "\n";  
+    }
 
 // // Top wall boundary
 //     do i = nx, 1, -1
