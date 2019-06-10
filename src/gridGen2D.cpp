@@ -250,8 +250,8 @@ void gridGen2D::build(){//build
     for (int j=0; j<ny; ++j) {       // Go up in y-direction.
         for (int i=0; i<nx; ++i) {   // Go to the right in x-direction.
             //printf("\ni = %d, j = %d",i,j);
-            (*xs)(i,j) = xmin + dx*float(i-1);
-            (*ys)(i,j) = ymin + dy*float(j-1);
+            (*xs)(i,j) = xmin + dx*float(i);
+            (*ys)(i,j) = ymin + dy*float(j);
         }
     }
 
@@ -296,6 +296,8 @@ void gridGen2D::build(){//build
             inode = i + (j)*nx;   //<- Node number in the lexcographic ordering
             (*x)(inode) = (*xs)(inode);
             (*y)(inode) = (*ys)(inode);
+            //(*x)(inode) = (*xs)(i,j);
+            //(*y)(inode) = (*ys)(i,j);
         }
     }
     printf("\n");
@@ -334,7 +336,7 @@ void gridGen2D::build(){//build
     printf( "\n Number of triangles = %d", ntria);
     printf("\n");
     printf( "\nWriting a tecplot file for the triangular grid...");
-    //call write_tecplot_file(datafile_tria_tec)
+    write_tecplot_file();//datafile_tria_tec)
     printf( "\n --> File generated:  tria_grid_tecplot.dat");//%d", tria_grid_tecplot);
 
     printf( "\nWriting a grid file for the triangular grid...");
@@ -410,7 +412,7 @@ void gridGen2D::build(){//build
     for (int j=0; j<ny-1; ++j) {
         for (int i=0; i<nx-1; ++i) {
 
-            inode = i + (j-1)*nx;
+            inode = i + (j)*nx;
 
 //     Define the local numbers (see figure above)
             i1 = inode;
@@ -460,10 +462,10 @@ void gridGen2D::generate_quad_grid(){
 
     nquad = -1;
 
-    for (int j=0; j<ny-1; ++j) {
-        for (int i=0; i<nx-1; ++i) {
+    for (int j=0; j<=ny-1; ++j) {
+        for (int i=0; i<=nx-1; ++i) {
 
-            inode = i + (j-1)*nx;
+            inode = i + (j)*nx;
             //Define the local numbers (see figure above)
             i1 = inode;
             i2 = inode + 1;
@@ -494,21 +496,57 @@ void gridGen2D::generate_quad_grid(){
 //* ------------------------------------------------------------------------------
 //*
 //********************************************************************************
+    //void gridGen2D::write_tecplot_file(char* datafile){
     void gridGen2D::write_tecplot_file(){
 
-    float entropy;
+        int os;
+        // float entropy;
 
-    // ofstream outfile;
-    // outfile.open ("tria_grid_tecplot.dat");
-    // for (int i=1; i<ncells+1; ++i){
-    //     entropy = log( cell[i].w(2)* pow(cell[i].w(0) , (-gamma)) ) / (gamma-one);
-    //     outfile << std::setprecision(16) << cell[i].xc << '\t'
-    //             << std::setprecision(16) << cell[i].w(0) << '\t'
-    //             << std::setprecision(16) << cell[i].w(1) << '\t'
-    //             << std::setprecision(16) << cell[i].w(2) << '\t'
-    //             << std::setprecision(16) << entropy <<  "\n";
-    // }
-    // outfile.close();
+        ofstream outfile;
+        outfile.open ("tria_grid_tecplot.dat");
+        outfile << "title = \"grid\" \n";
+        outfile << "variables = \"x\" \"y\" \n";
+        outfile << "zone N="  << nnodes << ",E= " << ntria+nquad << ",ET=quadrilateral,F=FEPOINT \n";
+        //--------------------------------------------------------------------------------
+        for (int i=0; i<nnodes; ++i) {
+            outfile << (*x)(i) << '\t' 
+                    << (*y)(i) << "\n"; 
+        }
+        //--------------------------------------------------------------------------------
+        //Triangles
+        if (ntria > 0) {
+            for (int i=0; i<ntria; ++i) {
+                outfile << (*tria)(i,0) << '\t' 
+                        << (*tria)(i,1) << '\t' 
+                        << (*tria)(i,2) << '\t' 
+                        << (*tria)(i,2) <<  "\n"; //The last one is a dummy.
+            }
+        }
+
+        //Quadrilaterals
+        if (nquad > 0) {
+            for (int i=0; i<nquad; ++i) {
+                outfile << (*quad)(i,0) << '\t' 
+                        << (*quad)(i,1) << '\t' 
+                        << (*quad)(i,2) << '\t' 
+                        << (*quad)(i,3) <<  "\n";
+            }
+        }
+        //--------------------------------------------------------------------------------
+        outfile.close();
+
+
+
+        // ofstream outfile;
+        // outfile.open ("tria_grid_tecplot.dat");
+        // for (int i=1; i<ncells+1; ++i){
+        //     outfile << std::setprecision(16) << cell[i].xc << '\t'
+        //             << std::setprecision(16) << cell[i].w(0) << '\t'
+        //             << std::setprecision(16) << cell[i].w(1) << '\t'
+        //             << std::setprecision(16) << cell[i].w(2) << '\t'
+        //             << std::setprecision(16) << entropy <<  "\n";
+        // }
+        // outfile.close();
 
 }
 //--------------------------------------------------------------------------------
