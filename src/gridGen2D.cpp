@@ -294,10 +294,10 @@ void gridGen2D::build(){//build
         for (int i=0; i<nx; ++i) { //Go to the right in x-direction.
 
             inode = i + (j)*nx;   //<- Node number in the lexcographic ordering
-            (*x)(inode) = (*xs)(inode);
-            (*y)(inode) = (*ys)(inode);
-            //(*x)(inode) = (*xs)(i,j);
-            //(*y)(inode) = (*ys)(i,j);
+            //(*x)(inode) = (*xs)(inode);
+            //(*y)(inode) = (*ys)(inode);
+            (*x)(inode) = (*xs)(i,j);
+            (*y)(inode) = (*ys)(i,j);
         }
     }
     printf("\n");
