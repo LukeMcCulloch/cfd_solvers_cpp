@@ -111,11 +111,19 @@ class gridGen2D{
 
 public:
 
+
     //constructor
     gridGen2D();
+    //gridGen2D(int nxi, int nyi);
     // explicit constructor declaring size nrow,ncol:
-    explicit gridGen2D(int nx, int ny):
-                    nx(nx), ny(ny){
+    explicit gridGen2D(int nxi, int nyi):
+                    nx(nxi), ny(nyi){
+        //  Define the domain: here we define a unit square.
+        xmin = zero;
+        xmax = one;
+
+        ymin = zero;
+        ymax = one;
         build();
     }
     //destructor
@@ -125,6 +133,7 @@ public:
 
     //output
     void output();
+
 
     //Input  - domain size and grid dimensions
     float xmin, xmax;            //Minimum x and Max x.
@@ -195,6 +204,7 @@ gridGen2D::gridGen2D(){
     ny = 401;
     build();
 }
+
 // Default Constructor
 void gridGen2D::build(){//build
 
@@ -282,14 +292,91 @@ void gridGen2D::build(){//build
         for (int i=0; i<nx; ++i) { //Go to the right in x-direction.
 
             inode = i + (j)*nx;   //<- Node number in the lexcographic ordering
-            (*x)(inode) = (*xs)(inode);//(i,j);
-            (*y)(inode) = (*ys)(inode);//(i,j);
+            (*x)(inode) = (*xs)(inode);
+            (*y)(inode) = (*ys)(inode);
         }
     }
+    printf("\n");
+    printf( "\n Nodes have been generated:");
+    printf( "\n       nx  = %d", nx);
+    printf( "\n       ny  = %d", ny);
+    printf( "\n    nx*ny  = %d", nx*ny);
+    printf( "\n    nnodes = %d", nnodes);
+    printf("\n");
+    printf( "\n Now, generate elements...");
+    printf("\n");
 
-// Deallocate the structured data: xs and ys, which are not needed any more.
-// - You guys helped me create the 1D array. Thanks//
-    //deallocate(xs, ys)
+
+
+
+//--------------------------------------------------------------------------------
+// 3. Generate unstructured element data:
+//
+//    We generate both quadrilateral and triangular grids.
+//    Both grids are constructed in the unstructured (finite-element) data.
+//
+
+// Allocate arrays of triangular and quad connectivity data.
+
+//   Number of quadrilaterals = (nx-1)(ny-1)
+//     quad = new Array2D<int>( (nx-1)*(ny-1) , 4 );
+
+// //   Number of triangles = 2*(nx-1)*(ny-1)
+//     tria = new Array2D<int>( 2*(nx-1)*(ny-1) ,  3 );
+
+// (1)Genearte a triangular grid
+
+//     printf( "\nGenerating triangular grid...");
+//     //call generate_tria_grid
+//     printf("\n");
+//     printf( "\n Number of triangles =", ntria
+//     printf("\n");
+//     printf( "\nWriting a tecplot file for the triangular grid..."
+//     //call write_tecplot_file(datafile_tria_tec)
+//     printf( "\n --> File generated: ", datafile_tria_tec
+
+//     printf( "\nWriting a grid file for the triangular grid..."
+//     //call write_grid_file(datafile_tria)
+//     printf( "\n --> File generated: ", datafile_tria
+
+//     printf("\n");
+
+// // (2)Generate a quadrilateral grid
+
+//     printf( "\nGenerating quad grid..."
+//     //call generate_quad_grid
+//     printf("\n");
+//     printf( "\n Number of quads =", nquad
+//     printf("\n");
+//     printf( "\nWriting a tecplot file for the quadrilateral grid..."
+//     //call write_tecplot_file(datafile_quad_tec)
+//     printf( "\n --> File generated: ", datafile_quad_tec
+
+//     printf( "\nWriting a grid file for the quadrilateral grid..."
+//     //call write_grid_file(datafile_quad)
+//     printf( "\n --> File generated: ", datafile_quad
+
+// // (3)Generate a mixed grid. (not implemented. I'll leave it to you// You can do it//)
+// //
+
+// // (4)Write a boundary condition file: to be read by EDU2D-Euler code
+//     printf( "\nGenerating bcmap file...");
+//     //open(unit=1, file=datafile_bcmap, status="unknown", iostat=os)
+//     printf("\nBoundary Segment  Boundary Condition");
+//     printf("\n               1          freestream");
+//     printf("\n               2           slip_wall");
+//     printf("\n               3  outflow_supersonic");
+//     printf("\n               4  outflow_supersonic");
+//     printf("\n               5           slip_wall");
+//     //close(1)
+
+// //--------------------------------------------------------------------------------
+
+//     printf("\n");
+//     printf( "\nSuccessfully completed. Stop.");
+
+
+
 
 }
 

@@ -84,7 +84,6 @@ class Array2D{
         int nBytes;
 
     public:
-
         // set up data size of matrix
         int nrows, ncols;
         int storage_size;
