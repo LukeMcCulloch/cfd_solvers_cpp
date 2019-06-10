@@ -562,7 +562,7 @@ void gridGen2D::generate_quad_grid(){
 // NOTE: Unlike the tecplot file, this files contains boundary info.
 //********************************************************************************
 void gridGen2D::write_grid_file(const std::string& datafile) {//(char* datafile)
-    int os;
+    int i,j,os;
 //--------------------------------------------------------------------------------
     ofstream outfile;
     outfile.open (datafile);
@@ -620,49 +620,52 @@ void gridGen2D::write_grid_file(const std::string& datafile) {//(char* datafile)
 //
 
 // Number of boundary segments
-//   outfile <<  5
+    outfile <<  5 << "\n";
 
-//   outfile <<  (ny-1)/2+1  //Inflow
-//   outfile <<  (ny-1)/2+1  //Left Wall
-//   outfile <<   nx         //Bottom Outflow
-//   outfile <<   ny         //Right  Outflow
-//   outfile <<   nx         //Top Wall
+    outfile <<  (ny-1)/2+1  << "\n"; //Inflow
+    outfile <<  (ny-1)/2+1  << "\n"; //Left Wall
+    outfile <<   nx << "\n";         //Bottom Outflow
+    outfile <<   ny  << "\n";        //Right  Outflow
+    outfile <<   nx  << "\n";        //Top Wall
 
-//   outfile << 
+    outfile << "\n";
 
-// // Inflow boundary
-//   do j = ny, (ny-1)/2+1, -1
-//    i = 1
-//     outfile <<  i + (j-1)*nx
-//   end do
+// Inflow boundary
+    //do j = ny, (ny-1)/2+1, -1
+    for (int j=ny-1; j<(ny-1)/2+1; ++j) {
+        i = 1;
+        outfile <<  i + (j-1)*nx  << "\n";  
+    }
 
 // // Left wall boundary
-//   do j = (ny-1)/2+1, 1, -1
-//    i = 1
-//     outfile <<  i + (j-1)*nx
-//   end do
+    //do j = (ny-1)/2+1, 1, -1
+    for (int j=(ny-1)/2+1; j>=1; --j) {
+        i = 1;
+        outfile <<  i + (j-1)*nx  << "\n";  
+    }
 
 // // Bottom outflow boundary
-//   do i = 1, nx
-//    j = 1
-//     outfile <<  i + (j-1)*nx
-//   end do
+//     do i = 1, nx
+    for (int i=nx-1; i<nx; ++i) {
+        j = 1;
+        outfile <<  i + (j-1)*nx  << "\n";  
+    }
 
 // // Right outflow boundary
-//   do j = 1, ny
-//    i = nx
-//     outfile <<  i + (j-1)*nx
-//   end do
+//     do j = 1, ny
+//     i = nx
+//         outfile <<  i + (j-1)*nx  << "\n";  
+//     }
 
 // // Top wall boundary
-//   do i = nx, 1, -1
-//    j = ny
-//     outfile <<  i + (j-1)*nx
-//   end do
+//     do i = nx, 1, -1
+//     j = ny
+//         outfile <<  i + (j-1)*nx  << "\n";  
+//     }
 
-// //--------------------------------------------------------------------------------
-//  close(1)
- }
+//--------------------------------------------------------------------------------
+    outfile.close();
+}
 //********************************************************************************
 
 
