@@ -326,54 +326,54 @@ void gridGen2D::build(){//build
 
 // (1)Genearte a triangular grid
 
-//     printf( "\nGenerating triangular grid...");
-//     //call generate_tria_grid
-//     printf("\n");
-//     printf( "\n Number of triangles =", ntria
-//     printf("\n");
-//     printf( "\nWriting a tecplot file for the triangular grid..."
-//     //call write_tecplot_file(datafile_tria_tec)
-//     printf( "\n --> File generated: ", datafile_tria_tec
+    printf( "\nGenerating triangular grid...");
+    //call generate_tria_grid
+    printf("\n");
+    printf( "\n Number of triangles = %d", ntria);
+    printf("\n");
+    printf( "\nWriting a tecplot file for the triangular grid...");
+    //call write_tecplot_file(datafile_tria_tec)
+    printf( "\n --> File generated:  tria_grid_tecplot.dat");//%d", tria_grid_tecplot);
 
-//     printf( "\nWriting a grid file for the triangular grid..."
-//     //call write_grid_file(datafile_tria)
-//     printf( "\n --> File generated: ", datafile_tria
+    printf( "\nWriting a grid file for the triangular grid...");
+    //call write_grid_file(datafile_tria)
+    printf( "\n --> File generated: tria.dat");//%d", tria);
 
-//     printf("\n");
+    printf("\n");
 
-// // (2)Generate a quadrilateral grid
+// (2)Generate a quadrilateral grid
 
-//     printf( "\nGenerating quad grid..."
-//     //call generate_quad_grid
-//     printf("\n");
-//     printf( "\n Number of quads =", nquad
-//     printf("\n");
-//     printf( "\nWriting a tecplot file for the quadrilateral grid..."
-//     //call write_tecplot_file(datafile_quad_tec)
-//     printf( "\n --> File generated: ", datafile_quad_tec
+    printf( "\nGenerating quad grid...");
+    //call generate_quad_grid
+    printf("\n");
+    printf( "\n Number of quads =  %d", nquad);
+    printf("\n");
+    printf( "\nWriting a tecplot file for the quadrilateral grid...");
+    //call write_tecplot_file(datafile_quad_tec)
+    printf( "\n --> File generated:  quad_grid_tecplot.dat");//%d", datafile_quad_tec);
 
-//     printf( "\nWriting a grid file for the quadrilateral grid..."
-//     //call write_grid_file(datafile_quad)
-//     printf( "\n --> File generated: ", datafile_quad
+    printf( "\nWriting a grid file for the quadrilateral grid...");
+    //call write_grid_file(datafile_quad)
+    printf( "\n --> File generated:  quad.dat");//%d", datafile_quad);
 
-// // (3)Generate a mixed grid. (not implemented. I'll leave it to you// You can do it//)
-// //
+// (3)Generate a mixed grid. (not implemented. I'll leave it to you// You can do it//)
+//
 
-// // (4)Write a boundary condition file: to be read by EDU2D-Euler code
-//     printf( "\nGenerating bcmap file...");
-//     //open(unit=1, file=datafile_bcmap, status="unknown", iostat=os)
-//     printf("\nBoundary Segment  Boundary Condition");
-//     printf("\n               1          freestream");
-//     printf("\n               2           slip_wall");
-//     printf("\n               3  outflow_supersonic");
-//     printf("\n               4  outflow_supersonic");
-//     printf("\n               5           slip_wall");
-//     //close(1)
+// (4)Write a boundary condition file: to be read by EDU2D-Euler code
+    printf( "\nGenerating bcmap file...");
+    //open(unit=1, file=datafile_bcmap, status="unknown", iostat=os)
+    printf("\nBoundary Segment  Boundary Condition");
+    printf("\n               1          freestream");
+    printf("\n               2           slip_wall");
+    printf("\n               3  outflow_supersonic");
+    printf("\n               4  outflow_supersonic");
+    printf("\n               5           slip_wall");
+    //close(1)
 
-// //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
-//     printf("\n");
-//     printf( "\nSuccessfully completed. Stop.");
+    printf("\n");
+    printf( "\nSuccessfully completed. Stop.");
 
 
 
