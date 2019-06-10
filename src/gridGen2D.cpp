@@ -135,7 +135,7 @@ public:
 
     //output
     void write_tecplot_file(const std::string& datafile);
-    void write_grid_file();
+    void write_grid_file(const std::string& datafile);
 
 
     //Input  - domain size and grid dimensions
@@ -341,7 +341,7 @@ void gridGen2D::build(){//build
     printf( "\n --> File generated:  tria_grid_tecplot.dat");//%d", tria_grid_tecplot);
 
     printf( "\nWriting a grid file for the triangular grid...");
-    write_grid_file();//(datafile_tria)
+    write_grid_file("tria.dat");//(datafile_tria)
     printf( "\n --> File generated: tria.dat");//%d", tria);
 
     printf("\n");
@@ -358,7 +358,7 @@ void gridGen2D::build(){//build
     printf( "\n --> File generated:  quad_grid_tecplot.dat");//%d", datafile_quad_tec);
 
     printf( "\nWriting a grid file for the quadrilateral grid...");
-    //call write_grid_file(datafile_quad)
+    write_grid_file("quad.dat");//datafile_quad)
     printf( "\n --> File generated:  quad.dat");//%d", datafile_quad);
 
 // (3)Generate a mixed grid. (not implemented. I'll leave it to you// You can do it//)
@@ -387,13 +387,13 @@ void gridGen2D::build(){//build
 //********************************************************************************
 // This subroutine generates triangles by constructing the connectivity data.
 //********************************************************************************
- void gridGen2D::generate_tria_grid(){
-//Local variables
+void gridGen2D::generate_tria_grid(){
+    //Local variables
     int inode, i1, i2, i3, i4;
 
-// No quads
+    // No quads
     nquad = 0;
-     //quad = 0;
+    //quad = 0;
 
 // Trianguler grid with right-up diagonals (i.e., / ).
 //
@@ -447,7 +447,7 @@ void gridGen2D::generate_quad_grid(){
 
     // No triangles
     ntria = 0;
-     //tria = 0;
+    //tria = 0;
 
 //
 //  inode+nx   inode+nx+1     i4      i3
@@ -561,107 +561,108 @@ void gridGen2D::generate_quad_grid(){
 // This subroutine writes a grid file to be read by a solver.
 // NOTE: Unlike the tecplot file, this files contains boundary info.
 //********************************************************************************
-    void gridGen2D::write_grid_file(){}  //(char* datafile)
-//     int os;
-// //--------------------------------------------------------------------------------
-//     ofstream outfile;
+void gridGen2D::write_grid_file(const std::string& datafile) {//(char* datafile)
+    int os;
+//--------------------------------------------------------------------------------
+    ofstream outfile;
+    outfile.open (datafile);
 
-// //--------------------------------------------------------------------------------
-// // Grid size: # of nodes, # of triangles, # of quadrilaterals
-//     write(1,*) nnodes, ntria, nquad
+//--------------------------------------------------------------------------------
+// Grid size: # of nodes, # of triangles, # of quadrilaterals
+    outfile <<  nnodes << ntria << nquad << "\n";
 
-// //--------------------------------------------------------------------------------
-// // Node data
-//   do i = 1, nnodes
-//    write(1,*) x(i), y(i)
-//   end do
+//--------------------------------------------------------------------------------
+// Node data
+    for (int i=0; i<nnodes; ++i) {
+        outfile <<  (*x)(i) <<(*y)(i) << "\n";
+;    }
 
-// //--------------------------------------------------------------------------------
-// // Triangle connectivity
-//   if (ntria > 0) then
-//    do i = 1, ntria
-//     write(1,*) tria(i,1), tria(i,2), tria(i,3) 
-//    end do
-//   endif
+//--------------------------------------------------------------------------------
+// Triangle connectivity
+    if (ntria > 0) {
+        for (int i=0; i<ntria; ++i) {
+            outfile <<  (*tria)(i,0) << (*tria)(i,1) << (*tria)(i,2) <<  "\n";
+        }
+    }
 
-// // Quad connectivity
-//   if (nquad > 0) then
-//    do i = 1, nquad
-//     write(1,*) quad(i,1), quad(i,2), quad(i,3), quad(i,4) 
-//    end do
-//   endif
+// Quad connectivity
+    if (nquad > 0) {
+        for (int i=0; i<nquad; ++i) {
+            outfile <<  (*quad)(i,0) << (*quad)(i,1) << (*quad)(i,2) << (*quad)(i,3) <<  "\n";
+        }
+    }
 
-// // Boundary data:
-// // NOTE: These boundary data are specific to the shock diffraction problem.
-// //
-// //  Example: nx=ny=7
-// //
-// //   in = inflow
-// //    w = wall
-// //    e = outflow
-// //    o = interior nodes
-// //  inw = this node belongs to both inflow and wall boundaries.
-// //   we = this node belongs to both wall and outflow boundaries.
-// //
-// //   inw----w----w----w----w----w----we
-// //     |    |    |    |    |    |    |
-// //    in----o----o----o----o----o----e
-// //     |    |    |    |    |    |    |
-// //    in----o----o----o----o----o----e
-// //     |    |    |    |    |    |    |
-// //   inw----o----o----o----o----o----e
-// //     |    |    |    |    |    |    |
-// //     w----o----o----o----o----o----e
-// //     |    |    |    |    |    |    |
-// //     w----o----o----o----o----o----e
-// //     |    |    |    |    |    |    |
-// //    we----e----e----e----e----e----e
-// //
+// Boundary data:
+// NOTE: These boundary data are specific to the shock diffraction problem.
+//
+//  Example: nx=ny=7
+//
+//   in = inflow
+//    w = wall
+//    e = outflow
+//    o = interior nodes
+//  inw = this node belongs to both inflow and wall boundaries.
+//   we = this node belongs to both wall and outflow boundaries.
+//
+//   inw----w----w----w----w----w----we
+//     |    |    |    |    |    |    |
+//    in----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//    in----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//   inw----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//     w----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//     w----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//    we----e----e----e----e----e----e
+//
 
-// // Number of boundary segments
-//   write(1,*) 5
+// Number of boundary segments
+//   outfile <<  5
 
-//   write(1,*) (ny-1)/2+1  //Inflow
-//   write(1,*) (ny-1)/2+1  //Left Wall
-//   write(1,*)  nx         //Bottom Outflow
-//   write(1,*)  ny         //Right  Outflow
-//   write(1,*)  nx         //Top Wall
+//   outfile <<  (ny-1)/2+1  //Inflow
+//   outfile <<  (ny-1)/2+1  //Left Wall
+//   outfile <<   nx         //Bottom Outflow
+//   outfile <<   ny         //Right  Outflow
+//   outfile <<   nx         //Top Wall
 
-//   write(1,*)
+//   outfile << 
 
 // // Inflow boundary
 //   do j = ny, (ny-1)/2+1, -1
 //    i = 1
-//     write(1,*) i + (j-1)*nx
+//     outfile <<  i + (j-1)*nx
 //   end do
 
 // // Left wall boundary
 //   do j = (ny-1)/2+1, 1, -1
 //    i = 1
-//     write(1,*) i + (j-1)*nx
+//     outfile <<  i + (j-1)*nx
 //   end do
 
 // // Bottom outflow boundary
 //   do i = 1, nx
 //    j = 1
-//     write(1,*) i + (j-1)*nx
+//     outfile <<  i + (j-1)*nx
 //   end do
 
 // // Right outflow boundary
 //   do j = 1, ny
 //    i = nx
-//     write(1,*) i + (j-1)*nx
+//     outfile <<  i + (j-1)*nx
 //   end do
 
 // // Top wall boundary
 //   do i = nx, 1, -1
 //    j = ny
-//     write(1,*) i + (j-1)*nx
+//     outfile <<  i + (j-1)*nx
 //   end do
 
 // //--------------------------------------------------------------------------------
 //  close(1)
-//  }
+ }
 //********************************************************************************
 
 
