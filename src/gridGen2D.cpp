@@ -23,7 +23,7 @@
 // 3. Generate element connectivity data: tria(1:ntria,3), quad(1:nquad,4)
 //
 //
-// Inuput: 
+// Inuput:
 //        xmin, xmax = x-coordinates of the left and right ends
 //        ymin, ymax = y-coordinates of the bottom and top ends
 //                nx = number of nodes in x-direction
@@ -72,7 +72,7 @@
 #include <iostream>     // std::cout, std::fixed
 #include <fstream>      // write to file
 #include <iomanip>    // std::setprecision - only works for output :(
-#include <math.h>       // sqrt 
+#include <math.h>       // sqrt
 //=================================
 #include <cstring> //needed for memset
 #include <string.h>
@@ -84,7 +84,7 @@
 #include "../include/arrayops.hpp"
 
 //======================================
-// my simple vector class template 
+// my simple vector class template
 #include "../include/vector.h"
 
 //======================================
@@ -92,7 +92,7 @@ using namespace std;
 
 //======================================
 //fwd declarations
-struct cell_data; 
+struct cell_data;
 class gridGen2D;
 
 
@@ -114,7 +114,7 @@ public:
     //constructor
     gridGen2D();
     // explicit constructor declaring size nrow,ncol:
-    explicit gridGen2D(int nx, int ny): 
+    explicit gridGen2D(int nx, int ny):
                     nx(nx), ny(ny){
         build();
     }
@@ -155,7 +155,7 @@ public:
     int  nquad; //Total number of quadrilaterals
     int  inode; //Local variables used in the 1D nodal array
 
-    
+
     Array2D<int>* tria;      //Triangle connectivity data
     Array2D<int>* quad;      //Quad connectivity data
     Array2D<float>*  x;   //Nodal x coordinates, 1D array
@@ -167,14 +167,20 @@ public:
 };
 //
 gridGen2D::~gridGen2D(){
+    printf("destruct");
     delete xs;
     delete ys;
+    // delete tria;
+    // delete quad;
+    // delete x;
+    // delete y;
+
 }
 
 //
 // Default Constructor
 gridGen2D::gridGen2D(){
-    
+
     //  Define the domain: here we define a unit square.
     xmin = zero;
     xmax = one;
@@ -195,6 +201,48 @@ void gridGen2D::build(){//build
     // structured grid data
     xs = new Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
     ys = new Array2D<float>(nx,ny);  //Slopes between j and j-1, j and j+1
+
+    //--------------------------------------------------------------------------------
+    // 1. Generate a structured 2D grid data, (i,j) data: go up in y-direction//
+    //
+    // j=5 o--------o--------o--------o--------o
+    //     |        |        |        |        |
+    //     |        |        |        |        |   On the left is an example:
+    //     |        |        |        |        |         nx = 5
+    // j=4 o--------o--------o--------o--------o         ny = 5
+    //     |        |        |        |        |
+    //     |        |        |        |        |    +y
+    //     |        |        |        |        |    |
+    // j=3 o--------o--------o--------o--------o    |
+    //     |        |        |        |        |    |____ +x
+    //     |        |        |        |        |
+    //     |        |        |        |        |
+    // j=2 o--------o--------o--------o--------o
+    //     |        |        |        |        |
+    //     |        |        |        |        |
+    //     |        |        |        |        |
+    // j=1 o--------o--------o--------o--------o
+    //     i=1      i=2      i=3      i=4      i=5
+
+    printf("Generating structured data...");
+
+    //  Compute the grid spacing in x-direction
+    // dx = (xmax-xmin)/float(nx-1);
+
+    // //  Compute the grid spacing in y-direction
+    // dy = (ymax-ymin)/float(ny-1);
+
+    //  Generate nodes in the domain.
+
+
+    for (int j=0; j<ny; ++j) {       // Go up in y-direction.
+        for (int i=0; i<nx; ++i) {   // Go to the right in x-direction.
+        printf("\ni = %d, j = %d",i,j);
+        (*xs)(i,j) = 1.;//xmin + dx*float(i-1);
+        (*ys)(i,j) = 1.;//ymin + dy*float(j-1);  array[i*ncols + j]
+
+        }
+    }
 
 }
 
@@ -217,7 +265,7 @@ void gridGen2D::build(){//build
     // for (int i=1; i<ncells+1; ++i){
     //     entropy = log( cell[i].w(2)* pow(cell[i].w(0) , (-gamma)) ) / (gamma-one);
     //     outfile << std::setprecision(16) << cell[i].xc << '\t'
-    //             << std::setprecision(16) << cell[i].w(0) << '\t' 
+    //             << std::setprecision(16) << cell[i].w(0) << '\t'
     //             << std::setprecision(16) << cell[i].w(1) << '\t'
     //             << std::setprecision(16) << cell[i].w(2) << '\t'
     //             << std::setprecision(16) << entropy <<  "\n";
@@ -231,5 +279,6 @@ void gridGen2D::build(){//build
 
 void driverGrid2D(){
     gridGen2D Grid;
+    printf("\nGridding Complete\n");
     return;
 }
