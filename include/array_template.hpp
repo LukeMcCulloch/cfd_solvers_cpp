@@ -75,7 +75,10 @@ class Array2D{
 
     void check_index(int i) const { assert(i >= 0 && i < nrows); }
 
-    void check_size(int i) const { assert(i >= 0 && i < storage_size); }
+    void check_size(int i) const {
+        //printf("\nchecl size i = %d, storage_size = %d\n",i,storage_size);
+        assert(i >= 0 && i < storage_size);
+    }
 
     private:
         int nBytes;

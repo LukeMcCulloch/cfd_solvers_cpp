@@ -224,7 +224,7 @@ void gridGen2D::build(){//build
     // j=1 o--------o--------o--------o--------o
     //     i=1      i=2      i=3      i=4      i=5
 
-    printf("Generating structured data...");
+    printf("\nGenerating structured data...\n");
 
     //  Compute the grid spacing in x-direction
     dx = (xmax-xmin)/float(nx-1);
@@ -237,12 +237,59 @@ void gridGen2D::build(){//build
 
     for (int j=0; j<ny; ++j) {       // Go up in y-direction.
         for (int i=0; i<nx; ++i) {   // Go to the right in x-direction.
-        printf("\ni = %d, j = %d",i,j);
-        (*xs)(i,j) = xmin + dx*float(i-1);
-        (*ys)(i,j) = ymin + dy*float(j-1);
-
+            //printf("\ni = %d, j = %d",i,j);
+            (*xs)(i,j) = xmin + dx*float(i-1);
+            (*ys)(i,j) = ymin + dy*float(j-1);
         }
     }
+
+//--------------------------------------------------------------------------------
+// 2. Generate unstructured data: 1D array to store the node information.
+//
+//    - The so-called lexcographic ordering -
+//
+//   21       22       23       24       25
+//     o--------o--------o--------o--------o
+//     |        |        |        |        |
+//     |        |        |        |        |   On the left is an example:
+//   16|      17|      18|      19|      20|           nx = 5
+//     o--------o--------o--------o--------o           ny = 5
+//     |        |        |        |        |
+//     |        |        |        |        |   nnodes = 5x5 = 25
+//   11|      12|      13|      14|      15|
+//     o--------o--------o--------o--------o
+//     |        |        |        |        |
+//     |        |        |        |        |
+//    6|       7|       8|       9|      10|
+//     o--------o--------o--------o--------o
+//     |        |        |        |        |
+//     |        |        |        |        |
+//    1|       2|       3|       4|       5|
+//     o--------o--------o--------o--------o
+//
+   printf("\nGenerating 1D node array for unstructured grid data...\n");
+
+//  Total number of nodes
+   nnodes = nx*ny;
+
+//  Allocate the arrays
+   x = new Array2D<float>(nnodes,1);
+   y = new Array2D<float>(nnodes,1);
+
+// Node data: the nodes are ordered in 1D array.
+
+    for (int j=0; j<ny; ++j) {  //Go up in y-direction.
+        for (int i=0; i<nx; ++i) { //Go to the right in x-direction.
+
+            inode = i + (j)*nx;   //<- Node number in the lexcographic ordering
+            (*x)(inode) = (*xs)(inode);//(i,j);
+            (*y)(inode) = (*ys)(inode);//(i,j);
+        }
+    }
+
+// Deallocate the structured data: xs and ys, which are not needed any more.
+// - You guys helped me create the 1D array. Thanks//
+    //deallocate(xs, ys)
 
 }
 
