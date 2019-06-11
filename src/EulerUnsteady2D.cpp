@@ -148,7 +148,7 @@
 //*
 //*
 //* Katate Masatsuka, http://www.cfdbooks.com
-//* Translated ti c++ by Luke McCulloch
+//* Translated to c++ by Luke McCulloch
 //********************************************************************************
 
 //#define CHECKPT {printf("Checkpoint: .s, line .d\n",__FILE__,__LINE__);\
