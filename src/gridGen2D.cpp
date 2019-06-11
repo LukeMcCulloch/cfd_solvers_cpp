@@ -149,11 +149,11 @@ public:
 
 
     //Output - grid files
-    // tria_grid_tecplot.dat
-    // quad_grid_tecplot.dat
-    // tria.dat
-    // quad.dat
-    // project.dat
+    std::string datafile_tria_tec = "tria_grid_tecplot.dat";
+    std::string  datafile_quad_tec = "quad_grid_tecplot.dat";
+    std::string  datafile_tria = "tria.grid";
+    std::string  datafile_quad = "quad.grid";
+    std::string  datafile_bcmap = "project.dat";
 
 
     // structured grid data
@@ -337,11 +337,11 @@ void gridGen2D::build(){//build
     printf( "\n Number of triangles = %d", ntria);
     printf("\n");
     printf( "\nWriting a tecplot file for the triangular grid...");
-    write_tecplot_file("tria_grid_tecplot.dat");//datafile_tria_tec)
+    write_tecplot_file(datafile_tria_tec);//"tria_grid_tecplot.dat");//
     printf( "\n --> File generated:  tria_grid_tecplot.dat");//%d", tria_grid_tecplot);
 
     printf( "\nWriting a grid file for the triangular grid...");
-    write_grid_file("tria.dat");//(datafile_tria)
+    write_grid_file(datafile_tria);//("tria.dat");//
     printf( "\n --> File generated: tria.dat");//%d", tria);
 
     printf("\n");
@@ -354,11 +354,11 @@ void gridGen2D::build(){//build
     printf( "\n Number of quads =  %d", nquad);
     printf("\n");
     printf( "\nWriting a tecplot file for the quadrilateral grid...");
-    write_tecplot_file("quad_grid_tecplot.dat");//datafile_quad_tec)
+    write_tecplot_file(datafile_quad_tec);
     printf( "\n --> File generated:  quad_grid_tecplot.dat");//%d", datafile_quad_tec);
 
     printf( "\nWriting a grid file for the quadrilateral grid...");
-    write_grid_file("quad.dat");//datafile_quad)
+    write_grid_file(datafile_quad);//"quad.dat");//
     printf( "\n --> File generated:  quad.dat");//%d", datafile_quad);
 
 // (3)Generate a mixed grid. (not implemented. I'll leave it to you// You can do it//)
