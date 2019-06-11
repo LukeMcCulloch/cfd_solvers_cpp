@@ -668,9 +668,10 @@ void gridGen2D::write_grid_file(const std::string& datafile) {//(char* datafile)
 
 // // Top wall boundary
 //     do i = nx, 1, -1
-//     j = ny
-//         outfile <<  i + (j-1)*nx  << "\n";  
-//     }
+    for (int i=0; i<nx; ++i) {
+        j = ny;
+        outfile <<  i + (j-1)*nx  << "\n";  
+    }
 
 //--------------------------------------------------------------------------------
     outfile.close();
