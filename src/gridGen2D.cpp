@@ -88,7 +88,7 @@
 #include "../include/vector.h"
 
 //======================================
-using namespace std;
+//using namespace std;
 
 //======================================
 //fwd declarations

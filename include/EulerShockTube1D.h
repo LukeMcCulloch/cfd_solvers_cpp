@@ -10,9 +10,10 @@
 #include "../include/array_template.hpp"
 #include "../include/arrayops.hpp"
 
-//=================================
-// the driver function
-int driverEuler1D();
+
+namespace EulerSolver1D
+{
+
 
 
 
@@ -94,6 +95,14 @@ public:
     cell_data* cell;
 
 };
+
+
+//=================================
+// the driver function
+void driverEuler1D();
+
+} //namespace Euler1D
+
 
 
 #endif 

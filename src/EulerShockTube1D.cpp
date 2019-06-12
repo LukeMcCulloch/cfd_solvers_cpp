@@ -108,16 +108,18 @@
 #include "../include/EulerShockTube1D.h"
 
 //======================================
-using namespace std;
+//using namespace std;
+//using std::cout;
+//using namespace EulerSolver1D;
 
 //======================================
 //fwd declarations moved to header
+//struct cell_data; 
+//class Solver;
 
 
 
-
-
-Solver::Solver(){
+EulerSolver1D::Solver::Solver(){
 
 //--------------------------------------------------------------------------------
 // 0. Input parameters and initial condition.
@@ -151,11 +153,11 @@ Solver::Solver(){
 
 
 
-Solver::~Solver(){
+EulerSolver1D::Solver::~Solver(){
     delete[] cell;
 }
 
-void Solver::Euler1D(){
+void EulerSolver1D::Solver::Euler1D(){
     
 //output();
 //--------------------------------------------------------------------------------
@@ -293,7 +295,7 @@ void Solver::Euler1D(){
 
 
 
-void Solver::initialize( int ncells, float dx, float xmin, const float gamma){
+void EulerSolver1D::Solver::initialize( int ncells, float dx, float xmin, const float gamma){
     //
     //The initial condition for Sod's shock tube problem
     for ( int i = 0; i < ncells+2; ++i ) {
@@ -322,7 +324,7 @@ void Solver::initialize( int ncells, float dx, float xmin, const float gamma){
 // ------------------------------------------------------------------------------
 //
 //******************************************************************************
-float Solver::timestep(float cfl, float dx, float gamma, int ncells){
+float EulerSolver1D::Solver::timestep(float cfl, float dx, float gamma, int ncells){
     float dt;             //Output
     //Local variables
     float one = 1.0;
@@ -349,7 +351,7 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 // --------------------------------------------------------------------------
 // 
 //***************************************************************************
- float Solver::minmod(float a, float b){
+ float EulerSolver1D::Solver::minmod(float a, float b){
 
     float minmod;
 
@@ -375,14 +377,14 @@ float Solver::timestep(float cfl, float dx, float gamma, int ncells){
 //* ------------------------------------------------------------------------------
 //* 
 //********************************************************************************
-void Solver::w2u_efficient( Array2D<float>& w, Array2D<float>& u ) {
+void EulerSolver1D::Solver::w2u_efficient( Array2D<float>& w, Array2D<float>& u ) {
 
     u(0) = w(0);
     u(1) = w(0)*w(1);
     u(2) = ( w(2)/(gamma-one) ) + half*w(0)*w(1)*w(1);
     return;
 }
-Array2D<float> Solver::w2u( Array2D<float>& w) {
+Array2D<float> EulerSolver1D::Solver::w2u( Array2D<float>& w) {
 
     Array2D<float> u(3,1);
 
@@ -402,7 +404,7 @@ Array2D<float> Solver::w2u( Array2D<float>& w) {
 // ------------------------------------------------------------------------------
 // 
 //*******************************************************************************
-void Solver::u2w_efficient( Array2D<float>& u, Array2D<float>& w ) {
+void EulerSolver1D::Solver::u2w_efficient( Array2D<float>& u, Array2D<float>& w ) {
      
     
     w(0) = u(0);
@@ -410,7 +412,7 @@ void Solver::u2w_efficient( Array2D<float>& u, Array2D<float>& w ) {
     w(2) = (gamma-one)*( u(2) - half*w(0)*w(1)*w(1) );
     return;
 }
-Array2D<float>  Solver::u2w( Array2D<float>& u ) {
+Array2D<float>  EulerSolver1D::Solver::u2w( Array2D<float>& u ) {
      
     Array2D<float> w(3,1);
     
@@ -438,7 +440,7 @@ Array2D<float>  Solver::u2w( Array2D<float>& u ) {
 // 
 // Katate Masatsuka, December 2010. http://www.cfdbooks.com
 //*******************************************************************************
-Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
+Array2D<float> EulerSolver1D::Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
 
     //  Input:   wL(3), wR(3) =   Input (conservative variables rho*[1, v, E])
     Array2D<float> flux(3,1);  // Output (numerical flux across L and R states)
@@ -563,7 +565,7 @@ Array2D<float> Solver::roe_flux(Array2D<float>&  wL, Array2D<float>&  wR){
 //
 //*******************************************************************************
 //function euler_physical_flux(w) result(flux)
-Array2D<float> Solver::euler_physical_flux(Array2D<float>& w){
+Array2D<float> EulerSolver1D::Solver::euler_physical_flux(Array2D<float>& w){
 
     Array2D<float> flux(3,1); //Output
 
@@ -597,7 +599,7 @@ Array2D<float> Solver::euler_physical_flux(Array2D<float>& w){
 //* ------------------------------------------------------------------------------
 //*
 //********************************************************************************
-    void Solver::output(){
+    void EulerSolver1D::Solver::output(){
 
     float entropy;
 
@@ -617,9 +619,9 @@ Array2D<float> Solver::euler_physical_flux(Array2D<float>& w){
 //--------------------------------------------------------------------------------
 
 
-int driverEuler1D(){
+void EulerSolver1D::driverEuler1D(){
     Solver solver;
     solver.Euler1D();
     solver.output();
-    return 0;
+    return;
 }
