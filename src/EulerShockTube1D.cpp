@@ -111,9 +111,7 @@
 using namespace std;
 
 //======================================
-//fwd declarations
-struct cell_data; 
-class Solver;
+//fwd declarations moved to header
 
 
 
