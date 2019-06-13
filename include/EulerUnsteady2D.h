@@ -1,3 +1,38 @@
+//********************************************************************************
+//* Educationally-Designed Unstructured 2D (EDU2D) Code
+//*
+//*
+//*                      --- This is EDU2D-Euler-RK2 ---
+//*
+//*
+//* EDU2D-Euler-RK2: An Euler code with
+//*
+//*    - Node-centered finite-volume discretization
+//*    - 2-stage Runge-Kutta explicit time-stepping scheme (RK2)
+//*
+//*
+//*
+//*             specially set up for a shock-diffraction problem
+//*
+//*                                 Wall
+//*                         --------------------
+//*     Post-shock (inflow) |                  |
+//*                         |->Shock           |            o: Corner node
+//*                         |  Mach=5.09       |
+//*                  .......o                  |Outflow
+//*                    Wall |                  |
+//*                         |                  |
+//*                         |                  |
+//*                         --------------------
+//*                               Outflow
+//*
+//* - Node-centered finite-volume method for unstructured grids (quad/tri/mixed)
+//* - Roe flux with an entropy fix and Rotated-RHLL flux
+//* - Gradient reconstruction by unweighted least-squares method
+//* - Van Albada slope limiter to the primitive variable gradients
+//* - 2-Stage Runge-Kutta global time-stepping towards the final time
+//* - All quantities are nondimensionalized; velocity and pressure are
+//*   nondimensionalized based on the free stream speed of sound
 //=================================
 // include guard
 #ifndef __eulerUnsteady2d_INCLUDED__

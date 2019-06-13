@@ -42,7 +42,8 @@
 //* This is Version 0 (June 2019 translation)
 //*
 //* ------------------------------------------------------------------------------
-//* Files: There are 3 files.
+//* Files: There were 3 files in the fortran version.
+//* This translated version will differ
 //*
 //* ------------------------------------------
 //* - Main driver program file   : This reads grid and BC files, and call dummy NC/CC programs.
