@@ -36,14 +36,14 @@
 //*   (see "I do like CFD, VOL.1", whose PDF can be downloaded at cfdbooks.com).
 //*
 //*        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
-//*        translated by Luke McCulloch
+//*        translated to c++ by Luke McCulloch, PhD.
 //*
 //*
 //* This is Version 0 (June 2019 translation)
 //*
 //* ------------------------------------------------------------------------------
-//* Files: There were 3 files in the fortran version.
-//* This translated version will differ
+//* Files: There were 3 files (in the fortran version).
+//* This translated version will differ.
 //*
 //* ------------------------------------------
 //* - Main driver program file   : This reads grid and BC files, and call dummy NC/CC programs.
