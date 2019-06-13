@@ -10,9 +10,10 @@
 #include "../include/array_template.hpp"
 #include "../include/arrayops.hpp"
 
-//=================================
-// the driver function
-int driverEuler2D();
+
+
+namespace EulerSolver2D
+{
 
 
 // use an array of structs (may be inefficient//)
@@ -37,5 +38,13 @@ public:
     ~Solver();
 };
 
+
+
+//=================================
+// the driver function
+void driverEuler2D();
+
+
+}//end namespace
 
 #endif 

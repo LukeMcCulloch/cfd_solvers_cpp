@@ -114,8 +114,6 @@
 
 //======================================
 //fwd declarations moved to header
-//struct cell_data; 
-//class Solver;
 
 
 

@@ -180,12 +180,27 @@
 
 //======================================
 // 2D Eiuler approximate Riemann sovler
-#include "../include/EulerUnsteady.h"
+#include "../include/EulerUnsteady2D.h"
 
 //======================================
 using namespace std;
 
 //======================================
 //fwd declarations
-struct cell_data; 
-class Solver;
+
+
+
+EulerSolver2D::Solver::Solver(){}
+
+
+EulerSolver2D::Solver::~Solver(){}
+
+//--------------------------------------------------------------------------------
+
+
+void EulerSolver2D::driverEuler2D(){
+    Solver solver;
+    //solver.Euler2D();
+    //solver.output();
+    return;
+}
