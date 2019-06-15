@@ -33,6 +33,39 @@
 //* - 2-Stage Runge-Kutta global time-stepping towards the final time
 //* - All quantities are nondimensionalized; velocity and pressure are
 //*   nondimensionalized based on the free stream speed of sound
+//*
+//*
+//*
+//*
+//* ------------------------------------------------------------------------------
+//* Files: There are N? files.
+//*
+//* ------------------------------------------
+//* - Main driver program file   : This reads grid and BC files, and call dummy NC/CC programs.
+//*
+//*     EulerUnsteady2D (h and cpp), which contains a main driver class and driver calls
+//*      -- Unsteady2D - edu2d_euler_rk2       : Main driver code, which calls an Euler solver
+//*
+//* ------------------------------------------
+//* - The "package" file   : Arranged for a 2D Euler code
+//*
+//*     edu2d_basic_package_euler_rk2.f90, which contains the following modules.
+//*      -- edu2d_constants      : Numerical values defined
+//*      -- edu2d_grid_data_type : Grid data types defined
+//*      -- edu2d_main_data      : Main grid data and parameters declared
+//*      -- edu2d_grid_data      : Read/construct/check grid data
+//*
+//* ------------------------------------------
+//* - Euler "solver" file   : This computes a solution to the shock diffraction problem.
+//*
+//*     edu2d_euler_rk2_main.f90, which contains a 2D Euler solver with RK2.
+//*      -- edu2d_euler_rk2_solver : Node-centered Explicit Euler solver with RK2
+//*
+//* ------------------------------------------------------------------------------
+//* Notes:
+//*
+//*
+//*
 //=================================
 // include guard
 #ifndef __eulerUnsteady2d_INCLUDED__
