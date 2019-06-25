@@ -52,3 +52,42 @@
 //* This file may be updated in future.
 //*
 //********************************************************************************
+//#define REAL_IS_DOUBLE true
+#ifdef REAL_IS_DOUBLE
+  typedef double real;
+#else
+  typedef float real;
+#endif
+struct edu2d_constants {
+    edu2d_constants() = default; // asks the compiler to generate the default implementation
+
+
+
+    integer , parameter :: sp = kind(1.0)
+    integer , parameter :: p2 = selected_real_kind(2*precision(1.0_sp))
+                                
+    real                   zero = 0.0,
+                            one = 1.0,
+                            two = 2.0,
+                          three = 3.0,
+                           four = 4.0,
+                           five = 5.0,
+                            six = 6.0,
+                          seven = 7.0,
+                          eight = 8.0,
+                           nine = 9.0,
+                            ten = 10.0,
+                         eleven = 11.0,
+                           half = 0.5,
+                          third = 1.0 / 3.0,
+                         fourth = 1.0 / 4.0,
+                          fifth = 1.0 / 5.0,
+                          sixth = 1.0 / 6.0,
+                      two_third = 2.0 / 3.0,
+                     four_third = 4.0 / 3.0,
+                   three_fourth = 3.0 / 4.0,
+                        twelfth = 1.0 /12.0,
+               one_twentyfourth = 1.0 /24.0;
+                         
+  real                   pi = 3.141592653589793238;
+};
