@@ -190,7 +190,7 @@ using namespace std;
 
 //======================================
 //fwd declarations
-
+//namespace EulerSolver2D{
 
 
 EulerSolver2D::Solver::Solver(){}
@@ -200,6 +200,19 @@ EulerSolver2D::Solver::~Solver(){
     //delete[] cell;
     }
 
+
+//********************************************************************************
+//********************************************************************************
+//********************************************************************************
+//* Euler solver: Node-Centered Finite-Volume Method (Edge-Based)
+//*
+//* - Node-centered finite-volume method for unstructured grids(quad/tri/mixed)
+//* - Roe flux with an entropy fix and Rotated-RHLL flux
+//* - Reconstruction by unweighted least-squares method (2x2 system for gradients)
+//* - Van Albada slope limiter to the primitive variable gradients
+//* - 2-Stage Runge-Kutta time-stepping
+//*
+//********************************************************************************
 void EulerSolver2D::Solver::euler_solver_main(){
 }
 //********************************************************************************
@@ -213,3 +226,5 @@ void EulerSolver2D::driverEuler2D(){
     //solver.output();
     return;
 }
+
+//}  //end EulerSolver2D namespace
