@@ -55,7 +55,7 @@
 //=================================
 // include guard
 #ifndef __eulerUnsteady2d_basic_package_INCLUDED__
-#define __eulerUnsteady2d_INCLUDED__
+#define __eulerUnsteady2d_basic_package_INCLUDED__
 //
 //#define REAL_IS_DOUBLE true
 #ifdef REAL_IS_DOUBLE
@@ -63,11 +63,14 @@
 #else
   typedef float real;
 #endif
-struct edu2d_constants {
+//
+//********************************************************************************
+//
+struct edu2d_constants 
+{
     edu2d_constants() = default; // asks the compiler to generate the default implementation
-
-                                
-    real                   zero = 0.0,
+                         
+     real                   zero = 0.0,
                             one = 1.0,
                             two = 2.0,
                           three = 3.0,

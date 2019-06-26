@@ -81,8 +81,8 @@
 
 
 //======================================
-// 2D Eiuler approximate Riemann sovler
-#include "../include/EulerUnsteady2D_basic_package.h"
+// 2D Euler approximate Riemann sovler
+//#include "../include/EulerUnsteady2D_basic_package.h"
 
 
 namespace EulerSolver2D
