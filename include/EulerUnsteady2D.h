@@ -109,6 +109,8 @@ public:
     Solver();
     // destructor
     ~Solver();
+
+    void euler_solver_main();
 };
 
 

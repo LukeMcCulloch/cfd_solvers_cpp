@@ -150,8 +150,10 @@
 //*
 //* Katate Masatsuka, http://www.cfdbooks.com
 //* Translated to c++ by Luke McCulloch
+//*
+//*
+//*
 //********************************************************************************
-
 //#define CHECKPT {printf("Checkpoint: .s, line .d\n",__FILE__,__LINE__);\
 //fflush(stdout);}
 #ifdef DEBUG_BUILD
@@ -194,9 +196,15 @@ using namespace std;
 EulerSolver2D::Solver::Solver(){}
 
 
-EulerSolver2D::Solver::~Solver(){}
+EulerSolver2D::Solver::~Solver(){
+    //delete[] cell;
+    }
 
-//--------------------------------------------------------------------------------
+void EulerSolver2D::Solver::euler_solver_main(){
+}
+//********************************************************************************
+// End of program
+//********************************************************************************
 
 
 void EulerSolver2D::driverEuler2D(){
