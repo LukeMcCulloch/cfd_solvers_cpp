@@ -52,6 +52,11 @@
 //* This file may be updated in future.
 //*
 //********************************************************************************
+//=================================
+// include guard
+#ifndef __eulerUnsteady2d_basic_package_INCLUDED__
+#define __eulerUnsteady2d_INCLUDED__
+//
 //#define REAL_IS_DOUBLE true
 #ifdef REAL_IS_DOUBLE
   typedef double real;
@@ -61,10 +66,6 @@
 struct edu2d_constants {
     edu2d_constants() = default; // asks the compiler to generate the default implementation
 
-
-
-    integer , parameter :: sp = kind(1.0)
-    integer , parameter :: p2 = selected_real_kind(2*precision(1.0_sp))
                                 
     real                   zero = 0.0,
                             one = 1.0,
@@ -88,6 +89,8 @@ struct edu2d_constants {
                    three_fourth = 3.0 / 4.0,
                         twelfth = 1.0 /12.0,
                one_twentyfourth = 1.0 /24.0;
-                         
-  real                   pi = 3.141592653589793238;
+
+             real pi = 3.141592653589793238;
 };
+
+#endif
