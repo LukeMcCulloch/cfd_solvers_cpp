@@ -203,7 +203,7 @@ namespace edu2d_grid_data_type{
 //----------------------------------------------------------
   class elm_type{
     //  to be read from a grid file
-    int nvtx;                    //number of vertices
+    int nvtx;                   //number of vertices
     Array2D<int>*  vtx;         //list of vertices
     //  to be constructed in the code
     int nnghbrs;                //number of neighbors
@@ -215,16 +215,16 @@ namespace edu2d_grid_data_type{
     Array2D<real>* u;            //conservative variables
     Array2D<real>* uexact;       //conservative variables
     //NotUsed   Array2D<real>* du       //change in conservative variables
-   Array2D<real>* gradu;        //gradient of u
-   Array2D<real>* res;          //residual (rhs)
-   real dt;                     //local time step
-   real wsn;                    //??
-   int bmark;                   //Boundary mark
-   int nvnghbrs;                //number of vertex neighbors
-   Array2D<int>* vnghbr;        //list of vertex neighbors
-   real ar;                     //Element volume aspect ratio
-   Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
-   Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
+    Array2D<real>* gradu;        //gradient of u
+    Array2D<real>* res;          //residual (rhs)
+    real dt;                     //local time step
+    real wsn;                    //??
+    int bmark;                   //Boundary mark
+    int nvnghbrs;                //number of vertex neighbors
+    Array2D<int>* vnghbr;        //list of vertex neighbors
+    real ar;                     //Element volume aspect ratio
+    Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
+    Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
 
 };
 
@@ -288,9 +288,9 @@ namespace edu2d_grid_data_type{
 //----------------------------------------------------------
   class face_type{
 // to be constructed in the code (NB: boundary faces are excluded.)
-   int n1, n2; //associated nodes
-   int e1, e2; //associated elements
-   real           da;        //magnitude of the directed-area vector
+   int n1, n2;    //associated nodes
+   int e1, e2;    //associated elements
+   real da;       //magnitude of the directed-area vector
    Array2D<real> dav = Array2D<real>(2,1);   //unit directed-area vector
    //Array2D<float> u  = Array2D<float>(3,1);
 
