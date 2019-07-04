@@ -56,7 +56,16 @@
 // include guard
 #ifndef __eulerUnsteady2d_basic_package_INCLUDED__
 #define __eulerUnsteady2d_basic_package_INCLUDED__
-//
+
+//======================================
+//stl
+#include <vector> 
+//======================================
+// my simple array class template (type)
+#include "../include/tests_array.hpp"
+#include "../include/array_template.hpp"
+#include "../include/arrayops.hpp"
+
 //#define REAL_IS_DOUBLE true
 #ifdef REAL_IS_DOUBLE
   typedef double real;
@@ -119,18 +128,19 @@ struct edu2d_constants
 //*           a(1)%x, a(1)%y, a(1)%nghbr(1:nnghbrs), etc.
 //*       In C-programming, this type of data is called "structure", I think.
 //*
-//*
+//*post
 //*
 //* NOTE: Not all data types below are used in EDU2D-Euler-RK2.
 //*
 //*
 //*
 //*        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
+//*        translated to C++ by Luke McCulloch
 //*
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
-//* This is Version 0 (July 2015).
-//* This F90 code is written and made available for an educational purpose.
+//* This is Version 0 (July 2015).  Translated in June/July 2019
+//* This C++ code is written and made available for an educational purpose.
 //* This file may be updated in future.
 //*
 //********************************************************************************
@@ -142,41 +152,49 @@ namespace edu2d_grid_data_type{
 // Note: Each node has the following data.
 //----------------------------------------------------------
   class node_type{
-//  to be read from a grid file
-   real x, y;      //nodal coordinates
-//  to be constructed in the code
-   int nnghbrs;   //number of neighbors
-   integer,   dimension(:), pointer  :: nghbr     //list of neighbors
-   int nelms     //number of elements
-   integer,   dimension(:), pointer  :: elm       //list of elements
-   real vol;       //dual-cell volume
-   int bmark;     //Boundary mark
-   int nbmarks;   //# of boundary marks
-//  to be computed in the code
-   //Below are arrays always allocated.
-   real(p2), dimension(:)  , pointer :: u         //conservative variables
-   real(p2), dimension(:)  , pointer :: uexact    //conservative variables
-   real(p2), dimension(:,:), pointer :: gradu     //gradient of u
-   real(p2), dimension(:)  , pointer :: res       //residual (rhs)
-   real ar        // Control volume aspect ratio
-   real(p2), dimension(:)  , pointer :: lsq2x2_cx //    Linear LSQ coefficient for ux
-   real(p2), dimension(:)  , pointer :: lsq2x2_cy //    Linear LSQ coefficient for uy
-   real(p2), dimension(:)  , pointer :: lsq5x5_cx // Quadratic LSQ coefficient for ux
-   real(p2), dimension(:)  , pointer :: lsq5x5_cy // Quadratic LSQ coefficient for uy
-   real(p2), dimension(:  ), pointer :: dx, dy    // Extra data used by Quadratic LSQ
-   real(p2), dimension(:,:), pointer :: dw        // Extra data used by Quadratic LSQ
 
-   //Below are optional: Pointers need to be allocated in the main program if necessary.
-   real(p2), dimension(:)  , pointer :: du        //change in conservative variables
-   real(p2), dimension(:)  , pointer :: w         //primitive variables(optional)
-   real(p2), dimension(:,:), pointer :: gradw     //gradient of w
-   real phi       //limiter function (0 <= phi <= 1)
-   real dt        //local time step
-   real wsn       //Half the max wave speed at face
-   real(p2), dimension(:), pointer   :: r_temp    // For GCR implementation
-   real(p2), dimension(:), pointer   :: u_temp    // For GCR implementation
-   real(p2), dimension(:), pointer   :: w_temp    // For GCR implementation
+    //  to be read from a grid file
+    real x, y;                  //nodal coordinates
+    //  to be constructed in the code
 
+    int nnghbrs;   //number of neighbors
+    //int,   dimension(:), pointer  :: nghbr     //list of neighbors
+    vector<int> nghbr;          //list of neighbors
+
+    int nelms     //number of elements
+    //Array2D<int>*  elm        //list of elements
+    vector<int> elm;            //list of elements
+
+    real vol;                   //dual-cell volume
+    int bmark;                  //Boundary mark
+    int nbmarks;                //# of boundary marks
+    //  to be computed in the code
+    //Below are arrays always allocated.
+    Array2D<real>* u;           //conservative variables
+    Array2D<real>* uexact;      //conservative variables
+    //Array2D<real>* gradu      //gradient of u
+    Array2D<real>* gradu;       //gradient of u (2D) 
+    Array2D<real>* res          //residual (rhs)
+    real ar;                    // Control volume aspect ratio
+    Array2D<real>* lsq2x2_cx    //    Linear LSQ coefficient for ux
+    Array2D<real>* lsq2x2_cy    //    Linear LSQ coefficient for uy
+    Array2D<real>* lsq5x5_cx    // Quadratic LSQ coefficient for ux
+    Array2D<real>* lsq5x5_cy    // Quadratic LSQ coefficient for uy
+    Array2D<real>* dx, dy       // Extra data used by Quadratic LSQ
+    //Array2D<real>* dw         // Extra data used by Quadratic LSQ
+    Array2D<real>* dw           // Extra data used by Quadratic LSQ (2D)
+
+    //Below are optional: Pointers need to be allocated in the main program if necessary.
+    Array2D<real>* du           //change in conservative variables
+    Array2D<real>* w            //primitive variables(optional)
+    //Array2D<real>* gradw      //gradient of w
+    Array2D<real>* gradw;       //gradient of w (2D)
+    real phi                    //limiter function (0 <= phi <= 1)
+    real dt                     //local time step
+    real wsn                    //Half the max wave speed at face
+    Array2D<real>*  r_temp      // For GCR implementation
+    Array2D<real>*  u_temp      // For GCR implementation
+    Array2D<real>*  w_temp      // For GCR implementation
 };
 
 //----------------------------------------------------------
@@ -184,29 +202,29 @@ namespace edu2d_grid_data_type{
 // Note: Each element has the following data.
 //----------------------------------------------------------
   class elm_type{
-//  to be read from a grid file
-   int nvtx     //number of vertices
-   integer,   dimension(:), pointer  :: vtx      //list of vertices
-//  to be constructed in the code
-   int nnghbrs  //number of neighbors
-   integer,   dimension(:), pointer  :: nghbr    //list of neighbors
-   real x, y     //cell center coordinates
-   real vol      //cell volume
+    //  to be read from a grid file
+    int nvtx                    //number of vertices
+    Array2D<int>*  vtx;         //list of vertices
+    //  to be constructed in the code
+    int nnghbrs;                //number of neighbors
+    Array2D<int>*  nghbr;       //list of neighbors
+    real x, y;                  //cell center coordinates
+    real vol;                   //cell volume
 
-   integer,  dimension(:)  , pointer :: edge     //list of edges
-   real(p2), dimension(:)  , pointer :: u        //conservative variables
-   real(p2), dimension(:)  , pointer :: uexact   //conservative variables
-//NotUsed   real(p2), dimension(:)  , pointer :: du       //change in conservative variables
-   real(p2), dimension(:,:), pointer :: gradu    //gradient of u
-   real(p2), dimension(:)  , pointer :: res      //residual (rhs)
-   real dt       //local time step
-   real wsn      //
-   int bmark    //Boundary mark
-   int nvnghbrs //number of vertex neighbors
-   integer,  dimension(:), pointer   :: vnghbr   //list of vertex neighbors
-   real ar       //Element volume aspect ratio
-   real(p2), dimension(:) , pointer  :: lsq2x2_cx//Linear LSQ coefficient for ux
-   real(p2), dimension(:) , pointer  :: lsq2x2_cy//Linear LSQ coefficient for uy
+    Array2D<int>*  edge;        //list of edges
+    Array2D<real>* u            //conservative variables
+    Array2D<real>* uexact       //conservative variables
+    //NotUsed   Array2D<real>* du       //change in conservative variables
+   Array2D<real>* gradu;        //gradient of u
+   Array2D<real>* res;          //residual (rhs)
+   real dt;                     //local time step
+   real wsn;                    //??
+   int bmark;                   //Boundary mark
+   int nvnghbrs;                //number of vertex neighbors
+   Array2D<int>* vnghbr;        //list of vertex neighbors
+   real ar;                     //Element volume aspect ratio
+   Array2d<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
+   Array2d<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
 
 };
 
@@ -216,14 +234,14 @@ namespace edu2d_grid_data_type{
 //----------------------------------------------------------
   class edge_type{
 //  to be constructed in the code
-   integer                          :: n1, n2 //associated nodes
-   integer                          :: e1, e2 //associated elements
-   real(p2),           dimension(2) :: dav    //unit directed-area vector
-   real(p2)                         :: da     //magnitude of the directed-area vector
-   real(p2),           dimension(2) :: ev     //unit edge vector
-   real(p2)                         :: e      //magnitude of the edge vector
-   integer                          :: kth_nghbr_of_1 //neighbor index
-   integer                          :: kth_nghbr_of_2 //neighbor index
+   int n1, n2;            //associated nodes
+   int e1, e2;            //associated elements
+   Array2D<real>* dav;    //unit directed-area vector
+   real           da;     //magnitude of the directed-area vector
+   Array2D<real>* ev;     //unit edge vector
+   real            e;     //magnitude of the edge vector
+   int kth_nghbr_of_1;    //neighbor index
+   int kth_nghbr_of_2;     //neighbor index
 
   };
 
@@ -233,11 +251,11 @@ namespace edu2d_grid_data_type{
 //----------------------------------------------------------
   class bgrid_type{
 //  to be read from a boundary grid file
-   character(80)                    :: bc_type //type of boundary condition
-   integer                          :: nbnodes //# of boundary nodes
+   char(80)                    :: bc_type //type of boundary condition
+   int nbnodes //# of boundary nodes
    integer,   dimension(:), pointer :: bnode   //list of boundary nodes
 //  to be constructed in the code
-   integer                          :: nbfaces //# of boundary faces
+   int nbfaces //# of boundary faces
    real(p2),  dimension(:), pointer :: bfnx    //x-component of the face outward normal
    real(p2),  dimension(:), pointer :: bfny    //y-component of the face outward normal
    real(p2),  dimension(:), pointer :: bfn     //magnitude of the face normal vector
@@ -270,11 +288,10 @@ namespace edu2d_grid_data_type{
 //----------------------------------------------------------
   class face_type{
 // to be constructed in the code (NB: boundary faces are excluded.)
-   integer                         :: n1, n2 //associated nodes
-   integer                         :: e1, e2 //associated elements
-   real(p2),          dimension(2) :: dav    //unit directed-area vector
-   real(p2)                        :: da     //magnitude of the directed-area vector
-  end type face_type
+   int n1, n2; //associated nodes
+   int e1, e2; //associated elements
+   real           da        //magnitude of the directed-area vector
+   Array2D<real>  dav(2);   //unit directed-area vector
 
 };
 
