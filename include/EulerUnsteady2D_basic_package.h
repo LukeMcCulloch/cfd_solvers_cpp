@@ -291,7 +291,8 @@ namespace edu2d_grid_data_type{
    int n1, n2; //associated nodes
    int e1, e2; //associated elements
    real           da;        //magnitude of the directed-area vector
-   //Array2D<real>  dav(2,1);   //unit directed-area vector
+   Array2D<real> dav = Array2D<real>(2,1);   //unit directed-area vector
+   //Array2D<float> u  = Array2D<float>(3,1);
 
 };
 
