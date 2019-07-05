@@ -222,6 +222,15 @@ void EulerSolver2D::Solver::euler_solver_main(){
 
 void EulerSolver2D::driverEuler2D(){
     Solver solver;
+
+    int i;
+
+    //Set file names, Inout data files
+    std::string  datafile_grid_in  = "project.grid";  //Grid file
+    std::string  datafile_bcmap_in = "project.bcmap"; //Boundary condition file
+    std::string  datafile_tec      = "project_tecplot.dat";  //Tecplot file for viewing the result.
+
+
     //solver.Euler2D();
     //solver.output();
     return;

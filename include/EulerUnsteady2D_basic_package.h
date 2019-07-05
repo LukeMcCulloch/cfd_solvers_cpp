@@ -126,7 +126,7 @@ struct edu2d_constants
 //*       The variable, a, is a 1D array each component of which contains all data
 //*       defined as below. These data can be accessed by %, e.g.,
 //*           a(1)%x, a(1)%y, a(1)%nghbr(1:nnghbrs), etc.
-//*       In C-programming, this type of data is called "structure", I think.
+//*       In C-programming, this is just a struct or class
 //*
 //*post
 //*
