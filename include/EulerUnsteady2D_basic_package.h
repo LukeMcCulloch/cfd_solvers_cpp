@@ -360,25 +360,25 @@ namespace edu2d_my_main_data{
 
     //  Node data
     int nnodes; //total number of nodes
-    node_type* node;   //array of nodes
+    edu2d_grid_data_type::node_type* node;   //array of nodes
 
     //  Element data (element=cell)
     int ntria; //total number of triangler elements
     int nquad; //total number of quadrilateral elements
     int nelms; //total number of elements
-    elm_type* elm;    //array of elements
+    edu2d_grid_data_type::elm_type* elm;    //array of elements
 
     //  Edge data
     int nedges; //total number of edges
-    edge_type* edge;   //array of edges
+    edu2d_grid_data_type::edge_type* edge;   //array of edges
 
     //  Boundary data
     int nbound; //total number of boundary types
-    bgrid_type* bound;  //array of boundary segments
+    edu2d_grid_data_type::bgrid_type* bound;  //array of boundary segments
 
     //  Face data (cell-centered scheme only)
     int nfaces; //total number of cell-faces
-    face_type* face;   //array of cell-faces
+    edu2d_grid_data_type::face_type* face;   //array of cell-faces
 
   };
   
@@ -410,7 +410,7 @@ namespace edu2d_my_main_data{
 //* This file may be updated in future.
 //*
 //********************************************************************************
-namespace edu2d_my_allocation{
+//namespace edu2d_my_allocation{
 
   // public :: my_alloc_int_ptr
   // public :: my_alloc_p2_ptr
@@ -424,166 +424,165 @@ namespace edu2d_my_allocation{
 //*  Array, x, will be shrinked to the requested dimension, n, if (n < dim(x)).
 //*
 //********************************************************************************
-  void my_alloc_int_ptr(x,n){
+//   void my_alloc_int_ptr(int* x, int n){
   
-    int n, i;
-    int* x;
-    int* temp;
+//     int i;
+//     int* temp;
 
-    if (n <= 0) {
-      std::cout << "my_alloc_int_ptr received non-positive dimension. Stop." << std::endl;
-      stop;
-    }
+//     if (n <= 0) {
+//       std::cout << "my_alloc_int_ptr received non-positive dimension. Stop." << std::endl;
+//       stop;
+//     }
 
-    // If not allocated, allocate and return
-    if (.not.(associated(x))) then
-    allocate(x(n))
-    return
-    endif
+//     // If not allocated, allocate and return
+//     if (.not.(associated(x))) then
+//     allocate(x(n))
+//     return
+//     endif
 
-    // If reallocation, create a pointer with a target of new dimension.
-    allocate(temp(n))
-    temp = 0
+//     // If reallocation, create a pointer with a target of new dimension.
+//     allocate(temp(n))
+//     temp = 0
 
-    // (1) Expand the array dimension
-    if ( n > size(x) ) then
+//     // (1) Expand the array dimension
+//     if ( n > size(x) ) then
 
-    do i = 1, size(x)
-      temp(i) = x(i)
-    end do
+//     do i = 1, size(x)
+//       temp(i) = x(i)
+//     end do
 
-    // (2) Shrink the array dimension: the extra data, x(n+1:size(x)), discarded.
-    else
+//     // (2) Shrink the array dimension: the extra data, x(n+1:size(x)), discarded.
+//     else
 
-    do i = 1, n
-      temp(i) = x(i)
-    end do
+//     do i = 1, n
+//       temp(i) = x(i)
+//     end do
 
-    endif
+//     endif
 
-    // Destroy the target of x
-    //  deallocate(x)
+//     // Destroy the target of x
+//     //  deallocate(x)
 
-    // Re-assign the pointer
-    x => temp
+//     // Re-assign the pointer
+//     x => temp
 
-    return
+//     return;
 
-    };//end subroutine my_alloc_int_ptr
-//********************************************************************************
-
-
-//********************************************************************************
-//* This subroutine is useful to expand or shrink real arrays.
-//*
-//*  Array, x, will be allocated if the requested dimension is 1 (i.e., n=1)
-//*  Array, x, will be expanded to the requested dimension, n, if (n > dim(x)).
-//*  Array, x, will be shrinked to the requested dimension, n, if (n < dim(x)).
-//*
-//********************************************************************************
-  subroutine my_alloc_p2_ptr(x,n)
-
-  use edu2d_constants   , only : p2
-
-  implicit none
-  integer, intent(in) :: n
-  real(p2), dimension(:), pointer :: x
-  real(p2), dimension(:), pointer :: temp
-  integer :: i
-
-  if (n <= 0) then
-   write(*,*) "my_alloc_int_ptr received non-positive dimension. Stop."
-   stop
-  endif
-
-// If not allocated, allocate and return
-  if (.not.(associated(x))) then
-   allocate(x(n))
-   return
-  endif
-
-// If reallocation, create a pointer with a target of new dimension.
-  allocate(temp(n))
-   temp = 0
-
-// (1) Expand the array dimension
-  if ( n > size(x) ) then
-
-   do i = 1, size(x)
-    temp(i) = x(i)
-   end do
-
-// (2) Shrink the array dimension: the extra data, x(n+1:size(x)), discarded.
-  else
-
-   do i = 1, n
-    temp(i) = x(i)
-   end do
-
-  endif
-
-// Destroy the target of x
-  deallocate(x)
-
-// Re-assign the pointer
-   x => temp
-
-  return
-
-  end subroutine my_alloc_p2_ptr
+//     };//end subroutine my_alloc_int_ptr
+// //********************************************************************************
 
 
-//********************************************************************************
-//* This subroutine is useful to expand or shrink real arrays.
-//*
-//*  Array, x, will be allocated if the requested dimension is 1 (i.e., n=1)
-//*  Array, x, will be expanded to the requested dimension, n, if (n > dim(x)).
-//*  Array, x, will be shrinked to the requested dimension, n, if (n < dim(x)).
-//*
-//********************************************************************************
-  subroutine my_alloc_p2_matrix_ptr(x,n,m)
+// //********************************************************************************
+// //* This subroutine is useful to expand or shrink real arrays.
+// //*
+// //*  Array, x, will be allocated if the requested dimension is 1 (i.e., n=1)
+// //*  Array, x, will be expanded to the requested dimension, n, if (n > dim(x)).
+// //*  Array, x, will be shrinked to the requested dimension, n, if (n < dim(x)).
+// //*
+// //********************************************************************************
+//   subroutine my_alloc_p2_ptr(x,n)
 
-  use edu2d_constants   , only : p2
+//   use edu2d_constants   , only : p2
 
-  implicit none
-  integer, intent(in) :: n, m
-  real(p2), dimension(:,:), pointer :: x
-  real(p2), dimension(:,:), pointer :: temp
-  integer :: i, j
+//   implicit none
+//   integer, intent(in) :: n
+//   real(p2), dimension(:), pointer :: x
+//   real(p2), dimension(:), pointer :: temp
+//   integer :: i
 
-  if (n <= 0) then
-   write(*,*) "my_alloc_int_ptr received non-positive dimension. Stop."
-   stop
-  endif
+//   if (n <= 0) then
+//    write(*,*) "my_alloc_int_ptr received non-positive dimension. Stop."
+//    stop
+//   endif
 
-// If not allocated, allocate and return
-  if (.not.(associated(x))) then
-   allocate(x(n,m))
-   return
-  endif
+// // If not allocated, allocate and return
+//   if (.not.(associated(x))) then
+//    allocate(x(n))
+//    return
+//   endif
 
-// If reallocation, create a pointer with a target of new dimension.
-  allocate(temp(n,m))
-   temp = 0.0_p2
+// // If reallocation, create a pointer with a target of new dimension.
+//   allocate(temp(n))
+//    temp = 0
 
-  do i = 1, min(n, size(x,1))
-   do j = 1, min(m, size(x,2))
-    temp(i,j) = x(i,j)
-   end do
-  end do
+// // (1) Expand the array dimension
+//   if ( n > size(x) ) then
 
-// Destroy the target of x
-  deallocate(x)
+//    do i = 1, size(x)
+//     temp(i) = x(i)
+//    end do
 
-// Re-assign the pointer
-   x => temp
+// // (2) Shrink the array dimension: the extra data, x(n+1:size(x)), discarded.
+//   else
 
-  return
+//    do i = 1, n
+//     temp(i) = x(i)
+//    end do
 
-  end subroutine my_alloc_p2_matrix_ptr
+//   endif
 
- }// end namespace edu2d_my_allocation
-//********************************************************************************
+// // Destroy the target of x
+//   deallocate(x)
+
+// // Re-assign the pointer
+//    x => temp
+
+//   return
+
+//   end subroutine my_alloc_p2_ptr
+
+
+// //********************************************************************************
+// //* This subroutine is useful to expand or shrink real arrays.
+// //*
+// //*  Array, x, will be allocated if the requested dimension is 1 (i.e., n=1)
+// //*  Array, x, will be expanded to the requested dimension, n, if (n > dim(x)).
+// //*  Array, x, will be shrinked to the requested dimension, n, if (n < dim(x)).
+// //*
+// //********************************************************************************
+//   subroutine my_alloc_p2_matrix_ptr(x,n,m)
+
+//   use edu2d_constants   , only : p2
+
+//   implicit none
+//   integer, intent(in) :: n, m
+//   real(p2), dimension(:,:), pointer :: x
+//   real(p2), dimension(:,:), pointer :: temp
+//   integer :: i, j
+
+//   if (n <= 0) then
+//    write(*,*) "my_alloc_int_ptr received non-positive dimension. Stop."
+//    stop
+//   endif
+
+// // If not allocated, allocate and return
+//   if (.not.(associated(x))) then
+//    allocate(x(n,m))
+//    return
+//   endif
+
+// // If reallocation, create a pointer with a target of new dimension.
+//   allocate(temp(n,m))
+//    temp = 0.0_p2
+
+//   do i = 1, min(n, size(x,1))
+//    do j = 1, min(m, size(x,2))
+//     temp(i,j) = x(i,j)
+//    end do
+//   end do
+
+// // Destroy the target of x
+//   deallocate(x)
+
+// // Re-assign the pointer
+//    x => temp
+
+//   return
+
+//   end subroutine my_alloc_p2_matrix_ptr
+
+//  }// end namespace edu2d_my_allocation
+// //********************************************************************************
 
 
 
