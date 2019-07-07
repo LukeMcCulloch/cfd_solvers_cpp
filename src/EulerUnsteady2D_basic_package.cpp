@@ -58,3 +58,6 @@
 #include "../include/EulerUnsteady2D_basic_package.h"
 
 
+
+edu2d_my_main_data::MainData2D::MainData2D(){}
+edu2d_my_main_data::MainData2D::~MainData2D(){}

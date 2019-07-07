@@ -184,12 +184,13 @@
 //======================================
 // 2D Eiuler approximate Riemann sovler
 #include "../include/EulerUnsteady2D.h"
+#include "../include/EulerUnsteady2D_basic_package.h"
 
 //======================================
-using namespace std;
+//using namespace std;
 
 //======================================
-//fwd declarations
+//
 //namespace EulerSolver2D{
 
 
@@ -219,6 +220,8 @@ void EulerSolver2D::Solver::euler_solver_main(){
 //********************************************************************************
 // End of program
 //********************************************************************************
+
+//namespace edu2d_my_main_data{
 void program_2D_euler_rk2(){
     // procedural fortran ends up in this function
     int i;
@@ -233,11 +236,12 @@ void program_2D_euler_rk2(){
 // Input Parameters
 
 
-    using namespace edu2d_my_main_data;
 
-    
+    //typedef edu2d_my_main_data::edu2d_my_main_data 2Ddata;
+    edu2d_my_main_data::MainData2D data2D;
+    //2Ddata = new edu2d_my_main_data();
 
-//     edu2d_my_main_data::edu2d_my_main_data.M_inf  = 0.0         // Freestream Mach number to be set in the function
+//                2Ddata.M_inf  = 0.0         // Freestream Mach number to be set in the function
 //                                     //    -> "initial_solution_shock_diffraction"
 //                                     //    (Specify M_inf here for other problems.)
 //                 gamma = 1.4         // Ratio of specific heats
@@ -278,4 +282,4 @@ void EulerSolver2D::driverEuler2D(){
     return;
 }
 
-//}  //end EulerSolver2D namespace
+//}  //end namespace edu2d_my_main_data

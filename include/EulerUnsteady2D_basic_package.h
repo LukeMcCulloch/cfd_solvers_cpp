@@ -325,14 +325,14 @@ namespace edu2d_grid_data_type{
 //********************************************************************************
 namespace edu2d_my_main_data{
 
-  struct edu2d_my_main_data{
+  class MainData2D{
     
-    // use edu2d_constants     , only : p2, one
-    // use edu2d_grid_data_type, only : node_type, elm_type, edge_type, bgrid_type, face_type
-
-    // implicit none
 
     public:
+
+    MainData2D();
+    // destructor
+    ~MainData2D ();
 
     //  Parameters
 
