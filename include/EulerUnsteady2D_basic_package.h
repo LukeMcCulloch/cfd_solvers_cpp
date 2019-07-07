@@ -60,6 +60,7 @@
 //======================================
 //stl
 #include <vector> 
+using std::vector;
 //======================================
 // my simple array class template (type)
 #include "../include/tests_array.hpp"
@@ -75,11 +76,11 @@
 //
 //********************************************************************************
 //
-struct edu2d_constants 
+namespace edu2d_constants 
 {
-  edu2d_constants() = default; // asks the compiler to generate the default implementation
+  //edu2d_constants() = default; // asks the compiler to generate the default implementation
                          
-  real                 zero = 0.0,
+  real const           zero = 0.0,
                         one = 1.0,
                         two = 2.0,
                       three = 3.0,
@@ -102,8 +103,8 @@ struct edu2d_constants
                     twelfth = 1.0 /12.0,
            one_twentyfourth = 1.0 /24.0;
 
-          real pi = 3.141592653589793238;
-};
+       real  const pi = 3.141592653589793238;
+}
 
 
 //********************************************************************************

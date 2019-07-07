@@ -214,15 +214,13 @@ EulerSolver2D::Solver::~Solver(){
 //*
 //********************************************************************************
 void EulerSolver2D::Solver::euler_solver_main(){
+
 }
 //********************************************************************************
 // End of program
 //********************************************************************************
-
-
-void EulerSolver2D::driverEuler2D(){
-    Solver solver;
-
+void program_2D_euler_rk2(){
+    // procedural fortran ends up in this function
     int i;
 
     //Set file names, Inout data files
@@ -230,6 +228,50 @@ void EulerSolver2D::driverEuler2D(){
     std::string  datafile_bcmap_in = "project.bcmap"; //Boundary condition file
     std::string  datafile_tec      = "project_tecplot.dat";  //Tecplot file for viewing the result.
 
+
+//--------------------------------------------------------------------------------
+// Input Parameters
+
+
+    using namespace edu2d_my_main_data;
+
+    
+
+//     edu2d_my_main_data::edu2d_my_main_data.M_inf  = 0.0         // Freestream Mach number to be set in the function
+//                                     //    -> "initial_solution_shock_diffraction"
+//                                     //    (Specify M_inf here for other problems.)
+//                 gamma = 1.4         // Ratio of specific heats
+//                   CFL = 0.95        // CFL number
+//               t_final = 0.18        // Final time to stop the calculation.
+//         time_step_max = 5000        // Max time steps (just a big enough number)
+//         inviscid_flux = "rhll"      // = Rotated-RHLL      , "roe"  = Roe flux
+//          limiter_type = "vanalbada" // = Van Albada limiter, "none" = No limiter
+//                    nq = 4           // The number of equtaions/variables in the target equtaion.
+//     gradient_type     = "linear"    // or "quadratic2 for a quadratic LSQ.
+//     gradient_weight   = "none"      // or "inverse_distance"
+//     gradient_weight_p =  one        // or any other real value
+// //--------------------------------------------------------------------------------
+// // Input Parameters
+
+//                M_inf  = 0.0         // Freestream Mach number to be set in the subroutine
+//                                     //    -> "initial_solution_shock_diffraction"
+//                                     //    (Specify M_inf here for other problems.)
+//                 gamma = 1.4         // Ratio of specific heats
+//                   CFL = 0.95        // CFL number
+//               t_final = 0.18        // Final time to stop the calculation.
+//         time_step_max = 5000        // Max time steps (just a big enough number)
+//         inviscid_flux = "rhll"      // = Rotated-RHLL      , "roe"  = Roe flux
+//          limiter_type = "vanalbada" // = Van Albada limiter, "none" = No limiter
+//                    nq = 4           // The number of equtaions/variables in the target equtaion.
+//     gradient_type     = "linear"    // or "quadratic2 for a quadratic LSQ.
+//     gradient_weight   = "none"      // or "inverse_distance"
+//     gradient_weight_p =  one        // or any other real value
+
+
+}
+
+void EulerSolver2D::driverEuler2D(){
+    Solver solver;
 
     //solver.Euler2D();
     //solver.output();

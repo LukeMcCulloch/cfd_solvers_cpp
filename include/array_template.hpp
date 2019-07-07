@@ -9,10 +9,17 @@
 #include <cassert>
 #include <iostream>
 #include <limits>
+#include <string.h>
 
 
 //=================================
-using namespace std;
+//using namespace std; // do not do this in headers
+using std::cout;
+using std::cin;
+using std::endl;
+using std::numeric_limits;
+using std::ofstream;
+using std::max;
 
 
 
