@@ -241,19 +241,19 @@ void program_2D_euler_rk2(){
     edu2d_my_main_data::MainData2D data2D;
     //2Ddata = new edu2d_my_main_data();
 
-//                2Ddata.M_inf  = 0.0         // Freestream Mach number to be set in the function
-//                                     //    -> "initial_solution_shock_diffraction"
-//                                     //    (Specify M_inf here for other problems.)
-//                 gamma = 1.4         // Ratio of specific heats
-//                   CFL = 0.95        // CFL number
-//               t_final = 0.18        // Final time to stop the calculation.
-//         time_step_max = 5000        // Max time steps (just a big enough number)
-//         inviscid_flux = "rhll"      // = Rotated-RHLL      , "roe"  = Roe flux
-//          limiter_type = "vanalbada" // = Van Albada limiter, "none" = No limiter
-//                    nq = 4           // The number of equtaions/variables in the target equtaion.
-//     gradient_type     = "linear"    // or "quadratic2 for a quadratic LSQ.
-//     gradient_weight   = "none"      // or "inverse_distance"
-//     gradient_weight_p =  one        // or any other real value
+                data2D.M_inf  = 0.0;         // Freestream Mach number to be set in the function
+                                    //    -> "initial_solution_shock_diffraction"
+                                    //    (Specify M_inf here for other problems.)
+                data2D.gamma = 1.4;         // Ratio of specific heats
+                  data2D.CFL = 0.95;        // CFL number
+              data2D.t_final = 0.18;        // Final time to stop the calculation.
+        data2D.time_step_max = 5000;        // Max time steps (just a big enough number)
+        data2D.inviscid_flux = "rhll";      // = Rotated-RHLL      , "roe"  = Roe flux
+         data2D.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
+                   data2D.nq = 4;           // The number of equtaions/variables in the target equtaion.
+    data2D.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
+    data2D.gradient_weight   = "none";      // or "inverse_distance"
+    data2D.gradient_weight_p =  edu2d_constants::one;        // or any other real value
 // //--------------------------------------------------------------------------------
 // // Input Parameters
 
