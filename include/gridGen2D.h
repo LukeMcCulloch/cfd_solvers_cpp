@@ -61,7 +61,7 @@ public:
 
 
     //Output - grid files
-    std::string datafile_tria_tec = "tria_grid_tecplot.dat";
+    std::string  datafile_tria_tec = "tria_grid_tecplot.dat";
     std::string  datafile_quad_tec = "quad_grid_tecplot.dat";
     std::string  datafile_tria = "tria.grid";
     std::string  datafile_quad = "quad.grid";
