@@ -56,6 +56,14 @@
 //======================================
 // 2D Euler approximate Riemann sovler
 #include "../include/EulerUnsteady2D_basic_package.h"
+//======================================
+// i/o
+#include <iostream>     // std::cout, std::fixed
+#include <fstream>      // write to file
+//======================================
+// line based parsing, including streams
+#include <sstream>
+#include <string>
 
 
 
@@ -206,152 +214,175 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
 //*    bound(1:nbound)%bc_type  = Boundary condition name for each segment
 //*
 //********************************************************************************
-//  void MainData2D::read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in){
+ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in){
 
-//     //use edu2d_my_main_data, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
+    //use edu2d_my_main_data, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
 
-//     //Local variables
-//     int i, j, os, dummy_int;
+    //Local variables
+    int i, j, os, dummy_int;
 
-//     //--------------------------------------------------------------------------------
-//     // 1. Read grid file>: datafile_grid_in
+    //--------------------------------------------------------------------------------
+    // 1. Read grid file>: datafile_grid_in
 
-//     std::cout << "Reading the grid file...." << datafile_grid_in << std::endl;
+    std::cout << "Reading the grid file...." << datafile_grid_in << std::endl;
 
-//     //  Open the input file.
-//     open(unit=1, file=datafile_grid_in, status="unknown", iostat=os)
+    //  Open the input file.
+    std::ifstream infile;
+    infile.open(datafile_grid_in);
 
-//     // READ: Get the size of the grid.
-//     read(1,*) nnodes, ntria, nquad
-//     nelms = ntria + nquad
 
-//     //  Allocate node and element arrays.
-//     allocate(node(nnodes))
-//     allocate(elm(  nelms))
+    // line based parsing, using string streams:
+    std::string line;
+    // while (std::getline(infile, line))
+    // {
+    //     std::istringstream iss(line);
+    //     int a, b;
+    //     if (!(iss >> a >> b)) { break; } //error
+        
+    //     //process data here
+    // }
 
-//     // READ: Read the nodal coordinates
-//     do i = 1, nnodes
-//     read(1,*) node(i)%x, node(i)%y
-//     end do
+    // READ: Get the size of the grid.
+    //read(1,*) nnodes, ntria, nquad
+    //nelms = ntria + nquad
+    std::getline(infile, line);
+    std::istringstream iss(line);
+    iss >> nnodes >> ntria >> nquad;
+    nelms = ntria + nquad;
+    std::cout << "found data" << std::endl;
+    std::cout << "nnodes = " << nnodes << std::endl;
+    std::cout << "ntria = " << ntria << std::endl;
+    std::cout << "nquad = " << nquad << std::endl;
+    std::cout << "nelms = " << nelms << std::endl;
+    
 
-//     // Read element-connectivity information
+    // //  Allocate node and element arrays.
+    // allocate(node(nnodes))
+    // allocate(elm(  nelms))
 
-//     // Triangles: assumed that the vertices are ordered counterclockwise
-//     //
-//     //         v3
-//     //         /\
-//     //        /  \
-//     //       /    \
-//     //      /      \
-//     //     /        \
-//     //    /__________\
-//     //   v1           v2
+    // // READ: Read the nodal coordinates
+    // do i = 1, nnodes
+    // read(1,*) node(i)%x, node(i)%y
+    // end do
 
-//     // READ: read connectivity info for triangles
-//     if ( ntria > 0 ) then
-//     do i = 1, ntria
-//         elm(i)%nvtx = 3
-//         allocate(elm(i)%vtx(3))
-//         read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
-//     end do
-//     endif
+    // // Read element-connectivity information
 
-//     // Quads: assumed that the vertices are ordered counterclockwise
-//     //
-//     //        v4________v3
-//     //         /        |
-//     //        /         |
-//     //       /          |
-//     //      /           |
-//     //     /            |
-//     //    /_____________|
-//     //   v1             v2
+    // // Triangles: assumed that the vertices are ordered counterclockwise
+    // //
+    // //         v3
+    // //         /\
+    // //        /  \
+    // //       /    \
+    // //      /      \
+    // //     /        \
+    // //    /__________\
+    // //   v1           v2
 
-//     // READ: read connectivity info for quadrilaterals
-//     if ( nquad > 0 ) then
-//     do i = 1, nquad
-//         elm(ntria+i)%nvtx = 4
-//         allocate( elm(ntria+i)%vtx(4))
-//         read(1,*) elm(ntria+i)%vtx(1), elm(ntria+i)%vtx(2), &
-//                 elm(ntria+i)%vtx(3), elm(ntria+i)%vtx(4)
-//     end do
-//     endif
+    // // READ: read connectivity info for triangles
+    // if ( ntria > 0 ) then
+    // do i = 1, ntria
+    //     elm(i)%nvtx = 3
+    //     allocate(elm(i)%vtx(3))
+    //     read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
+    // end do
+    // endif
 
-//     //  Write out the grid data.
+    // // Quads: assumed that the vertices are ordered counterclockwise
+    // //
+    // //        v4________v3
+    // //         /        |
+    // //        /         |
+    // //       /          |
+    // //      /           |
+    // //     /            |
+    // //    /_____________|
+    // //   v1             v2
 
-//     write(*,*)
-//     write(*,*) " Total numbers:"
-//     write(*,*) "      nodes = ", nnodes
-//     write(*,*) "  triangles = ", ntria
-//     write(*,*) "      quads = ", nquad
-//     write(*,*)
+    // // READ: read connectivity info for quadrilaterals
+    // if ( nquad > 0 ) then
+    // do i = 1, nquad
+    //     elm(ntria+i)%nvtx = 4
+    //     allocate( elm(ntria+i)%vtx(4))
+    //     read(1,*) elm(ntria+i)%vtx(1), elm(ntria+i)%vtx(2), &
+    //             elm(ntria+i)%vtx(3), elm(ntria+i)%vtx(4)
+    // end do
+    // endif
 
-//     // Read the boundary grid data
+    // //  Write out the grid data.
 
-//     // READ: Number of boundary condition types
-//     read(1,*) nbound
-//     allocate(bound(nbound))
+    // write(*,*)
+    // write(*,*) " Total numbers:"
+    // write(*,*) "      nodes = ", nnodes
+    // write(*,*) "  triangles = ", ntria
+    // write(*,*) "      quads = ", nquad
+    // write(*,*)
 
-//     // READ: Number of Boundary nodes (including the starting one at the end if
-//     // it is closed such as an airfoil.)
-//     do i = 1, nbound
-//     read(1,*) bound(i)%nbnodes
-//     allocate(bound(i)%bnode(bound(i)%nbnodes))
-//     end do
+    // // Read the boundary grid data
 
-//     // READ: Read boundary nodes
-//     do i = 1, nbound
-//     do j = 1, bound(i)%nbnodes
-//     read(1,*) bound(i)%bnode(j)
-//     end do
-//     end do
+    // // READ: Number of boundary condition types
+    // read(1,*) nbound
+    // allocate(bound(nbound))
 
-//     //  Print the boundary grid data.
-//     write(*,*) " Boundary nodes:"
-//     write(*,*) "    segments = ", nbound
-//         do i = 1, nbound
-//         write(*,'(a9,i3,2(a11,i5))') " boundary", i, "  bnodes = ", bound(i)%nbnodes, &
-//                                                     "  bfaces = ", bound(i)%nbnodes-1
-//         end do
-//     write(*,*)
+    // // READ: Number of Boundary nodes (including the starting one at the end if
+    // // it is closed such as an airfoil.)
+    // do i = 1, nbound
+    // read(1,*) bound(i)%nbnodes
+    // allocate(bound(i)%bnode(bound(i)%nbnodes))
+    // end do
 
-//     close(1)
+    // // READ: Read boundary nodes
+    // do i = 1, nbound
+    // do j = 1, bound(i)%nbnodes
+    // read(1,*) bound(i)%bnode(j)
+    // end do
+    // end do
 
-//     // End of Read grid file>: datafile_grid_in
-//     //--------------------------------------------------------------------------------
+    // //  Print the boundary grid data.
+    // write(*,*) " Boundary nodes:"
+    // write(*,*) "    segments = ", nbound
+    //     do i = 1, nbound
+    //     write(*,'(a9,i3,2(a11,i5))') " boundary", i, "  bnodes = ", bound(i)%nbnodes, &
+    //                                                 "  bfaces = ", bound(i)%nbnodes-1
+    //     end do
+    // write(*,*)
 
-//     //--------------------------------------------------------------------------------
-//     // 2. Read the boundary condition data file
+    // close(1)
 
-//     write(*,*)
-//     write(*,*) "Reading the boundary condition file....", datafile_bcmap_in
-//     write(*,*)
+    // // End of Read grid file>: datafile_grid_in
+    // //--------------------------------------------------------------------------------
 
-//     // Open the input file.
-//     open(unit=2, file=datafile_bcmap_in, status="unknown", iostat=os)
+    // //--------------------------------------------------------------------------------
+    // // 2. Read the boundary condition data file
 
-//         read(2,*) 
+    // write(*,*)
+    // write(*,*) "Reading the boundary condition file....", datafile_bcmap_in
+    // write(*,*)
 
-//     // READ: Read the boundary condition type
-//     do i = 1, nbound
-//         read(2,*) dummy_int, bound(i)%bc_type
-//     end do
+    // // Open the input file.
+    // open(unit=2, file=datafile_bcmap_in, status="unknown", iostat=os)
 
-//     //  Print the data
-//         write(*,*) " Boundary conditions:"
-//     do i = 1, nbound
-//         write(*,'(a9,i3,a12,a35)') " boundary", i, "  bc_type = ", trim(bound(i)%bc_type)
-//     end do
+    //     read(2,*) 
 
-//         i = dummy_int //Never mind. Just to avoid a compilation warning.
+    // // READ: Read the boundary condition type
+    // do i = 1, nbound
+    //     read(2,*) dummy_int, bound(i)%bc_type
+    // end do
 
-//         write(*,*)
+    // //  Print the data
+    //     write(*,*) " Boundary conditions:"
+    // do i = 1, nbound
+    //     write(*,'(a9,i3,a12,a35)') " boundary", i, "  bc_type = ", trim(bound(i)%bc_type)
+    // end do
 
-//     close(2)
+    //     i = dummy_int //Never mind. Just to avoid a compilation warning.
 
-//     // End of Read the boundary condition data file
-//     //--------------------------------------------------------------------------------
+    //     write(*,*)
 
-//     end subroutine read_grid
+    // close(2)
+    infile.close();
 
-//  } // end function edu2d_grid_data
+    // End of Read the boundary condition data file
+    //--------------------------------------------------------------------------------
+    return;
+
+ } // end function read_grid

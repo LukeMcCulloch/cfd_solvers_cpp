@@ -226,6 +226,9 @@ void program_2D_euler_rk2(){
     // procedural fortran ends up in this function
     int i;
 
+    // euler solver 2D:
+    EulerSolver2D::Solver E2Dsolver;
+
     //Set file names, Inout data files
     std::string  datafile_grid_in  = "project.grid";  //Grid file
     std::string  datafile_bcmap_in = "project.bcmap"; //Boundary condition file
@@ -235,36 +238,34 @@ void program_2D_euler_rk2(){
 //--------------------------------------------------------------------------------
 // Input Parameters
 
-
-
+    // euler main data:
     //typedef edu2d_my_main_data::edu2d_my_main_data 2Ddata;
-    edu2d_my_main_data::MainData2D data2D;
+    edu2d_my_main_data::MainData2D E2Ddata;
     //2Ddata = new edu2d_my_main_data();
 
-                data2D.M_inf  = 0.0;         // Freestream Mach number to be set in the function
+                E2Ddata.M_inf  = 0.0;         // Freestream Mach number to be set in the function
                                     //    -> "initial_solution_shock_diffraction"
                                     //    (Specify M_inf here for other problems.)
-                data2D.gamma = 1.4;         // Ratio of specific heats
-                  data2D.CFL = 0.95;        // CFL number
-              data2D.t_final = 0.18;        // Final time to stop the calculation.
-        data2D.time_step_max = 5000;        // Max time steps (just a big enough number)
-        data2D.inviscid_flux = "rhll";      // = Rotated-RHLL      , "roe"  = Roe flux
-         data2D.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
-                   data2D.nq = 4;           // The number of equtaions/variables in the target equtaion.
-    data2D.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
-    data2D.gradient_weight   = "none";      // or "inverse_distance"
-    data2D.gradient_weight_p =  edu2d_constants::one;        // or any other real value
+                E2Ddata.gamma = 1.4;         // Ratio of specific heats
+                  E2Ddata.CFL = 0.95;        // CFL number
+              E2Ddata.t_final = 0.18;        // Final time to stop the calculation.
+        E2Ddata.time_step_max = 5000;        // Max time steps (just a big enough number)
+        E2Ddata.inviscid_flux = "rhll";      // = Rotated-RHLL      , "roe"  = Roe flux
+         E2Ddata.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
+                   E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
+    E2Ddata.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
+    E2Ddata.gradient_weight   = "none";      // or "inverse_distance"
+    E2Ddata.gradient_weight_p =  edu2d_constants::one;        // or any other real value
 //--------------------------------------------------------------------------------
 // Solve the Euler equations and write the output datafile.
 //
 // (1) Read grid files
+    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
 
 }
 
 void EulerSolver2D::driverEuler2D(){
-    Solver solver;
-
-    //solver.Euler2D();
+    program_2D_euler_rk2();
     //solver.output();
     return;
 }
