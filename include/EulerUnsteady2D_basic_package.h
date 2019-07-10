@@ -332,7 +332,11 @@ namespace edu2d_my_main_data{
 
     MainData2D();
     // destructor
-    ~MainData2D ();
+    ~MainData2D();
+
+    // build the grid:
+    void read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in);
+    //void construct_grid_data();
 
     //  Parameters
 
@@ -403,11 +407,12 @@ namespace edu2d_my_main_data{
 //*
 //*
 //*        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
+//*        translated, reconfigured by Dr. Luke McCulloch
 //*
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
 //* This is Version 0 (July 2015).
-//* This F90 code is written and made available for an educational purpose.
+//* This c++ code is written and made available for an educational purpose.
 //* This file may be updated in future.
 //*
 //********************************************************************************
@@ -584,7 +589,6 @@ namespace edu2d_my_main_data{
 
 //  }// end namespace edu2d_my_allocation
 // //********************************************************************************
-
 
 
 

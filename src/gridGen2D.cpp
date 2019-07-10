@@ -284,14 +284,18 @@ void Grid2D::gridGen2D::build(){//build
 
 // (4)Write a boundary condition file: to be read by EDU2D-Euler code
     printf( "\nGenerating bcmap file...");
-    //open(unit=1, file=datafile_bcmap, status="unknown", iostat=os)
-    printf("\nBoundary Segment  Boundary Condition");
-    printf("\n               1          freestream");
-    printf("\n               2           slip_wall");
-    printf("\n               3  outflow_supersonic");
-    printf("\n               4  outflow_supersonic");
-    printf("\n               5           slip_wall");
-    //close(1)
+
+
+    ofstream outfile;
+    //outfile.open ("tria_grid_tecplot.dat");
+    outfile.open (datafile_bcmap);
+    outfile << "Boundary Segment  Boundary Condition \n";
+    outfile << "               1          freestream \n";
+    outfile << "               2           slip_wall \n";
+    outfile << "               3  outflow_supersonic \n";
+    outfile << "               4  outflow_supersonic \n";
+    outfile << "               5           slip_wall \n";
+    outfile.close();
 
 //--------------------------------------------------------------------------------
 
