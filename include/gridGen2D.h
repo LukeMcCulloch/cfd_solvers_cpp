@@ -51,8 +51,8 @@ public:
 
 
     //Input  - domain size and grid dimensions
-    float xmin, xmax;            //Minimum x and Max x.
-    float ymin, ymax;            //Minimum y and Max y
+    float xmin, xmax;           //Minimum x and Max x.
+    float ymin, ymax;           //Minimum y and Max y
 
     const float  zero = 0.0;    // minimum x and max x
     const float   one = 1.0;    // minimum y and max y
