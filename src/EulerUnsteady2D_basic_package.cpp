@@ -58,14 +58,15 @@
 #include "../include/EulerUnsteady2D_basic_package.h"
 //======================================
 // i/o
-#include <iostream>     // std::cout, std::fixed
+#include <iostream>     // cout, std::fixed
 #include <fstream>      // write to file
 //======================================
 // line based parsing, including streams
 #include <sstream>
 #include <string>
 
-
+using std::cout;
+using std::endl;
 
 edu2d_my_main_data::MainData2D::MainData2D(){}
 edu2d_my_main_data::MainData2D::~MainData2D(){}
@@ -224,7 +225,7 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
     //--------------------------------------------------------------------------------
     // 1. Read grid file>: datafile_grid_in
 
-    std::cout << "Reading the grid file...." << datafile_grid_in << std::endl;
+    cout << "Reading the grid file...." << datafile_grid_in << endl;
 
     //  Open the input file.
     std::ifstream infile;
@@ -249,11 +250,11 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
     std::istringstream iss(line);
     iss >> nnodes >> ntria >> nquad;
     nelms = ntria + nquad;
-    std::cout << "found data" << std::endl;
-    std::cout << "nnodes = " << nnodes << std::endl;
-    std::cout << "ntria = " << ntria << std::endl;
-    std::cout << "nquad = " << nquad << std::endl;
-    std::cout << "nelms = " << nelms << std::endl;
+    cout << "found data" << endl;
+    cout << "nnodes = " << nnodes << endl;
+    cout << "ntria = " << ntria << endl;
+    cout << "nquad = " << nquad << endl;
+    cout << "nelms = " << nelms << endl;
     
 
     // //  Allocate node and element arrays.
