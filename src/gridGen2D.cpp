@@ -1,6 +1,9 @@
 //*******************************************************************************
 // This program generates 2D quad and triangular grids in a rectangular domain.
 //
+// Note that this is separate conceputally and practically from the 
+// Euler 2D code to read in a grid.
+// (and we want to keep it that way!)
 //
 //      Boundary information is set up for a shock-diffraction problem
 //
