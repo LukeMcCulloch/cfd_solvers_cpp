@@ -411,13 +411,14 @@ namespace edu2d_my_main_data{
 //*
 //*
 //*        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
-//*        translated, reconfigured by Dr. Luke McCulloch
 //*
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
 //* This is Version 0 (July 2015).
 //* This c++ code is written and made available for an educational purpose.
 //* This file may be updated in future.
+//*
+//* translated, reconfigured by Dr. Luke McCulloch
 //*
 //********************************************************************************
 //namespace edu2d_my_allocation{
