@@ -368,26 +368,26 @@ namespace edu2d_my_main_data{
     real gamma = 1.4;
 
     //  Node data
-    int nnodes; //total number of nodes
+    int                              nnodes; //total number of nodes
     edu2d_grid_data_type::node_type* node;   //array of nodes
 
     //  Element data (element=cell)
-    int ntria; //total number of triangler elements
-    int nquad; //total number of quadrilateral elements
-    int nelms; //total number of elements
-    edu2d_grid_data_type::elm_type* elm;    //array of elements
+    int                              ntria;   //total number of triangler elements
+    int                              nquad;   //total number of quadrilateral elements
+    int                              nelms;   //total number of elements
+    edu2d_grid_data_type::elm_type*  elm;     //array of elements
 
     //  Edge data
-    int nedges; //total number of edges
-    edu2d_grid_data_type::edge_type* edge;   //array of edges
+    int                              nedges;  //total number of edges
+    edu2d_grid_data_type::edge_type* edge;    //array of edges
 
     //  Boundary data
-    int nbound; //total number of boundary types
+    int                               nbound; //total number of boundary types
     edu2d_grid_data_type::bgrid_type* bound;  //array of boundary segments
 
     //  Face data (cell-centered scheme only)
-    int nfaces; //total number of cell-faces
-    edu2d_grid_data_type::face_type* face;   //array of cell-faces
+    int                               nfaces; //total number of cell-faces
+    edu2d_grid_data_type::face_type*  face;   //array of cell-faces
 
   };
   
