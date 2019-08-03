@@ -317,12 +317,14 @@ private:
 //*
 //*
 //*        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
-//*
+//* 
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
 //* This is Version 0 (July 2015).
 //* This F90 code is written and made available for an educational purpose.
 //* This file may be updated in future.
+//*
+//*        translated by T. Luke McCulloch
 //*
 //********************************************************************************
 namespace edu2d_my_main_data{
