@@ -16,7 +16,7 @@ int main(){
 
     if (false){
         EulerSolver1D::driverEuler1D();
-    }else if (true){
+    }else if (false){
         EulerSolver2D::driverEuler2D();
     }else{
         Grid2D::driverGrid2D();
