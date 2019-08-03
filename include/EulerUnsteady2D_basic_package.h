@@ -152,8 +152,10 @@ namespace edu2d_grid_data_type{
 // Data type for nodal quantities (used for node-centered schemes)
 // Note: Each node has the following data.
 //----------------------------------------------------------
-  class node_type{
+class node_type
+{
 
+private:
     //  to be read from a grid file
     real x, y;                  //nodal coordinates
     //  to be constructed in the code
@@ -171,12 +173,12 @@ namespace edu2d_grid_data_type{
     int nbmarks;                //# of boundary marks
     //  to be computed in the code
     //Below are arrays always allocated.
-    Array2D<real>* u;           //conservative variables
-    Array2D<real>* uexact;      //conservative variables
-    //Array2D<real>* gradu      //gradient of u
-    Array2D<real>* gradu;       //gradient of u (2D) 
-    Array2D<real>* res;         //residual (rhs)
-    real ar;                    // Control volume aspect ratio
+    Array2D<real>* u;           // conservative variables
+    Array2D<real>* uexact;      // conservative variables
+    //Array2D<real>* gradu      // gradient of u
+    Array2D<real>* gradu;       // gradient of u (2D) 
+    Array2D<real>* res;         // residual (rhs)
+    real ar;                    //      Control volume aspect ratio
     Array2D<real>* lsq2x2_cx;   //    Linear LSQ coefficient for ux
     Array2D<real>* lsq2x2_cy;   //    Linear LSQ coefficient for uy
     Array2D<real>* lsq5x5_cx;   // Quadratic LSQ coefficient for ux
