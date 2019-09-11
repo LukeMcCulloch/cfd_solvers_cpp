@@ -215,7 +215,9 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
 //*    bound(1:nbound)%bc_type  = Boundary condition name for each segment
 //*
 //********************************************************************************
- void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in){
+void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in, 
+                                               std::string datafile_bcmap_in)
+{
 
     //use edu2d_my_main_data, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
 
@@ -260,11 +262,26 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
     // //  Allocate node and element arrays.
     // allocate(node(nnodes))
     // allocate(elm(  nelms))
+    //node = new node_type[nnodes]; //??
+    edu2d_grid_data_type::node_type* node = new edu2d_grid_data_type::node_type[nnodes]; //??
+    edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
+
 
     // // READ: Read the nodal coordinates
     // do i = 1, nnodes
     // read(1,*) node(i)%x, node(i)%y
     // end do
+
+    // while (std::getline(infile, line))
+    // {
+    //     std::istringstream iss(line);
+    //     int a, b;
+    //     if (!(iss >> a >> b)) { break; } //error
+    for (size_t i = 1; i < nnodes; i++) {
+        std::istringstream iss(line);
+        iss >> node[i].x >> node[i].y ;
+    }
+        
 
     // // Read element-connectivity information
 
@@ -287,6 +304,7 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
     //     read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
     // end do
     // endif
+    
 
     // // Quads: assumed that the vertices are ordered counterclockwise
     // //

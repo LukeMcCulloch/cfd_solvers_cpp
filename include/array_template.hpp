@@ -176,7 +176,7 @@ template <class T>
 Array2D<T>::Array2D(){
     //nrows = 4;
     //ncols = 4;
-    cout << "build \n" << endl;
+    //cout << "build \n" << endl;
     //build();
     // cout << "initialize\n" << endl;
 

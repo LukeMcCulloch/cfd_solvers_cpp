@@ -140,7 +140,7 @@ namespace edu2d_constants
 //*
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
-//* This is Version 0 (July 2015).  Translated in June/July 2019
+//* This is Version 0 (July 2015).  Translated in June/July... Sept 2019
 //* This C++ code is written and made available for an educational purpose.
 //* This file may be updated in future.
 //*
@@ -155,7 +155,7 @@ namespace edu2d_grid_data_type{
 class node_type
 {
 
-private:
+public:
     //  to be read from a grid file
     real x, y;                  //nodal coordinates
     //  to be constructed in the code
@@ -205,29 +205,30 @@ private:
 // Note: Each element has the following data.
 //----------------------------------------------------------
   class elm_type{
-    //  to be read from a grid file
-    int nvtx;                   //number of vertices
-    Array2D<int>*  vtx;         //list of vertices
-    //  to be constructed in the code
-    int nnghbrs;                //number of neighbors
-    Array2D<int>*  nghbr;       //list of neighbors
-    real x, y;                  //cell center coordinates
-    real vol;                   //cell volume
+    public:
+      //  to be read from a grid file
+      int nvtx;                   //number of vertices
+      Array2D<int>*  vtx;         //list of vertices
+      //  to be constructed in the code
+      int nnghbrs;                //number of neighbors
+      Array2D<int>*  nghbr;       //list of neighbors
+      real x, y;                  //cell center coordinates
+      real vol;                   //cell volume
 
-    Array2D<int>*  edge;        //list of edges
-    Array2D<real>* u;            //conservative variables
-    Array2D<real>* uexact;       //conservative variables
-    //NotUsed   Array2D<real>* du       //change in conservative variables
-    Array2D<real>* gradu;        //gradient of u
-    Array2D<real>* res;          //residual (rhs)
-    real dt;                     //local time step
-    real wsn;                    //??
-    int bmark;                   //Boundary mark
-    int nvnghbrs;                //number of vertex neighbors
-    Array2D<int>* vnghbr;        //list of vertex neighbors
-    real ar;                     //Element volume aspect ratio
-    Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
-    Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
+      Array2D<int>*  edge;        //list of edges
+      Array2D<real>* u;            //conservative variables
+      Array2D<real>* uexact;       //conservative variables
+      //NotUsed   Array2D<real>* du       //change in conservative variables
+      Array2D<real>* gradu;        //gradient of u
+      Array2D<real>* res;          //residual (rhs)
+      real dt;                     //local time step
+      real wsn;                    //??
+      int bmark;                   //Boundary mark
+      int nvnghbrs;                //number of vertex neighbors
+      Array2D<int>* vnghbr;        //list of vertex neighbors
+      real ar;                     //Element volume aspect ratio
+      Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
+      Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
 
 };
 
