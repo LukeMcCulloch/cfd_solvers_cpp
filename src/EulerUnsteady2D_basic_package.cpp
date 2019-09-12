@@ -301,16 +301,24 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     if (ntria > 0) {
         for (size_t i = 1; i < ntria; i++) {
             std::getline(infile, line);
-            std::istringstream iss(line);
+            std::istringstream in(line);
             elm[i].nvtx = 3;
             //allocate(elm(i)%vtx(3))
             elm[i].vtx = new Array2D<int>(3,1) ;
             //edu2d_grid_data_type::elm_type[i].vtx* = new Array2D<int>(3,1) ;
             //edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
 
+            std::string type;
+            in >> type;                  //and read the first whitespace-separated token
+
+
+            float x, y, z;
+            in >> x >> y >> z;       //now read the whitespace-separated floats
             //read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
             //iss >> elm[i].vtx[0] >> elm[i].vtx[1] >> elm[i].vtx[2];
-            //iss >> elm[i].vtx[0,0] >> elm[i].vtx[1,0] >> elm[i].vtx[2,0];
+            elm[i].vtx[0] = x;
+            elm[i].vtx[1] = y;
+            elm[i].vtx[2] = z;
         }
     }
     // // Quads: assumed that the vertices are ordered counterclockwise
