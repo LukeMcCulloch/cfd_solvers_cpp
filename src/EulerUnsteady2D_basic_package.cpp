@@ -278,8 +278,9 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     //     int a, b;
     //     if (!(iss >> a >> b)) { break; } //error
     for (size_t i = 1; i < nnodes; i++) {
+        std::getline(infile, line);
         std::istringstream iss(line);
-        iss >> node[i].x >> node[i].y ;
+        iss >> node[i-1].x >> node[i-1].y ;
     }
         
 
@@ -297,15 +298,21 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // //   v1           v2
 
     // // READ: read connectivity info for triangles
-    // if ( ntria > 0 ) then
-    // do i = 1, ntria
-    //     elm(i)%nvtx = 3
-    //     allocate(elm(i)%vtx(3))
-    //     read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
-    // end do
-    // endif
-    
+    if (ntria > 0) {
+        for (size_t i = 1; i < ntria; i++) {
+            std::getline(infile, line);
+            std::istringstream iss(line);
+            elm[i].nvtx = 3;
+            //allocate(elm(i)%vtx(3))
+            elm[i].vtx = new Array2D<int>(3,1) ;
+            //edu2d_grid_data_type::elm_type[i].vtx* = new Array2D<int>(3,1) ;
+            //edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
 
+            //read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
+            //iss >> elm[i].vtx[0] >> elm[i].vtx[1] >> elm[i].vtx[2];
+            //iss >> elm[i].vtx[0,0] >> elm[i].vtx[1,0] >> elm[i].vtx[2,0];
+        }
+    }
     // // Quads: assumed that the vertices are ordered counterclockwise
     // //
     // //        v4________v3
