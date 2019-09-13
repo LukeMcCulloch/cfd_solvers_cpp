@@ -254,22 +254,22 @@ public:
 // Note: Each boundary segment has the following data.
 //----------------------------------------------------------
   class bgrid_type{
-    //  to be read from a boundary grid file
-    char bc_type[80];     //type of boundary condition
-    int nbnodes; //# of boundary nodes
-    Array2D<int>* bnode;  //list of boundary nodes
-    //  to be constructed in the code
-    int nbfaces; //# of boundary faces
-    Array2D<real>* bfnx;  //x-component of the face outward normal
-    Array2D<real>* bfny;  //y-component of the face outward normal
-    Array2D<real>* bfn;   //magnitude of the face normal vector
-    Array2D<real>* bnx;   //x-component of the outward normal
-    Array2D<real>* bny;   //y-component of the outward normal
-    Array2D<real>* bn;    //magnitude of the normal vector
-    Array2D<int>*  belm;  //list of elm adjacent to boundary face
-    Array2D<int>*  kth_nghbr_of_1;
-    Array2D<int>*  kth_nghbr_of_2;
-
+    public:
+      //  to be read from a boundary grid file
+      char bc_type[80];     //type of boundary condition
+      int nbnodes; //# of boundary nodes
+      Array2D<int>* bnode;  //list of boundary nodes
+      //  to be constructed in the code
+      int nbfaces; //# of boundary faces
+      Array2D<real>* bfnx;  //x-component of the face outward normal
+      Array2D<real>* bfny;  //y-component of the face outward normal
+      Array2D<real>* bfn;   //magnitude of the face normal vector
+      Array2D<real>* bnx;   //x-component of the outward normal
+      Array2D<real>* bny;   //y-component of the outward normal
+      Array2D<real>* bn;    //magnitude of the normal vector
+      Array2D<int>*  belm;  //list of elm adjacent to boundary face
+      Array2D<int>*  kth_nghbr_of_1;
+      Array2D<int>*  kth_nghbr_of_2;
   };
 
 //----------------------------------------------------------

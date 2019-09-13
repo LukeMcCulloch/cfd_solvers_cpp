@@ -302,9 +302,9 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
         for (size_t i = 1; i < ntria; i++) {
             std::getline(infile, line);
             std::istringstream in(line);
-            elm[i].nvtx = 3;
+            elm[i-1].nvtx = 3;
             //allocate(elm(i)%vtx(3))
-            elm[i].vtx = new Array2D<int>(3,1) ;
+            elm[i-1].vtx = new Array2D<int>(3,1) ;
             //edu2d_grid_data_type::elm_type[i].vtx* = new Array2D<int>(3,1) ;
             //edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
 
@@ -316,9 +316,9 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
             in >> x >> y >> z;       //now read the whitespace-separated floats
             //read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
             //iss >> elm[i].vtx[0] >> elm[i].vtx[1] >> elm[i].vtx[2];
-            elm[i].vtx[0] = x;
-            elm[i].vtx[1] = y;
-            elm[i].vtx[2] = z;
+            elm[i-1].vtx[0] = x;
+            elm[i-1].vtx[1] = y;
+            elm[i-1].vtx[2] = z;
         }
     }
     // // Quads: assumed that the vertices are ordered counterclockwise
@@ -346,12 +346,10 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
             std::istringstream in(line);
             elm[i].nvtx = 4;
             //allocate(elm(i)%vtx(3))
-            elm[i].vtx = new Array2D<int>(4,1) ;
-            //edu2d_grid_data_type::elm_type[i].vtx* = new Array2D<int>(3,1) ;
-            //edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
+            elm[i].vtx = new Array2D<int>(4,1);
 
-            std::string type;
-            in >> type;                  //and read the first whitespace-separated token
+            //std::string type;
+            //in >> type;                  //and read the first whitespace-separated token
 
 
             float x1,x2,x3,x4;
@@ -389,6 +387,9 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // // READ: Number of boundary condition types
     // read(1,*) nbound
     // allocate(bound(nbound))
+    std::getline(infile, line);
+    std::istringstream in(line);
+    in >> nbound;
 
     // // READ: Number of Boundary nodes (including the starting one at the end if
     // // it is closed such as an airfoil.)
@@ -396,6 +397,11 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // read(1,*) bound(i)%nbnodes
     // allocate(bound(i)%bnode(bound(i)%nbnodes))
     // end do
+    for (size_t i = 1; i < nbound; i++) {
+        std::getline(infile, line);
+        std::istringstream in(line);
+        in >> bound[i-1].nbnodes;
+    }
 
     // // READ: Read boundary nodes
     // do i = 1, nbound
@@ -424,9 +430,12 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // write(*,*)
     // write(*,*) "Reading the boundary condition file....", datafile_bcmap_in
     // write(*,*)
+    std::cout << "Reading the boundary condition file...." << datafile_bcmap_in << std::endl;
 
     // // Open the input file.
     // open(unit=2, file=datafile_bcmap_in, status="unknown", iostat=os)
+    ofstream outfile;
+    outfile.open (datafile_bcmap_in);
 
     //     read(2,*) 
 
