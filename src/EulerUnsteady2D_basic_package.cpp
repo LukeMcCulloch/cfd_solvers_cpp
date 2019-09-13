@@ -377,6 +377,12 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // write(*,*) "  triangles = ", ntria
     // write(*,*) "      quads = ", nquad
     // write(*,*)
+    cout << " Total numbers:" << endl;
+    cout << "       nodes = " << nnodes << endl;
+    cout << "   triangles = " << ntria << endl;
+    cout << "       nquad = " << nquad << endl;
+    cout << "       nelms = " << nelms << endl;
+    
 
     // // Read the boundary grid data
 
