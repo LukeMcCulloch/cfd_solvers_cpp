@@ -281,8 +281,6 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 
             float x, y, z;
             in >> x >> y >> z;       //now read the whitespace-separated floats
-            //read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
-            //iss >> elm[i].vtx[0] >> elm[i].vtx[1] >> elm[i].vtx[2];
             elm[i].vtx[0] = x;
             elm[i].vtx[1] = y;
             elm[i].vtx[2] = z;
@@ -300,48 +298,23 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // //   v1             v2
 
     // // READ: read connectivity info for quadrilaterals
-    // if ( nquad > 0 ) then
-    // do i = 1, nquad
-    //     elm(ntria+i)%nvtx = 4
-    //     allocate( elm(ntria+i)%vtx(4))
-    //     read(1,*) elm(ntria+i)%vtx(1), elm(ntria+i)%vtx(2), &
-    //             elm(ntria+i)%vtx(3), elm(ntria+i)%vtx(4)
-
     if (nquad > 0) {
-        for (size_t i = 1; i < nquad-1; i++) {
+        for (size_t i = 0; i < nquad; i++) {
             std::getline(infile, line);
             std::istringstream in(line);
-            elm[i].nvtx = 4;
-            //allocate(elm(i)%vtx(3))
-            elm[i].vtx = new Array2D<int>(4,1);
-
-            //std::string type;
-            //in >> type;                  //and read the first whitespace-separated token
-
+            elm[ntria+i].nvtx = 4;
+            elm[ntria+i].vtx = new Array2D<int>(4,1);
 
             float x1,x2,x3,x4;
             in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated floats
-            //read(1,*) elm(i)%vtx(1), elm(i)%vtx(2), elm(i)%vtx(3)
-            //iss >> elm[i].vtx[0] >> elm[i].vtx[1] >> elm[i].vtx[2];
-            elm[i].vtx[0] = x1;
-            elm[i].vtx[1] = x2;
-            elm[i].vtx[2] = x3;
-            elm[i].vtx[2] = x4;
+            elm[ntria+i].vtx[0] = x1;
+            elm[ntria+i].vtx[1] = x2;
+            elm[ntria+i].vtx[2] = x3;
+            elm[ntria+i].vtx[2] = x4;
         }
     }
-    // end do
-    // endif
 
-
-
-    // //  Write out the grid data.
-
-    // write(*,*)
-    // write(*,*) " Total numbers:"
-    // write(*,*) "      nodes = ", nnodes
-    // write(*,*) "  triangles = ", ntria
-    // write(*,*) "      quads = ", nquad
-    // write(*,*)
+    //  Write out the grid data.
     cout << " Total numbers:" << endl;
     cout << "       nodes = " << nnodes << endl;
     cout << "   triangles = " << ntria << endl;
@@ -349,39 +322,33 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     cout << "       nelms = " << nelms << endl;
     
 
-    // // Read the boundary grid data
+    // Read the boundary grid data
 
-    // // READ: Number of boundary condition types
-    // read(1,*) nbound
-    // allocate(bound(nbound))
+    // READ: Number of boundary condition types
     std::getline(infile, line);
     std::istringstream in(line);
     in >> nbound;
+    edu2d_grid_data_type::bgrid_type* bound = new edu2d_grid_data_type::bgrid_type[nbound];
+
 
     // // READ: Number of Boundary nodes (including the starting one at the end if
     // // it is closed such as an airfoil.)
-    // do i = 1, nbound
-    // read(1,*) bound(i)%nbnodes
-    // allocate(bound(i)%bnode(bound(i)%nbnodes))
-    // end do
-    for (size_t i = 1; i < nbound-1; i++) {
+    for (size_t i = 0; i < nbound; i++) {
         std::getline(infile, line);
         std::istringstream in(line);
-        in >> bound[i-1].nbnodes;
+        in >> bound[i].nbnodes;
+        bound[i].bnode = new Array2D<int>(bound[i].nbnodes,1);
     }
-    cout << "       nbnodes = " << bound[i-1].nbnodes << endl;
+    cout << "       nbnodes = " << bound[i].nbnodes << endl;
 
     // // READ: Read boundary nodes
-    // do i = 1, nbound
-    // do j = 1, bound(i)%nbnodes
-    for (size_t i = 1; i < nbound-1; i++) {
-        for (size_t j = 1; j < bound[i-1].nbnodes-1; j++) {
+    for (size_t i = 0; i < nbound; i++) {
+        for (size_t j = 0; j < bound[i-1].nbnodes; j++) {
             std::getline(infile, line);
             std::istringstream in(line);
-            //in >> bound[i-1].bnode[j-1];
-    // read(1,*) bound(i)%bnode(j)
-    // end do
-    // end do
+            int init;
+            in >> init;
+            bound[i].bnode[j] = init;
         }
     }
 
