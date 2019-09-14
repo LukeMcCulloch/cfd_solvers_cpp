@@ -269,11 +269,11 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 
     // READ: read connectivity info for triangles
     if (ntria > 0) {
-        for (size_t i = 1; i < ntria-1; i++) {
+        for (size_t i = 0; i < ntria; i++) {
             std::getline(infile, line);
             std::istringstream in(line);
-            elm[i-1].nvtx = 3;
-            elm[i-1].vtx = new Array2D<int>(3,1) ;
+            elm[i].nvtx = 3;
+            elm[i].vtx = new Array2D<int>(3,1) ;
 
             std::string type;
             in >> type;                  //and read the first whitespace-separated token
