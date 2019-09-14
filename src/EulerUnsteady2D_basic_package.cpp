@@ -272,11 +272,6 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // read(1,*) node(i)%x, node(i)%y
     // end do
 
-    // while (std::getline(infile, line))
-    // {
-    //     std::istringstream iss(line);
-    //     int a, b;
-    //     if (!(iss >> a >> b)) { break; } //error
     for (size_t i = 1; i < nnodes; i++) {
         std::getline(infile, line);
         std::istringstream iss(line);
@@ -299,14 +294,11 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 
     // // READ: read connectivity info for triangles
     if (ntria > 0) {
-        for (size_t i = 1; i < ntria; i++) {
+        for (size_t i = 1; i < ntria-1; i++) {
             std::getline(infile, line);
             std::istringstream in(line);
             elm[i-1].nvtx = 3;
-            //allocate(elm(i)%vtx(3))
             elm[i-1].vtx = new Array2D<int>(3,1) ;
-            //edu2d_grid_data_type::elm_type[i].vtx* = new Array2D<int>(3,1) ;
-            //edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
 
             std::string type;
             in >> type;                  //and read the first whitespace-separated token
@@ -341,7 +333,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     //             elm(ntria+i)%vtx(3), elm(ntria+i)%vtx(4)
 
     if (nquad > 0) {
-        for (size_t i = 1; i < nquad; i++) {
+        for (size_t i = 1; i < nquad-1; i++) {
             std::getline(infile, line);
             std::istringstream in(line);
             elm[i].nvtx = 4;
@@ -397,18 +389,26 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // read(1,*) bound(i)%nbnodes
     // allocate(bound(i)%bnode(bound(i)%nbnodes))
     // end do
-    for (size_t i = 1; i < nbound; i++) {
+    for (size_t i = 1; i < nbound-1; i++) {
         std::getline(infile, line);
         std::istringstream in(line);
         in >> bound[i-1].nbnodes;
     }
+    cout << "       nbnodes = " << bound[i-1].nbnodes << endl;
 
     // // READ: Read boundary nodes
     // do i = 1, nbound
     // do j = 1, bound(i)%nbnodes
+    for (size_t i = 1; i < nbound-1; i++) {
+        for (size_t j = 1; j < bound[i-1].nbnodes-1; j++) {
+            std::getline(infile, line);
+            std::istringstream in(line);
+            //in >> bound[i-1].bnode[j-1];
     // read(1,*) bound(i)%bnode(j)
     // end do
     // end do
+        }
+    }
 
     // //  Print the boundary grid data.
     // write(*,*) " Boundary nodes:"
