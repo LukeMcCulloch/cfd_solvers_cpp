@@ -233,66 +233,41 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     std::ifstream infile;
     infile.open(datafile_grid_in);
 
-
     // line based parsing, using string streams:
     std::string line;
-    // while (std::getline(infile, line))
-    // {
-    //     std::istringstream iss(line);
-    //     int a, b;
-    //     if (!(iss >> a >> b)) { break; } //error
-        
-    //     //process data here
-    // }
 
     // READ: Get the size of the grid.
-    //read(1,*) nnodes, ntria, nquad
-    //nelms = ntria + nquad
     std::getline(infile, line);
     std::istringstream iss(line);
     iss >> nnodes >> ntria >> nquad;
     nelms = ntria + nquad;
-    cout << "found data" << endl;
-    cout << "nnodes = " << nnodes << endl;
-    cout << "ntria = " << ntria << endl;
-    cout << "nquad = " << nquad << endl;
-    cout << "nelms = " << nelms << endl;
-    
 
     // //  Allocate node and element arrays.
-    // allocate(node(nnodes))
-    // allocate(elm(  nelms))
-    //node = new node_type[nnodes]; //??
-    edu2d_grid_data_type::node_type* node = new edu2d_grid_data_type::node_type[nnodes]; //??
+    edu2d_grid_data_type::node_type* node = new edu2d_grid_data_type::node_type[nnodes];
     edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
 
 
     // // READ: Read the nodal coordinates
-    // do i = 1, nnodes
-    // read(1,*) node(i)%x, node(i)%y
-    // end do
-
-    for (size_t i = 1; i < nnodes; i++) {
+    for (size_t i = 0; i < nnodes; i++) {
         std::getline(infile, line);
         std::istringstream iss(line);
-        iss >> node[i-1].x >> node[i-1].y ;
+        iss >> node[i].x >> node[i].y ;
     }
         
+    // Read element-connectivity information
 
-    // // Read element-connectivity information
+    // Triangles: assumed that the vertices are ordered counterclockwise
+    //
+    //         v3
+    //         /\
+    //        /  \
+    //       /    \
+    //      /      \
+    //     /        \
+    //    /__________\
+    //   v1           v2
 
-    // // Triangles: assumed that the vertices are ordered counterclockwise
-    // //
-    // //         v3
-    // //         /\
-    // //        /  \
-    // //       /    \
-    // //      /      \
-    // //     /        \
-    // //    /__________\
-    // //   v1           v2
-
-    // // READ: read connectivity info for triangles
+    // READ: read connectivity info for triangles
     if (ntria > 0) {
         for (size_t i = 1; i < ntria-1; i++) {
             std::getline(infile, line);
