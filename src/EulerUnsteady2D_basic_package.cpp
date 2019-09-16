@@ -343,7 +343,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 
     // // READ: Read boundary nodes
     for (size_t i = 0; i < nbound; i++) {
-        for (size_t j = 0; j < bound[i-1].nbnodes; j++) {
+        for (size_t j = 0; j < bound[i].nbnodes; j++) {
             std::getline(infile, line);
             std::istringstream in(line);
             int init;
