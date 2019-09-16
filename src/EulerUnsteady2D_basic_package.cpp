@@ -352,15 +352,14 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
         }
     }
 
-    // //  Print the boundary grid data.
-    // write(*,*) " Boundary nodes:"
-    // write(*,*) "    segments = ", nbound
-    //     do i = 1, nbound
-    //     write(*,'(a9,i3,2(a11,i5))') " boundary", i, "  bnodes = ", bound(i)%nbnodes, &
-    //                                                 "  bfaces = ", bound(i)%nbnodes-1
-    //     end do
-    // write(*,*)
-
+    //  Print the boundary grid data.
+    std::cout << " Boundary nodes:" << std::endl;
+    std::cout << "    segments = " << nbound << std::endl;
+        for (size_t i = 0; i < nbound; i++) {
+            std::cout <<  " boundary = " << i << 
+                          "   bnodes = " <<  bound[i].nbnodes <<  
+                          "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
+        }
     // close(1)
 
     // // End of Read grid file>: datafile_grid_in
