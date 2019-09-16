@@ -360,8 +360,9 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
                           "   bnodes = " <<  bound[i].nbnodes <<  
                           "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
         }
-    // close(1)
+    
 
+    infile.close(); // close datafile_grid_in
     // // End of Read grid file>: datafile_grid_in
     // //--------------------------------------------------------------------------------
 
@@ -396,7 +397,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     //     write(*,*)
 
     // close(2)
-    infile.close();
+    outfile.close(); // close datafile_bcmap_in
 
     // End of Read the boundary condition data file
     //--------------------------------------------------------------------------------
