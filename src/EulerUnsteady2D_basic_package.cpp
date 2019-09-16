@@ -363,27 +363,29 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     
 
     infile.close(); // close datafile_grid_in
-    // // End of Read grid file>: datafile_grid_in
-    // //--------------------------------------------------------------------------------
+    // End of Read grid file>: datafile_grid_in
+    //--------------------------------------------------------------------------------
 
-    // //--------------------------------------------------------------------------------
-    // // 2. Read the boundary condition data file
+    //--------------------------------------------------------------------------------
+    // 2. Read the boundary condition data file
 
     std::cout << "" << std::endl;
     std::cout << "Reading the boundary condition file...." << datafile_bcmap_in << std::endl;
     std::cout << "" << std::endl;
 
     // // Open the input file.
-    // open(unit=2, file=datafile_bcmap_in, status="unknown", iostat=os)
-    ofstream outfile;
+    //std::ofstream outfile;
+    std::ifstream outfile;
     outfile.open (datafile_bcmap_in);
 
-    //     read(2,*) 
+    std::getline(outfile, line);
 
-    // // READ: Read the boundary condition type
-    // do i = 1, nbound
-    //     read(2,*) dummy_int, bound(i)%bc_type
-    // end do
+    // READ: Read the boundary condition type
+    for (size_t i = 0; i < nbound; i++) {
+        std::getline(outfile, line);
+        std::istringstream in(line);
+        in >> dummy_int,bound[i].bc_type;
+    }
 
     // //  Print the data
     //     write(*,*) " Boundary conditions:"
