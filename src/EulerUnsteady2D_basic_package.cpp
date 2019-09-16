@@ -393,9 +393,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
         std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
     }
 
-    //     i = dummy_int //Never mind. Just to avoid a compilation warning.
-
-    //     write(*,*)
+    std::cout << "" << std::endl;
 
     // close(2)
     outfile.close(); // close datafile_bcmap_in
