@@ -369,10 +369,9 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     // //--------------------------------------------------------------------------------
     // // 2. Read the boundary condition data file
 
-    // write(*,*)
-    // write(*,*) "Reading the boundary condition file....", datafile_bcmap_in
-    // write(*,*)
+    std::cout << "" << std::endl;
     std::cout << "Reading the boundary condition file...." << datafile_bcmap_in << std::endl;
+    std::cout << "" << std::endl;
 
     // // Open the input file.
     // open(unit=2, file=datafile_bcmap_in, status="unknown", iostat=os)
