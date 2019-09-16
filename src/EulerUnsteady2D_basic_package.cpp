@@ -389,9 +389,9 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 
     //  Print the data
     std::cout << " Boundary conditions:" << std::endl;
-    // do i = 1, nbound
-    //     write(*,'(a9,i3,a12,a35)') " boundary", i, "  bc_type = ", trim(bound(i)%bc_type)
-    // end do
+    for (size_t i = 0; i < nbound; i++) {
+        std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
+    }
 
     //     i = dummy_int //Never mind. Just to avoid a compilation warning.
 
