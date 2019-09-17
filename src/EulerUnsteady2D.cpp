@@ -46,10 +46,10 @@
 //* This translated version will differ.
 //*
 //* ------------------------------------------
-//* - Main driver program file   : This reads grid and BC files, and call dummy NC/CC programs.
+//* - Main driver program file   : This reads grid and BC files, and dummy NC/CC programs.
 //*
 //*     edu2d_euler_rk2_main.f90 (This file), which contains a main driver program
-//*      -- edu2d_euler_rk2       : Main driver code, which calls an Euler solver
+//*      -- edu2d_euler_rk2       : Main driver code, which  an Euler solver
 //*
 //* ------------------------------------------
 //* - Basic EDU2D package file   : Arranged for a 2D Euler code
@@ -73,7 +73,7 @@
 //*  write an unstructured CFD code. Hence, the focus here is on the simplicity.
 //*  The code is not optimized for efficiency.
 //*
-//*  This code is set up specifically for a shock diffraction problem.
+//*  This code is set up specifi for a shock diffraction problem.
 //*  It can be modified easily to solve other problems:
 //*
 //*   1. Define your own free stream Mach number, M_inf, at the beginning of the main.
@@ -261,6 +261,35 @@ void program_2D_euler_rk2(){
 //
 // (1) Read grid files
     E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
+
+     //Allocate arrays
+      // do i = 1, nnodes
+      //  allocate( node(i)%u(    nq  ) )
+      //  allocate( node(i)%du(   nq  ) )
+      //  allocate( node(i)%w(    nq  ) )
+      //  allocate( node(i)%gradw(nq,2) ) //<- 2: x and y components.
+      //  allocate( node(i)%res(  nq  ) )
+      // end do
+
+// (2) Construct grid data
+//       construct_grid_data();
+
+// // (3) Check the grid data (It is always good to check them before use//)
+//       check_grid_data();
+
+// // (4) Prepare LSQ gradients
+//       compute_lsq_coeff_nc();
+//       check_lsq_coeff_nc();
+
+// // (5) Set initial solution for a shock diffraction problem
+// //     (Re-write or replace it by your own subroutine for other problems.)
+//       initial_solution_shock_diffraction();
+
+// // (6) Compute the solution (March in time to the final time)
+//       euler_solver_main();
+
+// // (7) Write out the tecplot data file (Solutions at nodes)
+//       write_tecplot_file(datafile_tec);
 
 }
 
