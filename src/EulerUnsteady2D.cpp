@@ -263,13 +263,6 @@ void program_2D_euler_rk2(){
    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
 
    std::cout << "Allocate arrays" << std::endl;
-   // do i = 1, nnodes
-   //  allocate( node(i)%u(    nq  ) )
-   //  allocate( node(i)%du(   nq  ) )
-   //  allocate( node(i)%w(    nq  ) )
-   //  allocate( node(i)%gradw(nq,2) ) //<- 2: x and y components.
-   //  allocate( node(i)%res(  nq  ) )
-   // end do
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
       // E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
       // E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
@@ -281,7 +274,7 @@ void program_2D_euler_rk2(){
 // (2) Construct grid data
    E2Ddata.construct_grid_data();
 
-// // (3) Check the grid data (It is always good to check them before use//)
+// (3) Check the grid data (It is always good to check them before use//)
 //       check_grid_data();
 
 // // (4) Prepare LSQ gradients
