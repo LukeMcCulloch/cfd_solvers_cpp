@@ -238,10 +238,10 @@ void program_2D_euler_rk2(){
 //--------------------------------------------------------------------------------
 // Input Parameters
 
-    // euler main data:
-    //typedef edu2d_my_main_data::edu2d_my_main_data 2Ddata;
-    edu2d_my_main_data::MainData2D E2Ddata;
-    //2Ddata = new edu2d_my_main_data();
+   // euler main data:
+   //typedef edu2d_my_main_data::edu2d_my_main_data 2Ddata;
+   edu2d_my_main_data::MainData2D E2Ddata;
+   //2Ddata = new edu2d_my_main_data();
 
                 E2Ddata.M_inf  = 0.0;         // Freestream Mach number to be set in the function
                                     //    -> "initial_solution_shock_diffraction"
@@ -260,9 +260,9 @@ void program_2D_euler_rk2(){
 // Solve the Euler equations and write the output datafile.
 //
 // (1) Read grid files
-    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
+   E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
 
-     //Allocate arrays
+      //Allocate arrays
       // do i = 1, nnodes
       //  allocate( node(i)%u(    nq  ) )
       //  allocate( node(i)%du(   nq  ) )
@@ -270,6 +270,9 @@ void program_2D_euler_rk2(){
       //  allocate( node(i)%gradw(nq,2) ) //<- 2: x and y components.
       //  allocate( node(i)%res(  nq  ) )
       // end do
+      for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+         //E2Ddata.node[i].u = new Array2D<real>(E2Ddata.nq,1);
+      }
 
 // (2) Construct grid data
 //       construct_grid_data();
