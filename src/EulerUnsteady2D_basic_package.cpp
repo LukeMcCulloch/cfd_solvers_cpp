@@ -452,7 +452,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 //*
 //********************************************************************************
 //  subroutine construct_grid_data
-void construct_grid_data(){
+void edu2d_my_main_data::MainData2D::construct_grid_data(){
 
 //  use edu2d_my_main_data , only : nnodes, node, nelms, elm, nedges, edge, nbound, bound, face, nfaces
 //  use edu2d_constants    , only : p2, zero, half, third

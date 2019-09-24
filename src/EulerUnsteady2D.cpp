@@ -223,16 +223,16 @@ void EulerSolver2D::Solver::euler_solver_main(){
 
 //namespace edu2d_my_main_data{
 void program_2D_euler_rk2(){
-    // procedural fortran ends up in this function
-    int i;
+   // procedural fortran ends up in this function
+   int i;
 
-    // euler solver 2D:
-    EulerSolver2D::Solver E2Dsolver;
+   // euler solver 2D:
+   EulerSolver2D::Solver E2Dsolver;
 
-    //Set file names, Inout data files
-    std::string  datafile_grid_in  = "project.grid";  //Grid file
-    std::string  datafile_bcmap_in = "project.bcmap"; //Boundary condition file
-    std::string  datafile_tec      = "project_tecplot.dat";  //Tecplot file for viewing the result.
+   //Set file names, Inout data files
+   std::string  datafile_grid_in  = "project.grid";  //Grid file
+   std::string  datafile_bcmap_in = "project.bcmap"; //Boundary condition file
+   std::string  datafile_tec      = "project_tecplot.dat";  //Tecplot file for viewing the result.
 
 
 //--------------------------------------------------------------------------------
@@ -262,24 +262,24 @@ void program_2D_euler_rk2(){
 // (1) Read grid files
    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
 
-      std::cout << "Allocate arrays" << std::endl;
-      // do i = 1, nnodes
-      //  allocate( node(i)%u(    nq  ) )
-      //  allocate( node(i)%du(   nq  ) )
-      //  allocate( node(i)%w(    nq  ) )
-      //  allocate( node(i)%gradw(nq,2) ) //<- 2: x and y components.
-      //  allocate( node(i)%res(  nq  ) )
-      // end do
-      for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-         E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
-         E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
-         E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
-         E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
-         E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
-      }
+   std::cout << "Allocate arrays" << std::endl;
+   // do i = 1, nnodes
+   //  allocate( node(i)%u(    nq  ) )
+   //  allocate( node(i)%du(   nq  ) )
+   //  allocate( node(i)%w(    nq  ) )
+   //  allocate( node(i)%gradw(nq,2) ) //<- 2: x and y components.
+   //  allocate( node(i)%res(  nq  ) )
+   // end do
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+      // E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+      // E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
+      // E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
+      // E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
+      // E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
+   }
 
 // (2) Construct grid data
-//       construct_grid_data();
+   E2Ddata.construct_grid_data();
 
 // // (3) Check the grid data (It is always good to check them before use//)
 //       check_grid_data();
