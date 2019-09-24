@@ -262,7 +262,7 @@ void program_2D_euler_rk2(){
 // (1) Read grid files
    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
 
-      //Allocate arrays
+      std::cout << "Allocate arrays" << std::endl;
       // do i = 1, nnodes
       //  allocate( node(i)%u(    nq  ) )
       //  allocate( node(i)%du(   nq  ) )
@@ -271,7 +271,11 @@ void program_2D_euler_rk2(){
       //  allocate( node(i)%res(  nq  ) )
       // end do
       for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-         //E2Ddata.node[i].u = new Array2D<real>(E2Ddata.nq,1);
+         E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+         E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
+         E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
+         E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
+         E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
       }
 
 // (2) Construct grid data
