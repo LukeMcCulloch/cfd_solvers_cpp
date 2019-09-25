@@ -263,13 +263,21 @@ void program_2D_euler_rk2(){
    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
 
    std::cout << "Allocate arrays" << std::endl;
-   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-      // E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
-      // E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
-      // E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
-      // E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
-      // E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
+   std::cout << "over " << E2Ddata.nnodes << " nodes " << std::endl;
+   for (size_t i = 0; i < 10; i++) {
+      E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+      E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
+      E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
+      E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
+      E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
    }
+   // for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+   //    E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+   //    E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
+   //    E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
+   //    E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
+   //    E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
+   // }
 
 // (2) Construct grid data
    E2Ddata.construct_grid_data();

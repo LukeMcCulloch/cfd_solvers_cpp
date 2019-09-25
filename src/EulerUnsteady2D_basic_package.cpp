@@ -243,7 +243,11 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     nelms = ntria + nquad;
 
     // //  Allocate node and element arrays.
+    std::cout << "Allocating node_type" << std::endl;
+   std::cout << "for " << nnodes << " nodes " << std::endl;
     edu2d_grid_data_type::node_type* node = new edu2d_grid_data_type::node_type[nnodes];
+    
+    std::cout << "Allocating elm_type" << std::endl;
     edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
 
 
@@ -355,7 +359,12 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
     //  Print the boundary grid data.
     std::cout << " Boundary nodes:" << std::endl;
     std::cout << "    segments = " << nbound << std::endl;
-        for (size_t i = 0; i < nbound; i++) {
+        for (size_t i = 0; i < 2; i++) {
+            std::cout <<  " boundary = " << i << 
+                          "   bnodes = " <<  bound[i].nbnodes <<  
+                          "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
+        }
+        for (size_t i = nbound-2; i < nbound; i++) {
             std::cout <<  " boundary = " << i << 
                           "   bnodes = " <<  bound[i].nbnodes <<  
                           "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
@@ -389,7 +398,10 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 
     //  Print the data
     std::cout << " Boundary conditions:" << std::endl;
-    for (size_t i = 0; i < nbound; i++) {
+    for (size_t i = 0; i < 2; i++) {
+        std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
+    }
+    for (size_t i = nbound-2; i < nbound; i++) {
         std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
     }
 
