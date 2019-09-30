@@ -273,7 +273,7 @@ void program_2D_euler_rk2(){
    //    E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
    //    E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
    //    E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
-      std::cout << E2Ddata.node[i].res << std::endl;
+      //std::cout << E2Ddata.node[i].res << std::endl;
    }
 
 // (2) Construct grid data
