@@ -68,6 +68,7 @@
 using std::cout;
 using std::endl;
 
+// fwd declarations?
 edu2d_my_main_data::MainData2D::MainData2D(){}
 edu2d_my_main_data::MainData2D::~MainData2D(){}
 
@@ -219,200 +220,202 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
                                                std::string datafile_bcmap_in)
 {
 
-    //use edu2d_my_main_data, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
+   //use edu2d_my_main_data, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
 
-    //Local variables
-    int i, j, os, dummy_int;
+   //Local variables
+   int i, j, os, dummy_int;
 
-    //--------------------------------------------------------------------------------
-    // 1. Read grid file>: datafile_grid_in
+   //--------------------------------------------------------------------------------
+   // 1. Read grid file>: datafile_grid_in
 
-    cout << "Reading the grid file...." << datafile_grid_in << endl;
+   cout << "Reading the grid file...." << datafile_grid_in << endl;
 
-    //  Open the input file.
-    std::ifstream infile;
-    infile.open(datafile_grid_in);
+   //  Open the input file.
+   std::ifstream infile;
+   infile.open(datafile_grid_in);
 
-    // line based parsing, using string streams:
-    std::string line;
+   // line based parsing, using string streams:
+   std::string line;
 
-    // READ: Get the size of the grid.
-    std::getline(infile, line);
-    std::istringstream iss(line);
-    iss >> nnodes >> ntria >> nquad;
-    nelms = ntria + nquad;
+   // READ: Get the size of the grid.
+   std::getline(infile, line);
+   std::istringstream iss(line);
+   iss >> nnodes >> ntria >> nquad;
+   nelms = ntria + nquad;
 
-    // //  Allocate node and element arrays.
-    std::cout << "Allocating node_type" << std::endl;
+   // //  Allocate node and element arrays.
+   std::cout << "Allocating node_type" << std::endl;
    std::cout << "for " << nnodes << " nodes " << std::endl;
-    edu2d_grid_data_type::node_type* node = new edu2d_grid_data_type::node_type[nnodes];
-    
-    std::cout << "Allocating elm_type" << std::endl;
-    edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
+   edu2d_grid_data_type::node_type* node = new edu2d_grid_data_type::node_type[nnodes];
+
+   std::cout << "Allocating elm_type" << std::endl;
+   std::cout << "for " << nelms << " elements " << std::endl;
+   edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
 
 
-    // // READ: Read the nodal coordinates
-    for (size_t i = 0; i < nnodes; i++) {
-        std::getline(infile, line);
-        std::istringstream iss(line);
-        iss >> node[i].x >> node[i].y ;
-    }
-        
-    // Read element-connectivity information
+   // // READ: Read the nodal coordinates
+   for (size_t i = 0; i < nnodes; i++) {
+      std::getline(infile, line);
+      std::istringstream iss(line);
+      iss >> node[i].x >> node[i].y ;
+      //std::cout << node[i].x << node[i].y << std::endl;
+   }
+      
+   // Read element-connectivity information
 
-    // Triangles: assumed that the vertices are ordered counterclockwise
-    //
-    //         v3
-    //         /\
-    //        /  \
-    //       /    \
-    //      /      \
-    //     /        \
-    //    /__________\
-    //   v1           v2
+   // Triangles: assumed that the vertices are ordered counterclockwise
+   //
+   //         v3
+   //         /\
+   //        /  \
+   //       /    \
+   //      /      \
+   //     /        \
+   //    /__________\
+   //   v1           v2
 
-    // READ: read connectivity info for triangles
-    if (ntria > 0) {
-        for (size_t i = 0; i < ntria; i++) {
-            std::getline(infile, line);
-            std::istringstream in(line);
-            elm[i].nvtx = 3;
-            elm[i].vtx = new Array2D<int>(3,1) ;
+   // READ: read connectivity info for triangles
+   if (ntria > 0) {
+      for (size_t i = 0; i < ntria; i++) {
+         std::getline(infile, line);
+         std::istringstream in(line);
+         elm[i].nvtx = 3;
+         elm[i].vtx = new Array2D<int>(3,1) ;
 
-            std::string type;
-            in >> type;                  //and read the first whitespace-separated token
-
-
-            float x, y, z;
-            in >> x >> y >> z;       //now read the whitespace-separated floats
-            elm[i].vtx[0] = x;
-            elm[i].vtx[1] = y;
-            elm[i].vtx[2] = z;
-        }
-    }
-    // // Quads: assumed that the vertices are ordered counterclockwise
-    // //
-    // //        v4________v3
-    // //         /        |
-    // //        /         |
-    // //       /          |
-    // //      /           |
-    // //     /            |
-    // //    /_____________|
-    // //   v1             v2
-
-    // // READ: read connectivity info for quadrilaterals
-    if (nquad > 0) {
-        for (size_t i = 0; i < nquad; i++) {
-            std::getline(infile, line);
-            std::istringstream in(line);
-            elm[ntria+i].nvtx = 4;
-            elm[ntria+i].vtx = new Array2D<int>(4,1);
-
-            float x1,x2,x3,x4;
-            in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated floats
-            elm[ntria+i].vtx[0] = x1;
-            elm[ntria+i].vtx[1] = x2;
-            elm[ntria+i].vtx[2] = x3;
-            elm[ntria+i].vtx[2] = x4;
-        }
-    }
-
-    //  Write out the grid data.
-    cout << " Total numbers:" << endl;
-    cout << "       nodes = " << nnodes << endl;
-    cout << "   triangles = " << ntria << endl;
-    cout << "       nquad = " << nquad << endl;
-    cout << "       nelms = " << nelms << endl;
-    
-
-    // Read the boundary grid data
-
-    // READ: Number of boundary condition types
-    std::getline(infile, line);
-    std::istringstream in(line);
-    in >> nbound;
-    edu2d_grid_data_type::bgrid_type* bound = new edu2d_grid_data_type::bgrid_type[nbound];
+         std::string type;
+         in >> type;                  //and read the first whitespace-separated token
 
 
-    // // READ: Number of Boundary nodes (including the starting one at the end if
-    // // it is closed such as an airfoil.)
-    for (size_t i = 0; i < nbound; i++) {
-        std::getline(infile, line);
-        std::istringstream in(line);
-        in >> bound[i].nbnodes;
-        bound[i].bnode = new Array2D<int>(bound[i].nbnodes,1);
-    }
-    cout << "       nbnodes = " << bound[i].nbnodes << endl;
+         float x, y, z;
+         in >> x >> y >> z;       //now read the whitespace-separated floats
+         elm[i].vtx[0] = x;
+         elm[i].vtx[1] = y;
+         elm[i].vtx[2] = z;
+      }
+   }
+   // // Quads: assumed that the vertices are ordered counterclockwise
+   // //
+   // //        v4________v3
+   // //         /        |
+   // //        /         |
+   // //       /          |
+   // //      /           |
+   // //     /            |
+   // //    /_____________|
+   // //   v1             v2
 
-    // // READ: Read boundary nodes
-    for (size_t i = 0; i < nbound; i++) {
-        for (size_t j = 0; j < bound[i].nbnodes; j++) {
-            std::getline(infile, line);
-            std::istringstream in(line);
-            int init;
-            in >> init;
-            bound[i].bnode[j] = init;
-        }
-    }
+   // // READ: read connectivity info for quadrilaterals
+   if (nquad > 0) {
+      for (size_t i = 0; i < nquad; i++) {
+         std::getline(infile, line);
+         std::istringstream in(line);
+         elm[ntria+i].nvtx = 4;
+         elm[ntria+i].vtx = new Array2D<int>(4,1);
 
-    //  Print the boundary grid data.
-    std::cout << " Boundary nodes:" << std::endl;
-    std::cout << "    segments = " << nbound << std::endl;
-        for (size_t i = 0; i < 2; i++) {
-            std::cout <<  " boundary = " << i << 
-                          "   bnodes = " <<  bound[i].nbnodes <<  
-                          "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
-        }
-        for (size_t i = nbound-2; i < nbound; i++) {
-            std::cout <<  " boundary = " << i << 
-                          "   bnodes = " <<  bound[i].nbnodes <<  
-                          "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
-        }
-    
+         float x1,x2,x3,x4;
+         in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated floats
+         elm[ntria+i].vtx[0] = x1;
+         elm[ntria+i].vtx[1] = x2;
+         elm[ntria+i].vtx[2] = x3;
+         elm[ntria+i].vtx[2] = x4;
+      }
+   }
 
-    infile.close(); // close datafile_grid_in
-    // End of Read grid file>: datafile_grid_in
-    //--------------------------------------------------------------------------------
+   //  Write out the grid data.
+   cout << " Total numbers:" << endl;
+   cout << "       nodes = " << nnodes << endl;
+   cout << "   triangles = " << ntria << endl;
+   cout << "       nquad = " << nquad << endl;
+   cout << "       nelms = " << nelms << endl;
+   
 
-    //--------------------------------------------------------------------------------
-    // 2. Read the boundary condition data file
+   // Read the boundary grid data
 
-    std::cout << "" << std::endl;
-    std::cout << "Reading the boundary condition file...." << datafile_bcmap_in << std::endl;
-    std::cout << "" << std::endl;
+   // READ: Number of boundary condition types
+   std::getline(infile, line);
+   std::istringstream in(line);
+   in >> nbound;
+   edu2d_grid_data_type::bgrid_type* bound = new edu2d_grid_data_type::bgrid_type[nbound];
 
-    // // Open the input file.
-    //std::ofstream outfile;
-    std::ifstream outfile;
-    outfile.open (datafile_bcmap_in);
 
-    std::getline(outfile, line);
+   // // READ: Number of Boundary nodes (including the starting one at the end if
+   // // it is closed such as an airfoil.)
+   for (size_t i = 0; i < nbound; i++) {
+      std::getline(infile, line);
+      std::istringstream in(line);
+      in >> bound[i].nbnodes;
+      bound[i].bnode = new Array2D<int>(bound[i].nbnodes,1);
+   }
+   cout << "       nbnodes = " << bound[i].nbnodes << endl;
 
-    // READ: Read the boundary condition type
-    for (size_t i = 0; i < nbound; i++) {
-        std::getline(outfile, line);
-        std::istringstream in(line);
-        in >> dummy_int, bound[i].bc_type;
-    }
+   // // READ: Read boundary nodes
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbnodes; j++) {
+         std::getline(infile, line);
+         std::istringstream in(line);
+         int init;
+         in >> init;
+         bound[i].bnode[j] = init;
+      }
+   }
 
-    //  Print the data
-    std::cout << " Boundary conditions:" << std::endl;
-    for (size_t i = 0; i < 2; i++) {
-        std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
-    }
-    for (size_t i = nbound-2; i < nbound; i++) {
-        std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
-    }
+   //  Print the boundary grid data.
+   std::cout << " Boundary nodes:" << std::endl;
+   std::cout << "    segments = " << nbound << std::endl;
+      for (size_t i = 0; i < 2; i++) {
+         std::cout <<  " boundary = " << i << 
+                     "   bnodes = " <<  bound[i].nbnodes <<  
+                     "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
+      }
+      for (size_t i = nbound-2; i < nbound; i++) {
+         std::cout <<  " boundary = " << i << 
+                     "   bnodes = " <<  bound[i].nbnodes <<  
+                     "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
+      }
+   
 
-    std::cout << "" << std::endl;
+   infile.close(); // close datafile_grid_in
+   // End of Read grid file>: datafile_grid_in
+   //--------------------------------------------------------------------------------
 
-    // close(2)
-    outfile.close(); // close datafile_bcmap_in
+   //--------------------------------------------------------------------------------
+   // 2. Read the boundary condition data file
 
-    // End of Read the boundary condition data file
-    //--------------------------------------------------------------------------------
-    return;
+   std::cout << "" << std::endl;
+   std::cout << "Reading the boundary condition file...." << datafile_bcmap_in << std::endl;
+   std::cout << "" << std::endl;
+
+   // // Open the input file.
+   //std::ofstream outfile;
+   std::ifstream outfile;
+   outfile.open (datafile_bcmap_in);
+
+   std::getline(outfile, line);
+
+   // READ: Read the boundary condition type
+   for (size_t i = 0; i < nbound; i++) {
+      std::getline(outfile, line);
+      std::istringstream in(line);
+      in >> dummy_int, bound[i].bc_type;
+   }
+
+   //  Print the data
+   std::cout << " Boundary conditions:" << std::endl;
+   for (size_t i = 0; i < 2; i++) {
+      std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
+   }
+   for (size_t i = nbound-2; i < nbound; i++) {
+      std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
+   }
+
+   std::cout << "" << std::endl;
+
+   // close(2)
+   outfile.close(); // close datafile_bcmap_in
+
+   // End of Read the boundary condition data file
+   //--------------------------------------------------------------------------------
+   return;
 
  } // end function read_grid
 
@@ -463,7 +466,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 //*    bound(:)%belm   = Element to which the boundary face belongs
 //*
 //********************************************************************************
-//  subroutine construct_grid_data
+
 void edu2d_my_main_data::MainData2D::construct_grid_data(){
 
 //  use edu2d_my_main_data , only : nnodes, node, nelms, elm, nedges, edge, nbound, bound, face, nfaces
