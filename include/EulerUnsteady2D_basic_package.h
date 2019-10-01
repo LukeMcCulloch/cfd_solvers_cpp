@@ -1,3 +1,15 @@
+/*
+This file contranins geometry classes
+
+classes:
+   node_type
+   elm_type
+   edge_type
+   bgrid_type
+   face_type
+   main_data
+
+*/
 //********************************************************************************
 //* Educationally-Designed Unstructured 2D (EDU2D) Code
 //*
