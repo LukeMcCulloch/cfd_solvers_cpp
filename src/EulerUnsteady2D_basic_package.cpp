@@ -258,14 +258,14 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
       std::getline(infile, line);
       std::istringstream iss(line);
       iss >> node[i].x >> node[i].y ;
-      //std::cout << node[i].x << node[i].y << std::endl;
+      std::cout << node[i].x << node[i].y << std::endl;
       node[i].u     = new Array2D<real>(4,1);
       node[i].du    = new Array2D<real>(4,1);
       node[i].w     = new Array2D<real>(4,1);
       node[i].gradw = new Array2D<real>(4,2); //<- 2: x and y components.
       node[i].res   = new Array2D<real>(4,1);
+      std::cout << "i = " << i << " of " << nnodes << std::endl;
    }
-      std::cout << "i = " << i << " of " << nnodes <<" node = " << node << std::endl;
       
    // Read element-connectivity information
 

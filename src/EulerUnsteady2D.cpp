@@ -266,15 +266,16 @@ void program_2D_euler_rk2(){
    std::cout << "there are " << E2Ddata.nnodes << " nodes " << std::endl;
 
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-      std::cout << "i = " << i << " of " << E2Ddata.nnodes <<" node = " << E2Ddata.node << std::endl;
-      //std::cout << E2Ddata.node[i].x << std::endl;
-      // E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+      std::cout << "i = " << i << " of " << E2Ddata.nnodes << std::endl;
+      std::cout << E2Ddata.node[i].x << std::endl;
+      // E2Ddata.node[i].u     = new Array2D<real>(4,1);
       // E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
       // E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
       // E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
       // E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
    }
 
+   std::cout << "E2Ddata.nq, = " << E2Ddata.nq << std::endl;
 // (2) Construct grid data
    E2Ddata.construct_grid_data();
 
