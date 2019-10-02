@@ -7,7 +7,7 @@ classes:
    edge_type
    bgrid_type
    face_type
-   main_data
+   MainData2D
 
 */
 //********************************************************************************
