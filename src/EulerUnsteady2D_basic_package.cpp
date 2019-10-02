@@ -246,11 +246,11 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
    // //  Allocate node and element arrays.
    std::cout << "Allocating node_type" << std::endl;
    std::cout << "for " << nnodes << " nodes " << std::endl;
-   edu2d_grid_data_type::node_type* node = new edu2d_grid_data_type::node_type[nnodes];
+   node_type* node = new node_type[nnodes];
 
    std::cout << "Allocating elm_type" << std::endl;
    std::cout << "for " << nelms << " elements " << std::endl;
-   edu2d_grid_data_type::elm_type*  elm = new edu2d_grid_data_type::elm_type[nelms];
+   elm_type*  elm = new elm_type[nelms];
 
 
    // // READ: Read the nodal coordinates
@@ -264,10 +264,8 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
       node[i].w     = new Array2D<real>(4,1);
       node[i].gradw = new Array2D<real>(4,2); //<- 2: x and y components.
       node[i].res   = new Array2D<real>(4,1);
-      std::cout << node[i].res << std::endl;
-      //std::cout << node[i].res(0) << std::endl;
-      std::cout << "i = " << i << " of " << nnodes <<" node = " << node << std::endl;
    }
+      std::cout << "i = " << i << " of " << nnodes <<" node = " << node << std::endl;
       
    // Read element-connectivity information
 
@@ -343,7 +341,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
    std::getline(infile, line);
    std::istringstream in(line);
    in >> nbound;
-   edu2d_grid_data_type::bgrid_type* bound = new edu2d_grid_data_type::bgrid_type[nbound];
+   bgrid_type* bound = new bgrid_type[nbound];
 
 
    // // READ: Number of Boundary nodes (including the starting one at the end if

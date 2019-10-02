@@ -22,7 +22,7 @@ classes:
 //* This file contains 4 modules:
 //*
 //*  1. module edu2d_constants      - Some numerical values, e.g., zero, one, pi, etc.
-//*  2. module edu2d_grid_data_type - Grid data types: node, edge, face, element, etc.
+//*  2. module edu2d_my_main_data - Grid data types: node, edge, face, element, etc.
 //*  3. module edu2d_my_main_data   - Parameters and arrays mainly used in a solver.
 //*  4. module edu2d_my_allocation  - Subroutines for dynamic allocation
 //*  5. module edu2d_grid_data      - Subroutines for reading/constructing/checking grid data
@@ -157,7 +157,7 @@ namespace edu2d_constants
 //* This file may be updated in future.
 //*
 //********************************************************************************
-namespace edu2d_grid_data_type{
+namespace edu2d_my_main_data{
 
 
 //----------------------------------------------------------
@@ -311,7 +311,7 @@ public:
 
 };
 
-} // end namespace edu2d_grid_data_type
+} // end namespace edu2d_my_main_data
 
 
 
@@ -382,25 +382,25 @@ namespace edu2d_my_main_data{
 
     //  Node data
     int                              nnodes; //total number of nodes
-    edu2d_grid_data_type::node_type* node;   //array of nodes
+    node_type* node;   //array of nodes
 
     //  Element data (element=cell)
     int                              ntria;   //total number of triangler elements
     int                              nquad;   //total number of quadrilateral elements
     int                              nelms;   //total number of elements
-    edu2d_grid_data_type::elm_type*  elm;     //array of elements
+    elm_type*  elm;     //array of elements
 
     //  Edge data
     int                              nedges;  //total number of edges
-    edu2d_grid_data_type::edge_type* edge;    //array of edges
+    edge_type* edge;    //array of edges
 
     //  Boundary data
     int                               nbound; //total number of boundary types
-    edu2d_grid_data_type::bgrid_type* bound;  //array of boundary segments
+    bgrid_type* bound;  //array of boundary segments
 
     //  Face data (cell-centered scheme only)
     int                               nfaces; //total number of cell-faces
-    edu2d_grid_data_type::face_type*  face;   //array of cell-faces
+    face_type*  face;   //array of cell-faces
 
   };
   
