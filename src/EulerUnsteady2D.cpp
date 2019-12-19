@@ -55,10 +55,10 @@
 //* - Basic EDU2D package file   : Arranged for a 2D Euler code
 //*
 //*     edu2d_basic_package_euler_rk2.f90, which contains the following modules.
-//*      -- edu2d_constants      : Numerical values defined
-//*      -- edu2d_grid_data_type : Grid data types defined
+//*      -- EulerSolver2D      : Numerical values defined
+//*      -- _data_type : Grid data types defined
 //*      -- edu2d_main_data      : Main grid data and parameters declared
-//*      -- edu2d_grid_data      : Read/construct/check grid data
+//*      -- _data      : Read/construct/check grid data
 //*
 //* ------------------------------------------
 //* - Euler solver file   : This computes a solution to the shock diffraction problem.
@@ -221,7 +221,7 @@ void EulerSolver2D::Solver::euler_solver_main(){
 // End of program
 //********************************************************************************
 
-//namespace edu2d_my_main_data{
+//namespace EulerSolver2D{
 void program_2D_euler_rk2(){
    // procedural fortran ends up in this function
    int i;
@@ -239,9 +239,9 @@ void program_2D_euler_rk2(){
 // Input Parameters
 
    // euler main data:
-   //typedef edu2d_my_main_data::edu2d_my_main_data 2Ddata;
-   edu2d_my_main_data::MainData2D E2Ddata;
-   //2Ddata = new edu2d_my_main_data();
+   //typedef EulerSolver2D::EulerSolver2D 2Ddata;
+   EulerSolver2D::MainData2D E2Ddata;
+   //2Ddata = new EulerSolver2D();
 
                 E2Ddata.M_inf  = 0.0;         // Freestream Mach number to be set in the function
                                     //    -> "initial_solution_shock_diffraction"
@@ -255,7 +255,7 @@ void program_2D_euler_rk2(){
                    E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
     E2Ddata.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
     E2Ddata.gradient_weight   = "none";      // or "inverse_distance"
-    E2Ddata.gradient_weight_p =  edu2d_constants::one;        // or any other real value
+    E2Ddata.gradient_weight_p =  EulerSolver2D::one;        // or any other real value
 //--------------------------------------------------------------------------------
 // Solve the Euler equations and write the output datafile.
 //
@@ -267,12 +267,14 @@ void program_2D_euler_rk2(){
 
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
       std::cout << "i = " << i << " of " << E2Ddata.nnodes << std::endl;
-      std::cout << E2Ddata.node[i].x << std::endl;
-      // E2Ddata.node[i].u     = new Array2D<real>(4,1);
-      // E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
-      // E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
-      // E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
-      // E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
+      //std::cout << E2Ddata.node[i].x << std::endl;
+
+    // segmentation fault:
+    //   E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+    //   E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
+    //   E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
+    //   E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
+    //   E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
    }
 
    std::cout << "E2Ddata.nq, = " << E2Ddata.nq << std::endl;
@@ -304,4 +306,4 @@ void EulerSolver2D::driverEuler2D(){
     return;
 }
 
-//}  //end namespace edu2d_my_main_data
+//}  //end namespace EulerSolver2D

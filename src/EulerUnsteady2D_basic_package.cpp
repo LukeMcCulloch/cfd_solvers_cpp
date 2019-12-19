@@ -9,11 +9,11 @@
 //*
 //* This file contains 4 modules:
 //*
-//*  1. module edu2d_constants      - Some numerical values, e.g., zero, one, pi, etc.
-//*  2. module edu2d_grid_data_type - Grid data types: node, edge, face, element, etc.
-//*  3. module edu2d_my_main_data   - Parameters and arrays mainly used in a solver.
-//*  4. module edu2d_my_allocation  - Subroutines for dynamic allocation
-//*  5. module edu2d_grid_data      - Subroutines for reading/constructing/checking grid data
+//*  1. module EulerSolver2D      - Some numerical values, e.g., zero, one, pi, etc.
+//*  2. module EulerSolver2D_type - Grid data types: node, edge, face, element, etc.
+//*  3. module EulerSolver2D   - Parameters and arrays mainly used in a solver.
+//*  4. module EulerSolver2D  - Subroutines for dynamic allocation
+//*  5. module EulerSolver2D      - Subroutines for reading/constructing/checking grid data
 //*
 //* All data in the modules can be accessed by the use statement, e.g., 'use constants'.
 //*
@@ -35,7 +35,7 @@
 //********************************************************************************
 //********************************************************************************
 //********************************************************************************
-//* 1. module edu2d_constants
+//* 1. module EulerSolver2D
 //*
 //* Some useful constants are defined here.
 //* They can be accessed by the use statement, 'use constants'.
@@ -68,9 +68,11 @@
 using std::cout;
 using std::endl;
 
-// fwd declarations?
-edu2d_my_main_data::MainData2D::MainData2D(){}
-edu2d_my_main_data::MainData2D::~MainData2D(){}
+// constructors and destrutors that do nothing
+//EulerSolver2D::MainData2D::MainData2D() {}
+//EulerSolver2D::MainData2D::~MainData2D() {
+//   if ()
+//}
 
 
 
@@ -79,7 +81,7 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
 //********************************************************************************
 //********************************************************************************
 //********************************************************************************
-//* 5. module edu2d_grid_data
+//* 5. module EulerSolver2D
 //*
 //* This module contians subroutines used for reading a grid, constructing
 //* additional grid data, and check the grid data.
@@ -112,7 +114,7 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
 //* This file may be updated in future.
 //*
 //********************************************************************************
-//namespace edu2d_grid_data{
+//namespace EulerSolver2D{
 
 
 
@@ -216,11 +218,11 @@ edu2d_my_main_data::MainData2D::~MainData2D(){}
 //*    bound(1:nbound)%bc_type  = Boundary condition name for each segment
 //*
 //********************************************************************************
-void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in, 
+void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in, 
                                                std::string datafile_bcmap_in)
 {
 
-   //use edu2d_my_main_data, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
+   //use EulerSolver2D, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
 
    //Local variables
    int i, j, os, dummy_int;
@@ -264,7 +266,7 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
       node[i].w     = new Array2D<real>(4,1);
       node[i].gradw = new Array2D<real>(4,2); //<- 2: x and y components.
       node[i].res   = new Array2D<real>(4,1);
-      std::cout << "i = " << i << " of " << nnodes << std::endl;
+      std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
    }
       
    // Read element-connectivity information
@@ -473,11 +475,11 @@ void edu2d_my_main_data::MainData2D::read_grid(std::string datafile_grid_in,
 //*
 //********************************************************************************
 
-void edu2d_my_main_data::MainData2D::construct_grid_data(){
+void EulerSolver2D::MainData2D::construct_grid_data(){
 
-//  use edu2d_my_main_data , only : nnodes, node, nelms, elm, nedges, edge, nbound, bound, face, nfaces
-//  use edu2d_constants    , only : p2, zero, half, third
-//  use edu2d_my_allocation, only : my_alloc_int_ptr, my_alloc_p2_ptr, my_alloc_p2_matrix_ptr
+//  use EulerSolver2D , only : nnodes, node, nelms, elm, nedges, edge, nbound, bound, face, nfaces
+//  use EulerSolver2D    , only : p2, zero, half, third
+//  use EulerSolver2D, only : my_alloc_int_ptr, my_alloc_p2_ptr, my_alloc_p2_matrix_ptr
 
 //  implicit none
 

@@ -50,10 +50,10 @@
 //* - The "package" file   : Arranged for a 2D Euler code
 //*
 //*     edu2d_basic_package_euler_rk2.f90, which contains the following modules.
-//*      -- edu2d_constants      : Numerical values defined
-//*      -- edu2d_grid_data_type : Grid data types defined
+//*      -- EulerSolver2D      : Numerical values defined
+//*      -- EulerSolver2D_type : Grid data types defined
 //*      -- edu2d_main_data      : Main grid data and parameters declared
-//*      -- edu2d_grid_data      : Read/construct/check grid data
+//*      -- EulerSolver2D      : Read/construct/check grid data
 //*
 //* ------------------------------------------
 //* - Euler "solver" file   : This computes a solution to the shock diffraction problem.

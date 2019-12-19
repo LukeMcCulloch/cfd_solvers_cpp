@@ -21,11 +21,11 @@ classes:
 //*
 //* This file contains 4 modules:
 //*
-//*  1. module edu2d_constants      - Some numerical values, e.g., zero, one, pi, etc.
-//*  2. module edu2d_my_main_data - Grid data types: node, edge, face, element, etc.
-//*  3. module edu2d_my_main_data   - Parameters and arrays mainly used in a solver.
-//*  4. module edu2d_my_allocation  - Subroutines for dynamic allocation
-//*  5. module edu2d_grid_data      - Subroutines for reading/constructing/checking grid data
+//*  1. module EulerSolver2D      - Some numerical values, e.g., zero, one, pi, etc.
+//*  2. module EulerSolver2D - Grid data types: node, edge, face, element, etc.
+//*  3. module EulerSolver2D   - Parameters and arrays mainly used in a solver.
+//*  4. module EulerSolver2D  - Subroutines for dynamic allocation
+//*  5. module EulerSolver2D      - Subroutines for reading/constructing/checking grid data
 //*
 //* All data in the modules can be accessed by the use statement, e.g., 'use constants'.
 //*
@@ -47,7 +47,7 @@ classes:
 //********************************************************************************
 //********************************************************************************
 //********************************************************************************
-//* 1. module edu2d_constants
+//* 1. module EulerSolver2D
 //*
 //* Some useful constants are defined here.
 //* They can be accessed by the use statement, 'use constants'.
@@ -88,9 +88,9 @@ using std::vector;
 //
 //********************************************************************************
 //
-namespace edu2d_constants 
+namespace EulerSolver2D 
 {
-  //edu2d_constants() = default; // asks the compiler to generate the default implementation
+  //EulerSolver2D() = default; // asks the compiler to generate the default implementation
                          
   real const           zero = 0.0,
                         one = 1.0,
@@ -157,7 +157,7 @@ namespace edu2d_constants
 //* This file may be updated in future.
 //*
 //********************************************************************************
-namespace edu2d_my_main_data{
+namespace EulerSolver2D{
 
 
 //----------------------------------------------------------
@@ -311,7 +311,7 @@ public:
 
 };
 
-} // end namespace edu2d_my_main_data
+} // end namespace EulerSolver2D
 
 
 
@@ -340,16 +340,16 @@ public:
 //*        translated by T. Luke McCulloch
 //*
 //********************************************************************************
-namespace edu2d_my_main_data{
+namespace EulerSolver2D{
 
   class MainData2D{
     
 
     public:
 
-    MainData2D();
-    // destructor
-    ~MainData2D();
+    //MainData2D();
+    
+    //~MainData2D();
 
     // build the grid:
     void read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in);
@@ -404,7 +404,7 @@ namespace edu2d_my_main_data{
 
   };
   
-}// end namespace  module edu2d_my_main_data
+}// end namespace  module EulerSolver2D
 //********************************************************************************
 
 
@@ -434,7 +434,7 @@ namespace edu2d_my_main_data{
 //* translated, reconfigured by Dr. Luke McCulloch
 //*
 //********************************************************************************
-//namespace edu2d_my_allocation{
+//namespace EulerSolver2D{
 
   // public :: my_alloc_int_ptr
   // public :: my_alloc_p2_ptr
@@ -506,7 +506,7 @@ namespace edu2d_my_main_data{
 // //********************************************************************************
 //   subroutine my_alloc_p2_ptr(x,n)
 
-//   use edu2d_constants   , only : p2
+//   use EulerSolver2D   , only : p2
 
 //   implicit none
 //   integer, intent(in) :: n
@@ -566,7 +566,7 @@ namespace edu2d_my_main_data{
 // //********************************************************************************
 //   subroutine my_alloc_p2_matrix_ptr(x,n,m)
 
-//   use edu2d_constants   , only : p2
+//   use EulerSolver2D   , only : p2
 
 //   implicit none
 //   integer, intent(in) :: n, m
@@ -605,7 +605,7 @@ namespace edu2d_my_main_data{
 
 //   end subroutine my_alloc_p2_matrix_ptr
 
-//  }// end namespace edu2d_my_allocation
+//  }// end namespace EulerSolver2D
 // //********************************************************************************
 
 
