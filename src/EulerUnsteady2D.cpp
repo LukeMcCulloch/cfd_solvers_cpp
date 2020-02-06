@@ -46,19 +46,19 @@
 //* This translated version will differ.
 //*
 //* ------------------------------------------
-//* - Main driver program file   : This reads grid and BC files, and call dummy NC/CC programs.
+//* - Main driver program file   : This reads grid and BC files, and dummy NC/CC programs.
 //*
 //*     edu2d_euler_rk2_main.f90 (This file), which contains a main driver program
-//*      -- edu2d_euler_rk2       : Main driver code, which calls an Euler solver
+//*      -- edu2d_euler_rk2       : Main driver code, which  an Euler solver
 //*
 //* ------------------------------------------
 //* - Basic EDU2D package file   : Arranged for a 2D Euler code
 //*
 //*     edu2d_basic_package_euler_rk2.f90, which contains the following modules.
-//*      -- edu2d_constants      : Numerical values defined
-//*      -- edu2d_grid_data_type : Grid data types defined
+//*      -- EulerSolver2D      : Numerical values defined
+//*      -- _data_type : Grid data types defined
 //*      -- edu2d_main_data      : Main grid data and parameters declared
-//*      -- edu2d_grid_data      : Read/construct/check grid data
+//*      -- _data      : Read/construct/check grid data
 //*
 //* ------------------------------------------
 //* - Euler solver file   : This computes a solution to the shock diffraction problem.
@@ -73,7 +73,7 @@
 //*  write an unstructured CFD code. Hence, the focus here is on the simplicity.
 //*  The code is not optimized for efficiency.
 //*
-//*  This code is set up specifically for a shock diffraction problem.
+//*  This code is set up specifi for a shock diffraction problem.
 //*  It can be modified easily to solve other problems:
 //*
 //*   1. Define your own free stream Mach number, M_inf, at the beginning of the main.
@@ -221,27 +221,27 @@ void EulerSolver2D::Solver::euler_solver_main(){
 // End of program
 //********************************************************************************
 
-//namespace edu2d_my_main_data{
+//namespace EulerSolver2D{
 void program_2D_euler_rk2(){
-    // procedural fortran ends up in this function
-    int i;
+   // procedural fortran ends up in this function
+   int i;
 
-    // euler solver 2D:
-    EulerSolver2D::Solver E2Dsolver;
+   // euler solver 2D:
+   EulerSolver2D::Solver E2Dsolver;
 
-    //Set file names, Inout data files
-    std::string  datafile_grid_in  = "project.grid";  //Grid file
-    std::string  datafile_bcmap_in = "project.bcmap"; //Boundary condition file
-    std::string  datafile_tec      = "project_tecplot.dat";  //Tecplot file for viewing the result.
+   //Set file names, Inout data files
+   std::string  datafile_grid_in  = "project.grid";  //Grid file
+   std::string  datafile_bcmap_in = "project.bcmap"; //Boundary condition file
+   std::string  datafile_tec      = "project_tecplot.dat";  //Tecplot file for viewing the result.
 
 
 //--------------------------------------------------------------------------------
 // Input Parameters
 
-    // euler main data:
-    //typedef edu2d_my_main_data::edu2d_my_main_data 2Ddata;
-    edu2d_my_main_data::MainData2D E2Ddata;
-    //2Ddata = new edu2d_my_main_data();
+   // euler main data:
+   //typedef EulerSolver2D::EulerSolver2D 2Ddata;
+   EulerSolver2D::MainData2D E2Ddata;
+   //2Ddata = new EulerSolver2D();
 
                 E2Ddata.M_inf  = 0.0;         // Freestream Mach number to be set in the function
                                     //    -> "initial_solution_shock_diffraction"
@@ -255,12 +255,48 @@ void program_2D_euler_rk2(){
                    E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
     E2Ddata.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
     E2Ddata.gradient_weight   = "none";      // or "inverse_distance"
-    E2Ddata.gradient_weight_p =  edu2d_constants::one;        // or any other real value
+    E2Ddata.gradient_weight_p =  EulerSolver2D::one;        // or any other real value
 //--------------------------------------------------------------------------------
 // Solve the Euler equations and write the output datafile.
 //
 // (1) Read grid files
-    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
+   E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
+
+   std::cout << "Allocate arrays" << std::endl;
+   std::cout << "there are " << E2Ddata.nnodes << " nodes " << std::endl;
+
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+      std::cout << "i = " << i << " of " << E2Ddata.nnodes << std::endl;
+      //std::cout << E2Ddata.node[i].x << std::endl;
+
+    // segmentation fault:
+    //   E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+    //   E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
+    //   E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
+    //   E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
+    //   E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
+   }
+
+   std::cout << "E2Ddata.nq, = " << E2Ddata.nq << std::endl;
+// (2) Construct grid data
+   E2Ddata.construct_grid_data();
+
+// (3) Check the grid data (It is always good to check them before use//)
+//       check_grid_data();
+
+// // (4) Prepare LSQ gradients
+//       compute_lsq_coeff_nc();
+//       check_lsq_coeff_nc();
+
+// // (5) Set initial solution for a shock diffraction problem
+// //     (Re-write or replace it by your own subroutine for other problems.)
+//       initial_solution_shock_diffraction();
+
+// // (6) Compute the solution (March in time to the final time)
+//       euler_solver_main();
+
+// // (7) Write out the tecplot data file (Solutions at nodes)
+//       write_tecplot_file(datafile_tec);
 
 }
 
@@ -270,4 +306,4 @@ void EulerSolver2D::driverEuler2D(){
     return;
 }
 
-//}  //end namespace edu2d_my_main_data
+//}  //end namespace EulerSolver2D

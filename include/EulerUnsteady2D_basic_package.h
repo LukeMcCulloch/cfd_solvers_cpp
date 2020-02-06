@@ -1,3 +1,15 @@
+/*
+This file contranins geometry classes
+
+classes:
+   node_type
+   elm_type
+   edge_type
+   bgrid_type
+   face_type
+   MainData2D
+
+*/
 //********************************************************************************
 //* Educationally-Designed Unstructured 2D (EDU2D) Code
 //*
@@ -9,11 +21,11 @@
 //*
 //* This file contains 4 modules:
 //*
-//*  1. module edu2d_constants      - Some numerical values, e.g., zero, one, pi, etc.
-//*  2. module edu2d_grid_data_type - Grid data types: node, edge, face, element, etc.
-//*  3. module edu2d_my_main_data   - Parameters and arrays mainly used in a solver.
-//*  4. module edu2d_my_allocation  - Subroutines for dynamic allocation
-//*  5. module edu2d_grid_data      - Subroutines for reading/constructing/checking grid data
+//*  1. module EulerSolver2D      - Some numerical values, e.g., zero, one, pi, etc.
+//*  2. module EulerSolver2D - Grid data types: node, edge, face, element, etc.
+//*  3. module EulerSolver2D   - Parameters and arrays mainly used in a solver.
+//*  4. module EulerSolver2D  - Subroutines for dynamic allocation
+//*  5. module EulerSolver2D      - Subroutines for reading/constructing/checking grid data
 //*
 //* All data in the modules can be accessed by the use statement, e.g., 'use constants'.
 //*
@@ -35,7 +47,7 @@
 //********************************************************************************
 //********************************************************************************
 //********************************************************************************
-//* 1. module edu2d_constants
+//* 1. module EulerSolver2D
 //*
 //* Some useful constants are defined here.
 //* They can be accessed by the use statement, 'use constants'.
@@ -76,9 +88,9 @@ using std::vector;
 //
 //********************************************************************************
 //
-namespace edu2d_constants 
+namespace EulerSolver2D 
 {
-  //edu2d_constants() = default; // asks the compiler to generate the default implementation
+  //EulerSolver2D() = default; // asks the compiler to generate the default implementation
                          
   real const           zero = 0.0,
                         one = 1.0,
@@ -140,20 +152,22 @@ namespace edu2d_constants
 //*
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
-//* This is Version 0 (July 2015).  Translated in June/July 2019
+//* This is Version 0 (July 2015).  Translated in June/July... Sept 2019
 //* This C++ code is written and made available for an educational purpose.
 //* This file may be updated in future.
 //*
 //********************************************************************************
-namespace edu2d_grid_data_type{
+namespace EulerSolver2D{
 
 
 //----------------------------------------------------------
 // Data type for nodal quantities (used for node-centered schemes)
 // Note: Each node has the following data.
 //----------------------------------------------------------
-  class node_type{
+class node_type
+{
 
+public:
     //  to be read from a grid file
     real x, y;                  //nodal coordinates
     //  to be constructed in the code
@@ -171,12 +185,12 @@ namespace edu2d_grid_data_type{
     int nbmarks;                //# of boundary marks
     //  to be computed in the code
     //Below are arrays always allocated.
-    Array2D<real>* u;           //conservative variables
-    Array2D<real>* uexact;      //conservative variables
-    //Array2D<real>* gradu      //gradient of u
-    Array2D<real>* gradu;       //gradient of u (2D) 
-    Array2D<real>* res;         //residual (rhs)
-    real ar;                    // Control volume aspect ratio
+    Array2D<real>* u;           // conservative variables
+    Array2D<real>* uexact;      // conservative variables
+    //Array2D<real>* gradu      // gradient of u
+    Array2D<real>* gradu;       // gradient of u (2D) 
+    Array2D<real>* res;         // residual (rhs)
+    real ar;                    //      Control volume aspect ratio
     Array2D<real>* lsq2x2_cx;   //    Linear LSQ coefficient for ux
     Array2D<real>* lsq2x2_cy;   //    Linear LSQ coefficient for uy
     Array2D<real>* lsq5x5_cx;   // Quadratic LSQ coefficient for ux
@@ -203,29 +217,30 @@ namespace edu2d_grid_data_type{
 // Note: Each element has the following data.
 //----------------------------------------------------------
   class elm_type{
-    //  to be read from a grid file
-    int nvtx;                   //number of vertices
-    Array2D<int>*  vtx;         //list of vertices
-    //  to be constructed in the code
-    int nnghbrs;                //number of neighbors
-    Array2D<int>*  nghbr;       //list of neighbors
-    real x, y;                  //cell center coordinates
-    real vol;                   //cell volume
+    public:
+      //  to be read from a grid file
+      int nvtx;                   //number of vertices
+      Array2D<int>*  vtx;         //list of vertices
+      //  to be constructed in the code
+      int nnghbrs;                //number of neighbors
+      Array2D<int>*  nghbr;       //list of neighbors
+      real x, y;                  //cell center coordinates
+      real vol;                   //cell volume
 
-    Array2D<int>*  edge;        //list of edges
-    Array2D<real>* u;            //conservative variables
-    Array2D<real>* uexact;       //conservative variables
-    //NotUsed   Array2D<real>* du       //change in conservative variables
-    Array2D<real>* gradu;        //gradient of u
-    Array2D<real>* res;          //residual (rhs)
-    real dt;                     //local time step
-    real wsn;                    //??
-    int bmark;                   //Boundary mark
-    int nvnghbrs;                //number of vertex neighbors
-    Array2D<int>* vnghbr;        //list of vertex neighbors
-    real ar;                     //Element volume aspect ratio
-    Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
-    Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
+      Array2D<int>*  edge;        //list of edges
+      Array2D<real>* u;            //conservative variables
+      Array2D<real>* uexact;       //conservative variables
+      //NotUsed   Array2D<real>* du       //change in conservative variables
+      Array2D<real>* gradu;        //gradient of u
+      Array2D<real>* res;          //residual (rhs)
+      real dt;                     //local time step
+      real wsn;                    //??
+      int bmark;                   //Boundary mark
+      int nvnghbrs;                //number of vertex neighbors
+      Array2D<int>* vnghbr;        //list of vertex neighbors
+      real ar;                     //Element volume aspect ratio
+      Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
+      Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
 
 };
 
@@ -251,22 +266,22 @@ namespace edu2d_grid_data_type{
 // Note: Each boundary segment has the following data.
 //----------------------------------------------------------
   class bgrid_type{
-    //  to be read from a boundary grid file
-    char bc_type[80];     //type of boundary condition
-    int nbnodes; //# of boundary nodes
-    Array2D<int>* bnode;  //list of boundary nodes
-    //  to be constructed in the code
-    int nbfaces; //# of boundary faces
-    Array2D<real>* bfnx;  //x-component of the face outward normal
-    Array2D<real>* bfny;  //y-component of the face outward normal
-    Array2D<real>* bfn;   //magnitude of the face normal vector
-    Array2D<real>* bnx;   //x-component of the outward normal
-    Array2D<real>* bny;   //y-component of the outward normal
-    Array2D<real>* bn;    //magnitude of the normal vector
-    Array2D<int>*  belm;  //list of elm adjacent to boundary face
-    Array2D<int>*  kth_nghbr_of_1;
-    Array2D<int>*  kth_nghbr_of_2;
-
+    public:
+      //  to be read from a boundary grid file
+      char bc_type[80];     //type of boundary condition
+      int nbnodes; //# of boundary nodes
+      Array2D<int>* bnode;  //list of boundary nodes
+      //  to be constructed in the code
+      int nbfaces; //# of boundary faces
+      Array2D<real>* bfnx;  //x-component of the face outward normal
+      Array2D<real>* bfny;  //y-component of the face outward normal
+      Array2D<real>* bfn;   //magnitude of the face normal vector
+      Array2D<real>* bnx;   //x-component of the outward normal
+      Array2D<real>* bny;   //y-component of the outward normal
+      Array2D<real>* bn;    //magnitude of the normal vector
+      Array2D<int>*  belm;  //list of elm adjacent to boundary face
+      Array2D<int>*  kth_nghbr_of_1;
+      Array2D<int>*  kth_nghbr_of_2;
   };
 
 //----------------------------------------------------------
@@ -296,7 +311,7 @@ namespace edu2d_grid_data_type{
 
 };
 
-} // end namespace edu2d_grid_data_type
+} // end namespace EulerSolver2D
 
 
 
@@ -315,28 +330,30 @@ namespace edu2d_grid_data_type{
 //*
 //*
 //*        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
-//*
+//* 
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
 //* This is Version 0 (July 2015).
 //* This F90 code is written and made available for an educational purpose.
 //* This file may be updated in future.
 //*
+//*        translated by T. Luke McCulloch
+//*
 //********************************************************************************
-namespace edu2d_my_main_data{
+namespace EulerSolver2D{
 
   class MainData2D{
     
 
     public:
 
-    MainData2D();
-    // destructor
-    ~MainData2D();
+    //MainData2D();
+    
+    //~MainData2D();
 
     // build the grid:
     void read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in);
-    //void construct_grid_data();
+    void construct_grid_data();
 
     //  Parameters
 
@@ -364,30 +381,30 @@ namespace edu2d_my_main_data{
     real gamma = 1.4;
 
     //  Node data
-    int nnodes; //total number of nodes
-    edu2d_grid_data_type::node_type* node;   //array of nodes
+    int                              nnodes; //total number of nodes
+    node_type* node;   //array of nodes
 
     //  Element data (element=cell)
-    int ntria; //total number of triangler elements
-    int nquad; //total number of quadrilateral elements
-    int nelms; //total number of elements
-    edu2d_grid_data_type::elm_type* elm;    //array of elements
+    int                              ntria;   //total number of triangler elements
+    int                              nquad;   //total number of quadrilateral elements
+    int                              nelms;   //total number of elements
+    elm_type*  elm;     //array of elements
 
     //  Edge data
-    int nedges; //total number of edges
-    edu2d_grid_data_type::edge_type* edge;   //array of edges
+    int                              nedges;  //total number of edges
+    edge_type* edge;    //array of edges
 
     //  Boundary data
-    int nbound; //total number of boundary types
-    edu2d_grid_data_type::bgrid_type* bound;  //array of boundary segments
+    int                               nbound; //total number of boundary types
+    bgrid_type* bound;  //array of boundary segments
 
     //  Face data (cell-centered scheme only)
-    int nfaces; //total number of cell-faces
-    edu2d_grid_data_type::face_type* face;   //array of cell-faces
+    int                               nfaces; //total number of cell-faces
+    face_type*  face;   //array of cell-faces
 
   };
   
-}// end namespace  module edu2d_my_main_data
+}// end namespace  module EulerSolver2D
 //********************************************************************************
 
 
@@ -407,7 +424,6 @@ namespace edu2d_my_main_data{
 //*
 //*
 //*        written by Dr. Katate Masatsuka (info[at]cfdbooks.com),
-//*        translated, reconfigured by Dr. Luke McCulloch
 //*
 //* the author of useful CFD books, "I do like CFD" (http://www.cfdbooks.com).
 //*
@@ -415,8 +431,10 @@ namespace edu2d_my_main_data{
 //* This c++ code is written and made available for an educational purpose.
 //* This file may be updated in future.
 //*
+//* translated, reconfigured by Dr. Luke McCulloch
+//*
 //********************************************************************************
-//namespace edu2d_my_allocation{
+//namespace EulerSolver2D{
 
   // public :: my_alloc_int_ptr
   // public :: my_alloc_p2_ptr
@@ -488,7 +506,7 @@ namespace edu2d_my_main_data{
 // //********************************************************************************
 //   subroutine my_alloc_p2_ptr(x,n)
 
-//   use edu2d_constants   , only : p2
+//   use EulerSolver2D   , only : p2
 
 //   implicit none
 //   integer, intent(in) :: n
@@ -548,7 +566,7 @@ namespace edu2d_my_main_data{
 // //********************************************************************************
 //   subroutine my_alloc_p2_matrix_ptr(x,n,m)
 
-//   use edu2d_constants   , only : p2
+//   use EulerSolver2D   , only : p2
 
 //   implicit none
 //   integer, intent(in) :: n, m
@@ -587,7 +605,7 @@ namespace edu2d_my_main_data{
 
 //   end subroutine my_alloc_p2_matrix_ptr
 
-//  }// end namespace edu2d_my_allocation
+//  }// end namespace EulerSolver2D
 // //********************************************************************************
 
 
