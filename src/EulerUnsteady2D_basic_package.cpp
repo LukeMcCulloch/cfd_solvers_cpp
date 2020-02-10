@@ -493,25 +493,34 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
 // //Local variables
 //  integer  ::  i, j, k, ii, in, im, jelm, v1, v2, v3, v4
+int i, j, k, ii, in, im, jelm, v1, v2, v3, v4;
 //  real(p2) :: x1, x2, x3, x4, y1, y2, y3, y4, xm, ym, xc, yc
+real x1, x2, x3, x4, y1, y2, y3, y4, xm, ym, xc, yc;
 //  real(p2) :: xj, yj, xm1, ym1, xm2, ym2, dsL,dsR,dx,dy
+real xj, yj, xm1, ym1, xm2, ym2, dsL,dsR,dx,dy;
 //  logical  :: found
+bool found;
 //  integer  :: vL, vR, n1, n2, e1, e2
+int vL, vR, n1, n2, e1, e2;
 //  integer  :: vt1, vt2, ielm
-
+int vt1, vt2, ielm;
 //  integer  :: ave_nghbr, min_nghbr, max_nghbr, imin, imax
+int ave_nghbr, min_nghbr, max_nghbr, imin, imax;
 
-//  integer :: iedge
+//  integer :: iedge4
+int iedge;
 
 //  real(p2)                          :: ds
+real ds;
 
 // // Some initialization
-//  v2 = 0
-//  vL = 0
-//  im = 0
-//  jelm = 0
+ v2 = 0;
+ vL = 0;
+ im = 0;
+ jelm = 0;
 
 //   write(*,*) "Constructing grid data...."
+cout << "construct grid data" << endl;
 
 // // Initializations
 //   do i = 1, nnodes
