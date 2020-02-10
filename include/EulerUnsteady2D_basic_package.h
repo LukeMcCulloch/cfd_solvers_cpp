@@ -160,6 +160,18 @@ namespace EulerSolver2D
 namespace EulerSolver2D{
 
 
+// use an array of structs (may be inefficient//)
+struct cell_data{
+    real xc;  // Cell-center coordinate
+    Array2D<real> u   = Array2D<real>(4,1);  // Conservative variables = [rho, rho*u, rho*E]
+    Array2D<real> u0  = Array2D<real>(4,1);  // Conservative variables at the previous time step
+    Array2D<real> w   = Array2D<real>(4,1);  // Primitive variables = [rho, u, p]
+    Array2D<real> dw  = Array2D<real>(4,1);  // Slope (difference) of primitive variables
+    Array2D<real> res = Array2D<real>(4,1);  // Residual = f_{j+1/2) - f_{j-1/2)
+};
+
+
+
 //----------------------------------------------------------
 // Data type for nodal quantities (used for node-centered schemes)
 // Note: Each node has the following data.
@@ -185,11 +197,7 @@ public:
     int nbmarks;                //# of boundary marks
     //  to be computed in the code
     //Below are arrays always allocated.
-    Array2D<real>* u;           // conservative variables
     Array2D<real>* uexact;      // conservative variables
-    //Array2D<real>* gradu      // gradient of u
-    Array2D<real>* gradu;       // gradient of u (2D) 
-    Array2D<real>* res;         // residual (rhs)
     real ar;                    //      Control volume aspect ratio
     Array2D<real>* lsq2x2_cx;   //    Linear LSQ coefficient for ux
     Array2D<real>* lsq2x2_cy;   //    Linear LSQ coefficient for uy
@@ -199,17 +207,24 @@ public:
     //Array2D<real>* dw         // Extra data used by Quadratic LSQ
     Array2D<real>* dw;          // Extra data used by Quadratic LSQ (2D)
 
-    //Below are optional: Pointers need to be allocated in the main program if necessary.
+    //consertvative solution data
+    Array2D<real>* u;           // conservative variables
     Array2D<real>* du;          //change in conservative variables
+    Array2D<real>* gradu;       // gradient of u (2D) Array2D<real>* du;          //change in conservative variables
+    //nonconservative
     Array2D<real>* w;           //primitive variables(optional)
-    //Array2D<real>* gradw      //gradient of w
     Array2D<real>* gradw;       //gradient of w (2D)
+    //residual
+    Array2D<real>* res;         // residual (rhs)z
+    // Rieman data
     real phi;                   //limiter function (0 <= phi <= 1)
     real dt;                    //local time step
     real wsn;                   //Half the max wave speed at face
     Array2D<real>*  r_temp;     // For GCR implementation
     Array2D<real>*  u_temp;     // For GCR implementation
     Array2D<real>*  w_temp;     // For GCR implementation
+
+    //cell_data cell; //simpler to use the class structure instead of another structure
 };
 
 //----------------------------------------------------------

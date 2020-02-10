@@ -218,10 +218,18 @@ using std::endl;
 //*    bound(1:nbound)%bc_type  = Boundary condition name for each segment
 //*
 //********************************************************************************
+
+
 void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in, 
                                                std::string datafile_bcmap_in)
 {
-
+   /*
+   *   This is inside out from the C++ perspective.
+   *   'Somebody' needs to read the grid and figure 
+   *   out how many nodes we have.
+   *   Then create a MainData2D instance and allocate node arrays
+   *   within the constructor.
+   */
    //use EulerSolver2D, only : nnodes, node, ntria, nquad, nelms, elm, nbound, bound
 
    //Local variables
@@ -261,12 +269,13 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       std::istringstream iss(line);
       iss >> node[i].x >> node[i].y ;
       std::cout << node[i].x << node[i].y << std::endl;
-      node[i].u     = new Array2D<real>(4,1);
-      node[i].du    = new Array2D<real>(4,1);
-      node[i].w     = new Array2D<real>(4,1);
-      node[i].gradw = new Array2D<real>(4,2); //<- 2: x and y components.
+      node[i].u     = new Array2D<real>(nq,1);
+      node[i].du    = new Array2D<real>(nq,1);
+      node[i].w     = new Array2D<real>(nq,1);
+      node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
       node[i].res   = new Array2D<real>(4,1);
       std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
+
    }
       
    // Read element-connectivity information
@@ -426,7 +435,6 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    return;
 
  } // end function read_grid
-
 
 
 
