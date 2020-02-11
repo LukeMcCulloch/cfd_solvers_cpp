@@ -569,10 +569,13 @@ nedges = 0;
 // //        o-----o       o---------o
 
 //   elements : do i = 1, nelms
+for ( int j = 0; j < nelms; ++j ) {
 
 //    v1 = elm(i)%vtx(1)
 //    v2 = elm(i)%vtx(2)
 //    v3 = elm(i)%vtx(3)
+
+v1 = elm[i].vtx[0]
 
 //    x1 = node(v1)%x
 //    x2 = node(v2)%x
@@ -670,7 +673,7 @@ nedges = 0;
 
 //    endif tri_or_quad
 
-//   end do elements
+}//   end do elements
 
 // // Median dual volume
 
