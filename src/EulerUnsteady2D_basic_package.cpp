@@ -273,10 +273,14 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       node[i].du    = new Array2D<real>(nq,1);
       node[i].w     = new Array2D<real>(nq,1);
       node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
-      node[i].res   = new Array2D<real>(4,1);
+      node[i].res   = new Array2D<real>(nq,1);
       std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
 
    }
+
+for (size_t i = 0; i < nnodes; i++) {
+   node[i].nelms = 0;
+} 
       
    // Read element-connectivity information
 
@@ -527,6 +531,11 @@ cout << "construct grid data" << endl;
 //    node(i)%nelms = 0
 //   end do
 //    nedges = 0
+// moved to read grid data 
+// for (size_t i = 0; i < nnodes; i++) {
+//    node[i].nelms = 0;
+// } 
+nedges = 0;
 
 // //--------------------------------------------------------------------------------
 // // Loop over elements and construct the fololowing data.
