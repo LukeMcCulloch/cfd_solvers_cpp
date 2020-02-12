@@ -531,10 +531,12 @@ cout << "construct grid data" << endl;
 //    node(i)%nelms = 0
 //   end do
 //    nedges = 0
+
 // moved to read grid data 
 // for (size_t i = 0; i < nnodes; i++) {
 //    node[i].nelms = 0;
 // } 
+
 nedges = 0;
 
 // //--------------------------------------------------------------------------------
