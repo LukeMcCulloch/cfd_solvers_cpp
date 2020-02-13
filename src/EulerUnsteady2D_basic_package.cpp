@@ -258,9 +258,6 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::cout << "for " << nnodes << " nodes " << std::endl;
    node_type* node = new node_type[nnodes];
 
-   for (size_t i = 0; i < nnodes; i++) {
-      node[i].nelms = 0;
-   } 
 
    std::cout << "Allocating elm_type" << std::endl;
    std::cout << "for " << nelms << " elements " << std::endl;
@@ -278,13 +275,11 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       node[i].w     = new Array2D<real>(nq,1);
       node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
       node[i].res   = new Array2D<real>(nq,1);
+      node[i].nelms = 0;
       std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
 
    }
 
-for (size_t i = 0; i < nnodes; i++) {
-   node[i].nelms = 0;
-} 
       
    // Read element-connectivity information
 
@@ -580,6 +575,7 @@ for ( int j = 0; j < nelms; ++j ) {
 //    v1 = elm(i)%vtx(1)
 //    v2 = elm(i)%vtx(2)
 //    v3 = elm(i)%vtx(3)
+   //v1 = elm[i].vtx[0];
 
 //v1 = elm[i].vtx[0]
 

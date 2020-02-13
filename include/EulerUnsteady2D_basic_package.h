@@ -362,9 +362,9 @@ namespace EulerSolver2D{
 
     public:
 
-    MainData2D() {};
+    MainData2D(std::string datafile_grid_in, std::string datafile_bcmap_in);
     
-    //~MainData2D() {};
+    ~MainData2D();
 
     // build the grid:
     void read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in);

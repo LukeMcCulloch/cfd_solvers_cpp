@@ -104,7 +104,7 @@
 #include "../include/vector.h"
 
 //======================================
-// 1D Eiuler approximate Riemann sovler
+// 1D Euler approximate Riemann sovler
 #include "../include/EulerShockTube1D.h"
 
 //======================================
