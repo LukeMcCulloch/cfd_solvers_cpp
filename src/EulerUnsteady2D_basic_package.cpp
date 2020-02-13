@@ -258,6 +258,10 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::cout << "for " << nnodes << " nodes " << std::endl;
    node_type* node = new node_type[nnodes];
 
+   for (size_t i = 0; i < nnodes; i++) {
+      node[i].nelms = 0;
+   } 
+
    std::cout << "Allocating elm_type" << std::endl;
    std::cout << "for " << nelms << " elements " << std::endl;
    elm_type*  elm = new elm_type[nelms];
@@ -533,9 +537,9 @@ cout << "construct grid data" << endl;
 //    nedges = 0
 
 // moved to read grid data 
-// for (size_t i = 0; i < nnodes; i++) {
-//    node[i].nelms = 0;
-// } 
+for (size_t i = 0; i < nnodes; i++) {
+   //node[i].nelms = 0;
+} 
 
 nedges = 0;
 
