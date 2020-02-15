@@ -186,11 +186,12 @@ public:
 
     int nnghbrs;   //number of neighbors
     //int,   dimension(:), pointer  :: nghbr     //list of neighbors
-    vector<int> nghbr;          //list of neighbors
+    //vector<int> nghbr;          //list of neighbors
+    Array2D<int>*  nghbr;        //list of neighbors
 
     int nelms;     //number of elements
-    //Array2D<int>*  elm        //list of elements
-    vector<int> elm;            //list of elements
+    Array2D<int>*  elm;        //list of elements
+    //vector<int> elm;            //list of elements
 
     real vol;                   //dual-cell volume
     int bmark;                  //Boundary mark
