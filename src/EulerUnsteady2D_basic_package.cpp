@@ -256,12 +256,12 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    // //  Allocate node and element arrays.
    std::cout << "Allocating node_type" << std::endl;
    std::cout << "for " << nnodes << " nodes " << std::endl;
-   node_type* node = new node_type[nnodes];
+   node = new node_type[nnodes];
 
 
    std::cout << "Allocating elm_type" << std::endl;
    std::cout << "for " << nelms << " elements " << std::endl;
-   elm_type*  elm = new elm_type[nelms];
+   elm = new elm_type[nelms];
 
 
    // // READ: Read the nodal coordinates
@@ -269,14 +269,14 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       std::getline(infile, line);
       std::istringstream iss(line);
       iss >> node[i].x >> node[i].y ;
-      std::cout << node[i].x << node[i].y << std::endl;
+      //std::cout << node[i].x << node[i].y << std::endl;
       node[i].u     = new Array2D<real>(nq,1);
       node[i].du    = new Array2D<real>(nq,1);
       node[i].w     = new Array2D<real>(nq,1);
       node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
       node[i].res   = new Array2D<real>(nq,1);
       node[i].nelms = 0;
-      std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
+      //std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
 
    }
 
@@ -355,7 +355,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::getline(infile, line);
    std::istringstream in(line);
    in >> nbound;
-   bgrid_type* bound = new bgrid_type[nbound];
+   bound = new bgrid_type[nbound];
 
 
    // // READ: Number of Boundary nodes (including the starting one at the end if
@@ -575,9 +575,8 @@ for ( int j = 0; j < nelms; ++j ) {
 //    v1 = elm(i)%vtx(1)
 //    v2 = elm(i)%vtx(2)
 //    v3 = elm(i)%vtx(3)
-   //v1 = elm[i].vtx[0];
-
-//v1 = elm[i].vtx[0]
+   std::cout << "elm[i] = " << elm[i].vtx  << std::endl;
+   //v1 = elm[i].vtx[0]
 
 //    x1 = node(v1)%x
 //    x2 = node(v2)%x

@@ -221,7 +221,7 @@ EulerSolver2D::MainData2D::MainData2D(std::string datafile_grid_in,
    std::cout << "there are " << nnodes << " nodes " << std::endl;
 
    for (size_t i = 0; i < nnodes; i++) {
-      std::cout << "i = " << i << " of " << nnodes << std::endl;
+      //std::cout << "i = " << i << " of " << nnodes << std::endl;
       //std::cout << node[i].x << std::endl;
 
     // declare within the class
