@@ -505,296 +505,290 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
 void EulerSolver2D::MainData2D::construct_grid_data(){
 
-//  use EulerSolver2D , only : nnodes, node, nelms, elm, nedges, edge, nbound, bound, face, nfaces
-//  use EulerSolver2D    , only : p2, zero, half, third
-//  use EulerSolver2D, only : my_alloc_int_ptr, my_alloc_p2_ptr, my_alloc_p2_matrix_ptr
+   // //Local variables
+   int i, j, k, ii, in, im, jelm, v1, v2, v3, v4;
+   real x1, x2, x3, x4, y1, y2, y3, y4, xm, ym, xc, yc;
+   real xj, yj, xm1, ym1, xm2, ym2, dsL,dsR,dx,dy;
+   bool found;
+   int vL, vR, n1, n2, e1, e2;
+   int vt1, vt2, ielm;
+   int ave_nghbr, min_nghbr, max_nghbr, imin, imax;
+   int iedge;
 
-// //Local variables
-int i, j, k, ii, in, im, jelm, v1, v2, v3, v4;
-real x1, x2, x3, x4, y1, y2, y3, y4, xm, ym, xc, yc;
-real xj, yj, xm1, ym1, xm2, ym2, dsL,dsR,dx,dy;
-bool found;
-int vL, vR, n1, n2, e1, e2;
-int vt1, vt2, ielm;
-int ave_nghbr, min_nghbr, max_nghbr, imin, imax;
-int iedge;
+   //  real(p2)                          :: ds
+   real ds;
 
-//  real(p2)                          :: ds
-real ds;
+   // // Some initialization
+   v2 = 0;
+   vL = 0;
+   im = 0;
+   jelm = 0;
 
-// // Some initialization
- v2 = 0;
- vL = 0;
- im = 0;
- jelm = 0;
+   //   write(*,*) "Constructing grid data...."
+   cout << "construct grid data...." << endl;
 
-//   write(*,*) "Constructing grid data...."
-cout << "construct grid data...." << endl;
+   // // Initializations
+   for (size_t i = 0; i < nnodes; i++) {
+      node[i].nelms = 0;
+   } 
+   nedges = 0;
 
-// // Initializations
-for (size_t i = 0; i < nnodes; i++) {
-   node[i].nelms = 0;
-} 
-nedges = 0;
-
-// //--------------------------------------------------------------------------------
-// // Loop over elements and construct the fololowing data.
-// //
-// // 1. Surrounding elements: node(:).nelms, node(:).elm(:)
-// //
-// //    Example: Node i is surrounded by the eleemnts, 23, 101, 13, 41.
-// //             node[i].nelms = 4
-// //             node[i].elm(1) = 23
-// //             node[i].elm(2) = 13
-// //             node[i].elm(3) = 41
-// //             node[i].elm(4) = 101
-// //
-// //        o-------o-------------o
-// //       /        |   .         |
-// //      /    23   |      41     |
-// //     o----------o-------------o
-// //      \        i \            |
-// //       \   101    \     13    |
-// //        \          \          | 
-// //         o----------o---------o
-// //
-// // 2. Element quantities  : elm(:).x,elm(:).y,elm(:).vol
-// //
-// //  o-----------o            
-// //   \          |            o
-// //    \    (x,y)|           / \
-// //     \   .    |          /   \
-// //      \       |         /  .  \    (x,y): centroid coordinates
-// //       \      |        / (x,y) \     vol: volume of element
-// //        o-----o       o---------o
+//--------------------------------------------------------------------------------
+// Loop over elements and construct the fololowing data.
+//
+// 1. Surrounding elements: node(:).nelms, node(:).elm(:)
+//
+//    Example: Node i is surrounded by the eleemnts, 23, 101, 13, 41.
+//             node[i].nelms = 4
+//             node[i].elm(1) = 23
+//             node[i].elm(2) = 13
+//             node[i].elm(3) = 41
+//             node[i].elm(4) = 101
+//
+//        o-------o-------------o
+//       /        |   .         |
+//      /    23   |      41     |
+//     o----------o-------------o
+//      \        i \            |
+//       \   101    \     13    |
+//        \          \          | 
+//         o----------o---------o
+//
+// 2. Element quantities  : elm(:).x,elm(:).y,elm(:).vol
+//
+//  o-----------o            
+//   \          |            o
+//    \    (x,y)|           / \
+//     \   .    |          /   \
+//      \       |         /  .  \    (x,y): centroid coordinates
+//       \      |        / (x,y) \     vol: volume of element
+//        o-----o       o---------o
 
 //   elements : do i = 1, nelms
+   for ( int i = 0; i < nelms; ++i ) {
 
+      v1 = (*elm[i].vtx)(0,0);
+      v2 = (*elm[i].vtx)(0,0);
+      v3 = (*elm[i].vtx)(0,0);
 
-for ( int i = 0; i < nelms; ++i ) {
+      x1 = node[v1].x;
+      x2 = node[v2].x;
+      x3 = node[v3].x;
 
-   v1 = (*elm[i].vtx)(0,0);
-   v2 = (*elm[i].vtx)(0,0);
-   v3 = (*elm[i].vtx)(0,0);
+      y1 = node[v1].y;
+      y2 = node[v2].y;
+      y3 = node[v3].y;
 
-   x1 = node[v1].x;
-   x2 = node[v2].x;
-   x3 = node[v3].x;
+   // // Distribute the element index to nodes.
 
-   y1 = node[v1].y;
-   y2 = node[v2].y;
-   y3 = node[v3].y;
+      /*
+      * DESIGN CHOICE HERE -- use std<vector?> or similar?
+      * I don't think we need a true dynamic (i.e. resizable) array
+      */
+      node[v1].nelms = node[v1].nelms + 1;
+      node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
+      node[v1].elm[node[v1].nelms] = i;
 
-// // Distribute the element index to nodes.
+      node[v2].nelms = node[v2].nelms + 1;
+      node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
+      node[v2].elm[node[v2].nelms] = i;
 
-   /*
-   * DESIGN CHOICE HERE -- use std<vector?> or similar?
-   * I don't think we need a true dynamic (i.e. resizable) array
-   */
-   node[v1].nelms = node[v1].nelms + 1;
-   node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-   node[v1].elm[node[v1].nelms] = i;
+      node[v3].nelms = node[v3].nelms + 1;
+      node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+      node[v3].elm[node[v3].nelms] = i;
 
-   node[v2].nelms = node[v2].nelms + 1;
-   node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-   node[v2].elm[node[v2].nelms] = i;
+   // // Compute the cell center and cell volume.
+      //tri_or_quad : if (elm(i).nvtx==3) then
+      if (elm[i].nvtx==3) {
 
-   node[v3].nelms = node[v3].nelms + 1;
-   node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-   node[v3].elm[node[v3].nelms] = i;
+   //   Triangle centroid and volume
+      elm[i].x   = third*(x1+x2+x3);
+      elm[i].y   = third*(y1+y2+y3);
+      elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
+      }
+      else if (elm[i].nvtx==4) {
 
-// // Compute the cell center and cell volume.
-   //tri_or_quad : if (elm(i).nvtx==3) then
-   if (elm[i].nvtx==3) {
+   //   this is a quad. Get the 4th vertex.
+         v4 = (*elm[i].vtx)(4,0);
+         x4 = node[v4].x;
+         y4 = node[v4].y;
+   //   Centroid: median dual
+   //   (Note: There is an alternative. See Appendix B in Nishikawa AIAA2010-5093.)
+         xm1 = half*(x1+x2);
+         ym1 = half*(y1+y2);
+         xm2 = half*(x3+x4);
+         ym2 = half*(y3+y4);
+         elm[i].x   = half*(xm1+xm2);
+         elm[i].y   = half*(ym1+ym2);
+   //   Volume is computed as a sum of two triangles: 1-2-3 and 1-3-4.
+         elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3) + \
+                     tri_area(x1,x3,x4,y1,y3,y4);
 
-//   Triangle centroid and volume
-    elm[i].x   = third*(x1+x2+x3);
-    elm[i].y   = third*(y1+y2+y3);
-    elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
+         xc = elm[i].x;
+         yc = elm[i].y;
+         if (tri_area(x1,x2,xc,y1,y2,yc)<zero) {
+            cout << " Centroid outside the quad element 12c: i=" << i << endl;
+            cout << "  (x1,y1)=" << x1 << y1  << endl;
+            cout << "  (x2,y2)=" << x2 << y2  << endl;
+            cout << "  (x3,y3)=" << x3 << y3  << endl;
+            cout << "  (x4,y4)=" << x4 << y4  << endl;
+            cout << "  (xc,yc)=" << xc << yc  << endl;
+            //stop
+         }
+
+         if (tri_area(x2,x3,xc,y2,y3,yc)<zero) {
+            cout << " Centroid outside the quad element 23c: i=" << i << endl;
+            cout << "  (x1,y1)=" << x1 << y1  << endl;
+            cout << "  (x2,y2)=" << x2 << y2  << endl;
+            cout << "  (x3,y3)=" << x3 << y3  << endl;
+            cout << "  (x4,y4)=" << x4 << y4  << endl;
+            cout << "  (xc,yc)=" << xc << yc  << endl;
+            //stop
+         }
+
+         if (tri_area(x3,x4,xc,y3,y4,yc)<zero) {
+            cout << " Centroid outside the quad element 34c: i=" << i << endl;
+            cout << "  (x1,y1)=" << x1 << y1 << endl;
+            cout << "  (x2,y2)=" << x2 << y2 << endl;
+            cout << "  (x3,y3)=" << x3 << y3 << endl;
+            cout << "  (x4,y4)=" << x4 << y4 << endl;
+            cout << "  (xc,yc)=" << xc << yc << endl;
+            //stop
+         }
+
+         if (tri_area(x4,x1,xc,y4,y1,yc)<zero) {
+            cout << " Centroid outside the quad element 41c: i=" << i << endl;
+            cout << "  (x1,y1)=" << x1 << y1  << endl;
+            cout << "  (x2,y2)=" << x2 << y2  << endl;
+            cout << "  (x3,y3)=" << x3 << y3  << endl;
+            cout << "  (x4,y4)=" << x4 << y4  << endl;
+            cout << "  (xc,yc)=" << xc << yc  << endl;
+            //stop
+         }
+
+   //  Distribution of element number to the 4th node of the quadrilateral
+      node[v4].nelms = node[v4].nelms + 1;
+      node[v4].elm = new Array2D<int>(node[v4].nelms, 0);
+      (*node[v4].elm)[node[v4].nelms][0] = i;
+
+      }//    endif tri_or_quad
+
+   }//   end do elements (i loop)
+
+// Median dual volume
+
+   for (int i = 0; i < nnodes; i++) {
+      node[i].vol = zero;
    }
-   else if (elm[i].nvtx==4) {
-
-//   this is a quad. Get the 4th vertex.
-      v4 = (*elm[i].vtx)(4,0);
-      x4 = node[v4].x;
-      y4 = node[v4].y;
-//   Centroid: median dual
-//   (Note: There is an alternative. See Appendix B in Nishikawa AIAA2010-5093.)
-      xm1 = half*(x1+x2);
-      ym1 = half*(y1+y2);
-      xm2 = half*(x3+x4);
-      ym2 = half*(y3+y4);
-      elm[i].x   = half*(xm1+xm2);
-      elm[i].y   = half*(ym1+ym2);
-//   Volume is computed as a sum of two triangles: 1-2-3 and 1-3-4.
-      elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3) + \
-                  tri_area(x1,x3,x4,y1,y3,y4);
-
-      xc = elm[i].x;
-      yc = elm[i].y;
-      if (tri_area(x1,x2,xc,y1,y2,yc)<zero) {
-         cout << " Centroid outside the quad element 12c: i=" << i << endl;
-         cout << "  (x1,y1)=" << x1 << y1  << endl;
-         cout << "  (x2,y2)=" << x2 << y2  << endl;
-         cout << "  (x3,y3)=" << x3 << y3  << endl;
-         cout << "  (x4,y4)=" << x4 << y4  << endl;
-         cout << "  (xc,yc)=" << xc << yc  << endl;
-         //stop
-      }
-
-      if (tri_area(x2,x3,xc,y2,y3,yc)<zero) {
-         cout << " Centroid outside the quad element 23c: i=" << i << endl;
-         cout << "  (x1,y1)=" << x1 << y1  << endl;
-         cout << "  (x2,y2)=" << x2 << y2  << endl;
-         cout << "  (x3,y3)=" << x3 << y3  << endl;
-         cout << "  (x4,y4)=" << x4 << y4  << endl;
-         cout << "  (xc,yc)=" << xc << yc  << endl;
-         //stop
-      }
-
-      if (tri_area(x3,x4,xc,y3,y4,yc)<zero) {
-         cout << " Centroid outside the quad element 34c: i=" << i << endl;
-         cout << "  (x1,y1)=" << x1 << y1 << endl;
-         cout << "  (x2,y2)=" << x2 << y2 << endl;
-         cout << "  (x3,y3)=" << x3 << y3 << endl;
-         cout << "  (x4,y4)=" << x4 << y4 << endl;
-         cout << "  (xc,yc)=" << xc << yc << endl;
-         //stop
-      }
-
-      if (tri_area(x4,x1,xc,y4,y1,yc)<zero) {
-         cout << " Centroid outside the quad element 41c: i=" << i << endl;
-         cout << "  (x1,y1)=" << x1 << y1  << endl;
-         cout << "  (x2,y2)=" << x2 << y2  << endl;
-         cout << "  (x3,y3)=" << x3 << y3  << endl;
-         cout << "  (x4,y4)=" << x4 << y4  << endl;
-         cout << "  (xc,yc)=" << xc << yc  << endl;
-         //stop
-      }
-
-//  Distribution of element number to the 4th node of the quadrilateral
-   node[v4].nelms = node[v4].nelms + 1;
-   node[v4].elm = new Array2D<int>(node[v4].nelms, 0);
-   (*node[v4].elm)[node[v4].nelms][0] = i;
-
-   }//    endif tri_or_quad
-
-}//   end do elements (i loop)
-
-// // Median dual volume
-
-for (int i = 0; i < nnodes; i++) {
-   node[i].vol = zero;
-}
 
 //   elementsv : do i = 1, nelms
-for ( int i = 0; i < nelms; ++i ) {
+   for ( int i = 0; i < nelms; ++i ) {
+      
+
+      v1 = (*elm[i].vtx)(0);
+      v2 = (*elm[i].vtx)(1);
+      v3 = (*elm[i].vtx)(2);
+
+   //    tri_or_quadv : 
+      if (elm[i].nvtx==3) {
+   //   Dual volume is exactly 1/3 of the volume of the triangle.
+         node[v1].vol = node[v1].vol + third*elm[i].vol;
+         node[v2].vol = node[v2].vol + third*elm[i].vol;
+         node[v3].vol = node[v3].vol + third*elm[i].vol;
+
+      }  else if (elm[i].nvtx==4) {
+            v4 = (*elm[i].vtx)(4,0);
+
+            x1 = node[v1].x;
+            x2 = node[v2].x;
+            x3 = node[v3].x;
+            x4 = node[v4].x;
+            xc = elm[i].x;
+
+            y1 = node[v1].y;
+            y2 = node[v2].y;
+            y3 = node[v3].y;
+            y4 = node[v4].y;
+            yc = elm[i].y;
+
+   // - Vertex 1
+            xj = node[v1].x;
+            yj = node[v1].y;
+            xm1 = half*(xj+x2);
+            ym1 = half*(yj+y2);
+            xm2 = half*(xj+x4);
+            ym2 = half*(yj+y4);
+
+   //   Median volume is computed as a sum of two triangles.
+            node[v1].vol = node[v1].vol + \
+                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                           tri_area(xj,xc,xm2,yj,yc,ym2);
+
+   // - Vertex 2
+            xj = node[v2].x;
+            yj = node[v2].y;
+            xm1 = half*(xj+x3);
+            ym1 = half*(yj+y3);
+            xm2 = half*(xj+x1);
+            ym2 = half*(yj+y1);
+
+   //   Median volume is computed as a sum of two triangles.
+            node[v2].vol = node[v2].vol + \
+                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                           tri_area(xj,xc,xm2,yj,yc,ym2);
+
+   // - Vertex 3
+            xj = node[v3].x;
+            yj = node[v3].y;
+            xm1 = half*(xj+x4);
+            ym1 = half*(yj+y4);
+            xm2 = half*(xj+x2);
+            ym2 = half*(yj+y2);
+
+   //   Median volume is computed as a sum of two triangles.
+            node[v3].vol = node[v3].vol + \
+                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                           tri_area(xj,xc,xm2,yj,yc,ym2);
+
+      // - Vertex 4
+            xj = node[v4].x;
+            yj = node[v4].y;
+            xm1 = half*(xj+x1);
+            ym1 = half*(yj+y1);
+            xm2 = half*(xj+x3);
+            ym2 = half*(yj+y3);
+
+   //   Median volume is computed as a sum of two triangles.
+            node[v4].vol = node[v4].vol + \
+                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                           tri_area(xj,xc,xm2,yj,yc,ym2);
    
+      }//    endif tri_or_quadv
 
-   v1 = (*elm[i].vtx)(0);
-   v2 = (*elm[i].vtx)(1);
-   v3 = (*elm[i].vtx)(2);
+   }//   end do elementsv
 
-//    tri_or_quadv : 
-   if (elm[i].nvtx==3) {
-//   Dual volume is exactly 1/3 of the volume of the triangle.
-      node[v1].vol = node[v1].vol + third*elm[i].vol;
-      node[v2].vol = node[v2].vol + third*elm[i].vol;
-      node[v3].vol = node[v3].vol + third*elm[i].vol;
-
-   }  else if (elm[i].nvtx==4) {
-         v4 = (*elm[i].vtx)(4,0);
-
-         x1 = node[v1].x;
-         x2 = node[v2].x;
-         x3 = node[v3].x;
-         x4 = node[v4].x;
-         xc = elm[i].x;
-
-         y1 = node[v1].y;
-         y2 = node[v2].y;
-         y3 = node[v3].y;
-         y4 = node[v4].y;
-         yc = elm[i].y;
-
-// - Vertex 1
-         xj = node[v1].x;
-         yj = node[v1].y;
-         xm1 = half*(xj+x2);
-         ym1 = half*(yj+y2);
-         xm2 = half*(xj+x4);
-         ym2 = half*(yj+y4);
-
-//   Median volume is computed as a sum of two triangles.
-         node[v1].vol = node[v1].vol + \
-                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                        tri_area(xj,xc,xm2,yj,yc,ym2);
-
-// - Vertex 2
-         xj = node[v2].x;
-         yj = node[v2].y;
-         xm1 = half*(xj+x3);
-         ym1 = half*(yj+y3);
-         xm2 = half*(xj+x1);
-         ym2 = half*(yj+y1);
-
-//   Median volume is computed as a sum of two triangles.
-         node[v2].vol = node[v2].vol + \
-                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                        tri_area(xj,xc,xm2,yj,yc,ym2);
-
-// - Vertex 3
-         xj = node[v3].x;
-         yj = node[v3].y;
-         xm1 = half*(xj+x4);
-         ym1 = half*(yj+y4);
-         xm2 = half*(xj+x2);
-         ym2 = half*(yj+y2);
-
-//   Median volume is computed as a sum of two triangles.
-         node[v3].vol = node[v3].vol + \
-                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                        tri_area(xj,xc,xm2,yj,yc,ym2);
-
-   // - Vertex 4
-         xj = node[v4].x;
-         yj = node[v4].y;
-         xm1 = half*(xj+x1);
-         ym1 = half*(yj+y1);
-         xm2 = half*(xj+x3);
-         ym2 = half*(yj+y3);
-
-//   Median volume is computed as a sum of two triangles.
-         node[v4].vol = node[v4].vol + \
-                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                        tri_area(xj,xc,xm2,yj,yc,ym2);
- 
-   }//    endif tri_or_quadv
-
-}//   end do elementsv
-
-// //--------------------------------------------------------------------------------
-// // Loop over elements 2
-// //
-// //  Allocate elm[:].nghbr[:] : elm[:].nnghrs, elm[:].nghr[:]
-// //  Construct element nghbr data: elm(:).nghbr(:)
-// //  Order of neighbor elements [e1,e2,e3,..] are closely related to
-// //  the order of vertices [v1,v2,v3,..] (see below).
-// //
-// //          o------o
-// //          |      |                
-// //        v4|  e1  |v3                     v3
-// //    o-----o------o------o      o---------o------------o
-// //    |     |      |      |       .      .   .        .
-// //    | e2  |      |  e4  |        . e2 .     . e1  .
-// //    o-----o------o------o         .  .       .  .
-// //       v1 |     .v2              v1 o---------o v2   
-// //          | e3 .                     .   e3  .
-// //          |   .                        .    .
-// //          |  .                           . .
-// //          | .                             o
-// //          o
-// //
+//--------------------------------------------------------------------------------
+// Loop over elements 2
+//
+//  Allocate elm[:].nghbr[:] : elm[:].nnghrs, elm[:].nghr[:]
+//  Construct element nghbr data: elm(:).nghbr(:)
+//  Order of neighbor elements [e1,e2,e3,..] are closely related to
+//  the order of vertices [v1,v2,v3,..] (see below).
+//
+//          o------o
+//          |      |                
+//        v4|  e1  |v3                     v3
+//    o-----o------o------o      o---------o------------o
+//    |     |      |      |       .      .   .        .
+//    | e2  |      |  e4  |        . e2 .     . e1  .
+//    o-----o------o------o         .  .       .  .
+//       v1 |     .v2              v1 o---------o v2   
+//          | e3 .                     .   e3  .
+//          |   .                        .    .
+//          |  .                           . .
+//          | .                             o
+//          o
+//
 
    // Allocate the neighbor array
 
@@ -1033,68 +1027,72 @@ for ( int i = 0; i < nelms; ++i ) {
 
    }//   end do elements3
 
-// // Loop over edges
-// // Construct edge vector and directed area vector.
-// //
-// // Edge vector is a simple vector pointing froom n1 to n2.
-// // For each edge, add the directed area vector (dav) from
-// // the left and right elements.
-// //
-// //              n2
-// //   o-----------o-----------o
-// //   |     dav   |  dav      |
-// //   |       ^   |   ^       |
-// //   |       |   |   |       |
-// //   |   c - - - m - - -c    |
-// //   |           |           |
-// //   |           |           |    m: edge midpoint
-// //   |           |           |    c: element centroid
-// //   o-----------o-----------o
-// //                n1
-// //
+// Loop over edges
+// Construct edge vector and directed area vector.
+//
+// Edge vector is a simple vector pointing froom n1 to n2.
+// For each edge, add the directed area vector (dav) from
+// the left and right elements.
+//
+//              n2
+//   o-----------o-----------o
+//   |     dav   |  dav      |
+//   |       ^   |   ^       |
+//   |       |   |   |       |
+//   |   c - - - m - - -c    |
+//   |           |           |
+//   |           |           |    m: edge midpoint
+//   |           |           |    c: element centroid
+//   o-----------o-----------o
+//                n1
+//
 //   edges : do i = 1, nedges
+   for (int i = 0; i < nedges; i++) {
 
-//    n1 = edge[i].n1
-//    n2 = edge[i].n2
-//    e1 = edge[i].e1
-//    e2 = edge[i].e2
-//    xm = half*( node(n1).x + node(n2).x )
-//    ym = half*( node(n1).y + node(n2).y )
+      n1 = edge[i].n1;
+      n2 = edge[i].n2;
+      e1 = edge[i].e1;
+      e2 = edge[i].e2;
+      xm = half*( node[n1].x + node[n2].x );
+      ym = half*( node[n1].y + node[n2].y );
 
-//    edge[i].dav = zero
+      
+      edge[i].dav = zero;
 
-// // Contribution from the left element
-//   if (e1 > 0) {
-//    xc = elm(e1).x
-//    yc = elm(e1).y
-//    edge[i].dav(1) = -(ym-yc)
-//    edge[i].dav(2) =   xm-xc
-//   }
+      // Contribution from the left element
+      if (e1 > 0) {
+         xc = elm[e1].x;
+         yc = elm[e1].y;
+         edge[i].dav(0) = -(ym-yc);
+         edge[i].dav(1) =   xm-xc;
+      }
 
-// // Contribution from the right element
-//   if (e2 > 0) {
-//    xc = elm(e2).x
-//    yc = elm(e2).y
-//    edge[i].dav(1) = edge[i].dav(1) -(yc-ym)
-//    edge[i].dav(2) = edge[i].dav(2) + xc-xm
-//   }
+      // Contribution from the right element
+      if (e2 > 0) {
+         xc = elm[e2].x;
+         yc = elm[e2].y;
+         edge[i].dav(1) = edge[i].dav(0) -(yc-ym);
+         edge[i].dav(2) = edge[i].dav(1) + xc-xm;
+      }
 
-//   if (e1 < 0 .and. e2 < 0) {
-//    write(*,*) "////////// e1 and e2 are both negative... No way..."
-//   }
+      if (e1 < 0 and e2 < 0) {
+         cout << "////////// e1 and e2 are both negative... No way..." << endl;
+      }
 
-// // Magnitude and unit vector
-//    edge[i].da  = sqrt( edge[i].dav(1)**2 + edge[i].dav(2)**2 )
-//    edge[i].dav = edge[i].dav / edge[i].da
+      // Magnitude and unit vector
+      edge[i].da  = sqrt( edge[i].dav(0) * edge[i].dav(0) + \
+                                 edge[i].dav(1) * edge[i].dav(1) );
+      edge[i].dav = edge[i].dav / edge[i].da;
 
-// // Edge vector
+      // Edge vector
 
-//   edge[i].ev(1) = node(n2).x - node(n1).x
-//   edge[i].ev(2) = node(n2).y - node(n1).y
-//   edge[i].e     = sqrt( edge[i].ev(1)**2 + edge[i].ev(2)**2 )
-//   edge[i].ev    = edge[i].ev / edge[i].e
+      edge[i].ev(0) = node[n2].x - node[n1].x;
+      edge[i].ev(1) = node[n2].y - node[n1].y;
+      edge[i].e     = sqrt( edge[i].ev(0) * edge[i].ev(0) + \
+                                  edge[i].ev(1) * edge[i].ev(1) );
+      edge[i].ev    = edge[i].ev / edge[i].e;
 
-//   end do edges
+   }//   end do edges
 
 // //--------------------------------------------------------------------------------
 // // Construct node neighbor data:
@@ -1122,14 +1120,14 @@ for ( int i = 0; i < nelms; ++i ) {
 //    n2 = edge[i].n2
 
 // // (1) Add node1 to the neighbor list of n2
-//    node(n1).nnghbrs = node(n1).nnghbrs + 1
-//    call my_alloc_int_ptr(node(n1).nghbr, node(n1).nnghbrs)
-//    node(n1).nghbr(node(n1).nnghbrs) = n2
+//    node[n1].nnghbrs = node[n1].nnghbrs + 1
+//    call my_alloc_int_ptr(node[n1].nghbr, node[n1].nnghbrs)
+//    node[n1].nghbr(node[n1].nnghbrs) = n2
 
 // // (2) Add node2 to the neighbor list of n1
-//    node(n2).nnghbrs = node(n2).nnghbrs + 1
-//    call my_alloc_int_ptr(node(n2).nghbr, node(n2).nnghbrs)
-//    node(n2).nghbr(node(n2).nnghbrs) = n1
+//    node[n2].nnghbrs = node[n2].nnghbrs + 1
+//    call my_alloc_int_ptr(node[n2].nghbr, node[n2].nnghbrs)
+//    node[n2].nghbr(node[n2].nnghbrs) = n1
 
 //   end do edges4
 
@@ -1230,13 +1228,13 @@ for ( int i = 0; i < nelms; ++i ) {
 //       v3 = bound[i].bnode(j+1)
 //      }
 
-//      x1 = node(v1).x
-//      x2 = node(v2).x
-//      x3 = node(v3).x
+//      x1 = node[v1).x
+//      x2 = node[v2).x
+//      x3 = node[v3).x
 
-//      y1 = node(v1).y
-//      y2 = node(v2).y
-//      y3 = node(v3).y
+//      y1 = node[v1).y
+//      y2 = node[v2).y
+//      y3 = node[v3).y
 
 // //----------------------------------------------------------------------
 // //   Fit a quadratic over 3 nodes
@@ -1289,8 +1287,8 @@ for ( int i = 0; i < nelms; ++i ) {
 // //
 // //   That is,  we have
 // //
-// //    n2 = node(n1).nghbr(edge[i].kth_nghbr_of_1)
-// //    n1 = node(n2).nghbr(edge[i].kth_nghbr_of_2)
+// //    n2 = node[n1].nghbr(edge[i].kth_nghbr_of_1)
+// //    n1 = node[n2].nghbr(edge[i].kth_nghbr_of_2)
 // //
 // //   We make use of this data structure to access off-diagonal entries in Jacobian matrix.
 // //
@@ -1302,17 +1300,17 @@ for ( int i = 0; i < nelms; ++i ) {
 //    n1 = edge[i].n1
 //    n2 = edge[i].n2
 
-//    do k = 1, node(n2).nnghbrs
+//    do k = 1, node[n2].nnghbrs
 
-//     if ( n1 == node(n2).nghbr(k) ) {
+//     if ( n1 == node[n2].nghbr(k) ) {
 //      edge[i].kth_nghbr_of_2 = k
 //     }
 
 //    end do
 
-//    do k = 1, node(n1).nnghbrs
+//    do k = 1, node[n1].nnghbrs
 
-//     if ( n2 == node(n1).nghbr(k) ) {
+//     if ( n2 == node[n1].nghbr(k) ) {
 //      edge[i].kth_nghbr_of_1 = k
 //     }
 
@@ -1395,14 +1393,14 @@ for ( int i = 0; i < nelms; ++i ) {
 //     n1 = bound[i].bnode(j  )  //Left node
 //     n2 = bound[i].bnode(j+1)  //Right node
 
-//     do k = 1, node(n2).nnghbrs
-//      if ( n1 == node(n2).nghbr(k) ) {
+//     do k = 1, node[n2].nnghbrs
+//      if ( n1 == node[n2].nghbr(k) ) {
 //       bound[i].kth_nghbr_of_2(j) = k
 //      }
 //     end do
 
-//     do k = 1, node(n1).nnghbrs
-//      if ( n2 == node(n1).nghbr(k) ) {
+//     do k = 1, node[n1].nnghbrs
+//      if ( n2 == node[n1].nghbr(k) ) {
 //       bound[i].kth_nghbr_of_1(j) = k
 //      }
 //     end do
@@ -1438,8 +1436,8 @@ for ( int i = 0; i < nelms; ++i ) {
 //     found = .false.
 // //   Find the element having the bface from the elements
 // //   around the node v1.
-//     do k = 1, node(v1).nelms
-//      ielm = node(v1).elm(k)
+//     do k = 1, node[v1).nelms
+//      ielm = node[v1).elm(k)
 //      do ii = 1, elm(ielm).nvtx
 //       in = ii
 //       im = ii+1
@@ -1480,12 +1478,12 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Check the number of neighbor nodes (must have at least 2 neighbors)
 //   write(*,*) " --- Node neighbor data:"
 
-//   ave_nghbr = node(1).nnghbrs
-//   min_nghbr = node(1).nnghbrs
-//   max_nghbr = node(1).nnghbrs
+//   ave_nghbr = node[1).nnghbrs
+//   min_nghbr = node[1).nnghbrs
+//   max_nghbr = node[1).nnghbrs
 //        imin = 1
 //        imax = 1
-//    if (node(1).nnghbrs==2) {
+//    if (node[1).nnghbrs==2) {
 //     write(*,*) "--- 2 neighbors for the node = ", 1
 //    }
 
@@ -1522,15 +1520,15 @@ for ( int i = 0; i < nelms; ++i ) {
 
 // // Left element
 //   if (e1 > 0) {
-//    do k = 1, elm(e1).nnghbrs
-//     if (elm(e1).nghbr(k)==e2) elm(e1).edge(k) = i
+//    do k = 1, elm[e1].nnghbrs
+//     if (elm[e1].nghbr(k)==e2) elm[e1].edge(k) = i
 //    end do
 //   }
 
 // // Right element
 //   if (e2 > 0) {
-//    do k = 1, elm(e2).nnghbrs
-//     if (elm(e2).nghbr(k)==e1) elm(e2).edge(k) = i
+//    do k = 1, elm[e2].nnghbrs
+//     if (elm[e2].nghbr(k)==e1) elm[e2].edge(k) = i
 //    end do
 //   }
 
@@ -1613,8 +1611,8 @@ for ( int i = 0; i < nelms; ++i ) {
 //    e2 = face(i).e2
 
 // // Face vector
-//   face(i).dav(1) = -( node(n2).y - node(n1).y )
-//   face(i).dav(2) =    node(n2).x - node(n1).x
+//   face(i).dav(1) = -( node[n2].y - node[n1].y )
+//   face(i).dav(2) =    node[n2].x - node[n1].x
 //   face(i).da     = sqrt( face(i).dav(1)**2 + face(i).dav(2)**2 )
 //   face(i).dav    = face(i).dav / face(i).da
 
@@ -1673,8 +1671,8 @@ for ( int i = 0; i < nelms; ++i ) {
 //    do k = 1, elm(i).nvtx
 //     v1 = elm(i).vtx(k)
 
-//     velms : do j = 1, node(v1).nelms
-//      e1 = node(v1).elm(j)
+//     velms : do j = 1, node[v1).nelms
+//      e1 = node[v1).elm(j)
 //      if (e1 == i) cycle velms
 
 // //    Check if the element is already added.

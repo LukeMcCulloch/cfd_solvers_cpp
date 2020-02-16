@@ -15,3 +15,4 @@
 double tri_area(double x1, double x2, double x3, double y1, double y2, double y3) {
    return 0.5*( x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2) );
  }
+

@@ -79,6 +79,8 @@ using std::vector;
 #include "../include/array_template.hpp"
 #include "../include/arrayops.hpp"
 
+#include "MathGeometry.h"
+
 //#define REAL_IS_DOUBLE true
 #ifdef REAL_IS_DOUBLE
   typedef double real;
@@ -313,18 +315,18 @@ public:
     edge_type(){}
     
     ~edge_type(){
-      delete dav;
-      delete ev;
+      // delete dav;
+      // delete ev;
     }
     //  to be constructed in the code
-    int n1, n2;            //associated nodes
-    int e1, e2;            //associated elements
-    Array2D<real>* dav;    //unit directed-area vector
-    real           da;     //magnitude of the directed-area vector
-    Array2D<real>* ev;     //unit edge vector
-    real            e;     //magnitude of the edge vector
-    int kth_nghbr_of_1;    //neighbor index
-    int kth_nghbr_of_2;    //neighbor index
+    int n1, n2;                               //associated nodes
+    int e1, e2;                               //associated elements
+    Array2D<real> dav = Array2D<real>(2,1);   //unit directed-area vector
+    real          da;                         //magnitude of the directed-area vector
+    Array2D<real> ev = Array2D<real>(2,1);    //unit edge vector
+    real           e;                         //magnitude of the edge vector
+    int kth_nghbr_of_1;                       //neighbor index
+    int kth_nghbr_of_2;                       //neighbor index
 
   };
 

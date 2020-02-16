@@ -77,6 +77,18 @@ operator*(const Array2D<T>& a, const Array2D<T>& b) {
 }
 
 
+// division of an Array2D by a scalar
+template<typename T>
+Array2D<T> 
+operator/(Array2D<T> const& a , T const& s )
+{
+    Array2D<T> result(a.nrows,a.ncols);
+    for (size_t k = 0; k<a.size(); ++k) {
+        result.array[k] = a.array[k]/s;
+    }
+    return result;
+}
+
 
 // matmul of two Array2D into a third
 /**
