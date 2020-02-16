@@ -263,13 +263,13 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    nelms = ntria + nquad;
 
    // //  Allocate node and element arrays.
-   std::cout << "Allocating node_type" << std::endl;
-   std::cout << "    for " << nnodes << " nodes " << std::endl;
+   //std::cout << "Allocating node_type" << std::endl;
+   //std::cout << "    for " << nnodes << " nodes " << std::endl;
    node = new node_type[nnodes];
 
 
-   std::cout << " Allocating elm_type" << std::endl;
-   std::cout << "    for " << nelms << " elements " << std::endl;
+   //std::cout << " Allocating elm_type" << std::endl;
+   //std::cout << "    for " << nelms << " elements " << std::endl;
    elm = new elm_type[nelms];
 
 
@@ -290,7 +290,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       //std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
 
    }
-   cout << "done reading nodal coords" << endl;
+   //cout << "done reading nodal coords" << endl;
 
       
    // Read element-connectivity information
@@ -354,6 +354,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    }
 
    //  Write out the grid data.
+   cout << " " << endl;
    cout << " Total numbers:" << endl;
    cout << "       nodes = " << nnodes << endl;
    cout << "   triangles = " << ntria << endl;
@@ -368,6 +369,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::istringstream in(line);
    in >> nbound;
    bound = new bgrid_type[nbound];
+   cout << " nbound = " << nbound << endl;
 
 
    // // READ: Number of Boundary nodes (including the starting one at the end if
@@ -378,7 +380,6 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       in >> bound[i].nbnodes;
       bound[i].bnode = new Array2D<int>(bound[i].nbnodes,1);
    }
-   cout << "       nbnodes = " << bound[i].nbnodes << endl;
 
    // // READ: Read boundary nodes
    for (size_t i = 0; i < nbound; i++) {
@@ -399,15 +400,10 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    //  Print the boundary grid data.
    std::cout << " Boundary nodes:" << std::endl;
    std::cout << "    segments = " << nbound << std::endl;
-      for (size_t i = 0; i < 2; i++) {
+      for (size_t i = 0; i < nbound; i++) {
          std::cout <<  " boundary = " << i << 
                      "   bnodes = " <<  bound[i].nbnodes <<  
-                     "   bfaces = " <<  bound[i].nbnodes << std::endl;
-      }
-      for (size_t i = nbound-2; i < nbound; i++) {
-         std::cout <<  " boundary = " << i << 
-                     "   bnodes = " <<  bound[i].nbnodes <<  
-                     "   bfaces = " <<  bound[i].nbnodes << std::endl;
+                     "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
       }
    
 
@@ -433,15 +429,12 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    for (size_t i = 0; i < nbound; i++) {
       std::getline(outfile, line);
       std::istringstream in(line);
-      in >> dummy_int, bound[i].bc_type;
+      in >> dummy_int >> bound[i].bc_type;
    }
 
    //  Print the data
    std::cout << " Boundary conditions:" << std::endl;
-   for (size_t i = 0; i < 2; i++) {
-      std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
-   }
-   for (size_t i = nbound-2; i < nbound; i++) {
+   for (size_t i = 0; i < nbound; i++) {
       std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
    }
 
@@ -791,6 +784,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //
 
    // Allocate the neighbor array
+   // narrow stencil
 
    for (int i = 0; i < nelms; i++) {
 
@@ -855,9 +849,9 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       } //end do elms_around_vR
 
-      // why is this k+2 when we already loop all the way to nvtx?
+      // Q: why is this k+2 when we already loop all the way to nvtx?
       in = k + 2; 
-      if (in > elm[i].nvtx-1) { in = in - elm[i].nvtx; } // simple fix here: in > elm[i].nvtx had to be ammended
+      if (in > elm[i].nvtx-1) { in = in - elm[i].nvtx; } // A: simple fix here: in > elm[i].nvtx had to be ammended
 
       if (found) {
          (*elm[   i].nghbr)(in) = jelm;
@@ -1053,6 +1047,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       n2 = edge[i].n2;
       e1 = edge[i].e1;
       e2 = edge[i].e2;
+      // edge centroids:
       xm = half*( node[n1].x + node[n2].x );
       ym = half*( node[n1].y + node[n2].y );
 
@@ -1071,12 +1066,12 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       if (e2 > 0) {
          xc = elm[e2].x;
          yc = elm[e2].y;
-         edge[i].dav(1) = edge[i].dav(0) -(yc-ym);
-         edge[i].dav(2) = edge[i].dav(1) + xc-xm;
+         edge[i].dav(0) = edge[i].dav(0) -(yc-ym);
+         edge[i].dav(1) = edge[i].dav(1) + xc-xm;
       }
 
       if (e1 < 0 and e2 < 0) {
-         cout << "////////// e1 and e2 are both negative... No way..." << endl;
+         cout << "ERROR: e1 and e2 are both negative... " << endl;
       }
 
       // Magnitude and unit vector
@@ -1094,42 +1089,51 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    }//   end do edges
 
-// //--------------------------------------------------------------------------------
-// // Construct node neighbor data:
-// //  pointers to the neighbor nodes(o)
-// //
-// //        o     o
-// //         \   / 
-// //          \ /
-// //     o-----*-----o
-// //          /|
-// //         / |
-// //        /  o        *: node in interest
-// //       o            o: neighbors (edge-connected nghbrs)
-// //
+//--------------------------------------------------------------------------------
+// Construct node neighbor data:
+//  pointers to the neighbor nodes(o)
+//
+//        o     o
+//         \   / 
+//          \ /
+//     o-----*-----o
+//          /|
+//         / |
+//        /  o        *: node in interest
+//       o            o: neighbors (edge-connected nghbrs)
+//
 
-//   do i = 1, nnodes
-//    node[i].nnghbrs = 0
-//   end do
+   for (int i = 0; i < nnodes; i++) {
+      node[i].nnghbrs = 0;
+   }
 
-// // Loop over edges and distribute the node numbers:
+// Loop over edges and distribute the node numbers:
 
-//   edges4 : do i = 1, nedges
+   //edges4 : do i = 1, nedges
+   //for (int i = 0; i < nedges; i++) {
+   for (int i = 0; i < 10; i++) {
 
-//    n1 = edge[i].n1
-//    n2 = edge[i].n2
+      n1 = edge[i].n1;
+      n2 = edge[i].n2;
 
-// // (1) Add node1 to the neighbor list of n2
-//    node[n1].nnghbrs = node[n1].nnghbrs + 1
-//    call my_alloc_int_ptr(node[n1].nghbr, node[n1].nnghbrs)
-//    node[n1].nghbr(node[n1].nnghbrs) = n2
+      // (1) Add n1 to the neighbor list of n2
+      node[n1].nnghbrs = node[n1].nnghbrs + 1;
+      // node[n1].nghbr = new Array2D<int>(node[n1].nnghbrs, 1);
+      // (*node[n1].nghbr)(node[n1].nnghbrs) = n2;
 
-// // (2) Add node2 to the neighbor list of n1
-//    node[n2].nnghbrs = node[n2].nnghbrs + 1
-//    call my_alloc_int_ptr(node[n2].nghbr, node[n2].nnghbrs)
-//    node[n2].nghbr(node[n2].nnghbrs) = n1
 
-//   end do edges4
+      // (2) Add n2 to the neighbor list of n1
+      node[n2].nnghbrs = node[n2].nnghbrs + 1;
+      // node[n2].nghbr = new Array2D<int>(node[n2].nnghbrs, 1);
+      // (*node[n2].nghbr)(node[n2].nnghbrs) = n1;
+
+
+      cout << "e n1    = " << n1 << endl;
+      cout << "e n2    = " << n2 << endl;
+      cout << "n1 nbrs = " << node[n1].nnghbrs << endl;
+      cout << "n2 nbrs = " << node[n1].nnghbrs << endl;
+
+   } //end do edges4
 
 // //--------------------------------------------------------------------------------
 // // Boundary normal at nodes constructed by accumulating the contribution

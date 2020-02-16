@@ -217,7 +217,7 @@ public:
     int nnghbrs;   //number of neighbors
     //int,   dimension(:), pointer  :: nghbr     //list of neighbors
     //vector<int> nghbr;        //list of neighbors
-    int*  nghbr;                //list of neighbors
+    Array2D<int>*  nghbr;       //list of neighbors
 
     int nelms;                  //number of elements
     Array2D<int>*  elm;         //list of elements
@@ -269,7 +269,7 @@ public:
       elm_type(){}
       ~elm_type(){
         // delete vtx;
-        // delete nghbr;
+        //delete [] nghbr;
         // delete edge;
         // delete u;
         // delete uexact;
