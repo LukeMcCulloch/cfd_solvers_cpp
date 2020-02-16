@@ -964,75 +964,74 @@ for ( int i = 0; i < nelms; ++i ) {
       v1 = (*elm[i].vtx)(0);
       v2 = (*elm[i].vtx)(1);
       v3 = (*elm[i].vtx)(2);
-   }
-// Triangular element
-   //tri_quad2 : 
-   if (elm[i].nvtx==3) {
+   // Triangular element
+      //tri_quad2 : 
+      if (elm[i].nvtx==3) {
 
-      if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==0 ) {
-         nedges = nedges + 1;
-         edge[nedges].n1 = v1;
-         edge[nedges].n2 = v2;
-         edge[nedges].e1 = i;
-         edge[nedges].e2 = (*elm[i].nghbr)(2);
+         if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==0 ) {
+            nedges = nedges + 1;
+            edge[nedges].n1 = v1;
+            edge[nedges].n2 = v2;
+            edge[nedges].e1 = i;
+            edge[nedges].e2 = (*elm[i].nghbr)(2);
+         }
+
+         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
+            nedges = nedges + 1;
+            edge[nedges].n1 = v2;
+            edge[nedges].n2 = v3;
+            edge[nedges].e1 = i;
+            edge[nedges].e2 = (*elm[i].nghbr)(0);
+         }
+
+         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
+            nedges = nedges + 1;
+            edge[nedges].n1 = v3;
+            edge[nedges].n2 = v1;
+            edge[nedges].e1 = i;
+            edge[nedges].e2 = (*elm[i].nghbr)(1);
+         }
       }
+   //  Quadrilateral element
+      else if (elm[i].nvtx==4) {
 
-      if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
-         nedges = nedges + 1;
-         edge[nedges].n1 = v2;
-         edge[nedges].n2 = v3;
-         edge[nedges].e1 = i;
-         edge[nedges].e2 = (*elm[i].nghbr)(0);
-      }
+         v4 = (*elm[i].vtx)(3);
 
-      if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
-         nedges = nedges + 1;
-         edge[nedges].n1 = v3;
-         edge[nedges].n2 = v1;
-         edge[nedges].e1 = i;
-         edge[nedges].e2 = (*elm[i].nghbr)(1);
-      }
-   }
-//  Quadrilateral element
-   else if (elm[i].nvtx==4) {
+         if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) ==0 ) {
+            nedges = nedges + 1;
+            edge[nedges].n1 = v1;
+            edge[nedges].n2 = v2;
+            edge[nedges].e1 = i;
+            edge[nedges].e2 = (*elm[i].nghbr)(2);
+         }
 
-      v4 = (*elm[i].vtx)(3);
+         if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
+            nedges = nedges + 1;
+            edge[nedges].n1 = v2;
+            edge[nedges].n2 = v3;
+            edge[nedges].e1 = i;
+            edge[nedges].e2 = (*elm[i].nghbr)(3);
+         }
 
-      if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) ==0 ) {
-         nedges = nedges + 1;
-         edge[nedges].n1 = v1;
-         edge[nedges].n2 = v2;
-         edge[nedges].e1 = i;
-         edge[nedges].e2 = (*elm[i].nghbr)(2);
-      }
+         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) ==0 ) {
+            nedges = nedges + 1;
+            edge[nedges].n1 = v3;
+            edge[nedges].n2 = v4;
+            edge[nedges].e1 = i;
+            edge[nedges].e2 = (*elm[i].nghbr)(0);
+         }
 
-      if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
-         nedges = nedges + 1;
-         edge[nedges].n1 = v2;
-         edge[nedges].n2 = v3;
-         edge[nedges].e1 = i;
-         edge[nedges].e2 = (*elm[i].nghbr)(3);
-      }
+         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
+            nedges = nedges + 1;
+            edge[nedges].n1 = v4;
+            edge[nedges].n2 = v1;
+            edge[nedges].e1 = i;
+            edge[nedges].e2 = (*elm[i].nghbr)(1);
+         }
 
-      if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) ==0 ) {
-         nedges = nedges + 1;
-         edge[nedges].n1 = v3;
-         edge[nedges].n2 = v4;
-         edge[nedges].e1 = i;
-         edge[nedges].e2 = (*elm[i].nghbr)(0);
-      }
+      }//    endif tri_quad2
 
-      if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
-         nedges = nedges + 1;
-         edge[nedges].n1 = v4;
-         edge[nedges].n2 = v1;
-         edge[nedges].e1 = i;
-         edge[nedges].e2 = (*elm[i].nghbr)(1);
-      }
-
-   }//    endif tri_quad2
-
-//   end do elements3
+   }//   end do elements3
 
 // // Loop over edges
 // // Construct edge vector and directed area vector.
