@@ -251,7 +251,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::getline(infile, line);
    std::istringstream iss(line);
    iss >> nnodes >> ntria >> nquad;
-   cout <<  "File Found " <<
+   cout <<  "Found... " <<
             " nnodes =  " << nnodes << 
             "   ntria = " <<  ntria <<  
             "   nquad = " <<  nquad << endl;
@@ -259,12 +259,12 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
    // //  Allocate node and element arrays.
    std::cout << "Allocating node_type" << std::endl;
-   std::cout << "for " << nnodes << " nodes " << std::endl;
+   std::cout << "    for " << nnodes << " nodes " << std::endl;
    node = new node_type[nnodes];
 
 
-   std::cout << "Allocating elm_type" << std::endl;
-   std::cout << "for " << nelms << " elements " << std::endl;
+   std::cout << " Allocating elm_type" << std::endl;
+   std::cout << "    for " << nelms << " elements " << std::endl;
    elm = new elm_type[nelms];
 
 
@@ -535,7 +535,7 @@ real ds;
  jelm = 0;
 
 //   write(*,*) "Constructing grid data...."
-cout << "construct grid data" << endl;
+cout << "construct grid data...." << endl;
 
 // // Initializations
 //   do i = 1, nnodes
@@ -583,31 +583,29 @@ nedges = 0;
 //   elements : do i = 1, nelms
 
 
-for ( int j = 0; j < nelms; ++j ) {
-   //cout << "here2" << endl;
+for ( int i = 0; i < nelms; ++i ) {
 
-//    v1 = elm(i)%vtx(1)
-//    v2 = elm(i)%vtx(2)
-//    v3 = elm(i)%vtx(3)
-   //std::cout << "elm[i] = " << (*elm[i].vtx)(0,0)  << std::endl;
-   //v1 = elm[i].vtx(0);
-   //v1 = (*elm[i].vtx)(0,0);
-   //
+   v1 = (*elm[i].vtx)(0,0);
+   v2 = (*elm[i].vtx)(0,0);
+   v3 = (*elm[i].vtx)(0,0);
 
-   //cout << "here3" << endl;
-//    x1 = node(v1)%x
-//    x2 = node(v2)%x
-//    x3 = node(v3)%x
+   x1 = node[v1].x;
+   x2 = node[v2].x;
+   x3 = node[v3].x;
 
-//    y1 = node(v1)%y
-//    y2 = node(v2)%y
-//    y3 = node(v3)%y
+   y1 = node[v1].y;
+   y2 = node[v2].y;
+   y3 = node[v3].y;
 
 // // Distribute the element index to nodes.
 
-//    node(v1)%nelms = node(v1)%nelms + 1
-//    call my_alloc_int_ptr(node(v1)%elm, node(v1)%nelms)
-//    node(v1)%elm(node(v1)%nelms) = i
+   /*
+   * DESIGN CHOICE HERE -- use std<vector?>
+   * I don't think we need a true dynamic (i.e. resizable) array
+   */
+   node[v1].nelms = node[v1].nelms + 1;
+   node[v1].elm = new Array2D<int>(node[v1].nelms, 0);
+   node[v1].elm[node[v1].nelms] = i;
 
 //    node(v2)%nelms = node(v2)%nelms + 1
 //    call my_alloc_int_ptr(node(v2)%elm, node(v2)%nelms)

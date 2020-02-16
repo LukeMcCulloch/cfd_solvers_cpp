@@ -218,7 +218,7 @@ public:
     int*  nghbr;                //list of neighbors
 
     int nelms;                  //number of elements
-    int*  elm;                  //list of elements
+    Array2D<int>*  elm;         //list of elements
     //vector<int> elm;          //list of elements
 
     real vol;                   //dual-cell volume
