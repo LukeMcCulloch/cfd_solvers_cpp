@@ -208,19 +208,19 @@ using std::endl;
 //*    nelms         = Total number of elements (=ntria+nquad)
 //*
 //* 2. Element data:
-//*    elm(1:nelms)%nvtx   =  Number of vertices of each element
-//*    elm(1:nelms)%vtx(:) = Pointer to vertices of each element
+//*    elm(1:nelms).nvtx   =  Number of vertices of each element
+//*    elm(1:nelms).vtx(:) = Pointer to vertices of each element
 //*
 //* 3. Node data: nodes are stored in a 1D array
-//*    node(1:nnodes)%x     = x-coordinate of the nodes
-//*    node(1:nnodes)%y     = y-coordinate of the nodes
+//*    node(1:nnodes).x     = x-coordinate of the nodes
+//*    node(1:nnodes).y     = y-coordinate of the nodes
 //*
 //* 4. Boundary Data:
 //*    nbound                   = Number of boundary segments
-//*    bound(1:nbound)%nbnodes  = Number of nodes in each segment
-//*    bound(1:nbound)%bnode(:) = List of node numbers for each segment
-//*    bound(1:nbound)%bc_type  = Boundary condition name for each segment
-//*    bound(1:nbound)%bc_type  = Boundary condition name for each segment
+//*    bound(1:nbound).nbnodes  = Number of nodes in each segment
+//*    bound(1:nbound).bnode(:) = List of node numbers for each segment
+//*    bound(1:nbound).bc_type  = Boundary condition name for each segment
+//*    bound(1:nbound).bc_type  = Boundary condition name for each segment
 //*
 //********************************************************************************
 
@@ -465,41 +465,41 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 //* data read from the grid file.
 //*
 //* 1. Element data:
-//*    elm(:)%nnghbrs  = Number of element neighbors of each element
-//*    elm(:)%nghbr(:) = List of element neighbors of each element
-//*    elm(:)%x        = x-coordinate of the centroid
-//*    elm(:)%y        = y-coordinate of the centroid
-//*    elm(:)%vol      = Volume of the element
+//*    elm(:).nnghbrs  = Number of element neighbors of each element
+//*    elm(:).nghbr(:) = List of element neighbors of each element
+//*    elm(:).x        = x-coordinate of the centroid
+//*    elm(:).y        = y-coordinate of the centroid
+//*    elm(:).vol      = Volume of the element
 //*
 //*
 //* 2. Node data:
-//*    node(:)%nnghbrs = Number of node neighbors of each node
-//*    node(:)%nghbr(:)= List of node neighbors of each node
-//*    node(:)%nelms   = Number of adjacent elements of each node
-//*    node(:)%elm     = List of adjacent elements of each node
-//*    node(:)%vol     = Volume of the dual volume around each node
+//*    node(:).nnghbrs = Number of node neighbors of each node
+//*    node(:).nghbr(:)= List of node neighbors of each node
+//*    node(:).nelms   = Number of adjacent elements of each node
+//*    node(:).elm     = List of adjacent elements of each node
+//*    node(:).vol     = Volume of the dual volume around each node
 //*
 //* 3. Edge data:
-//*    edge(:)%n1, n2  = End nodes of each edge (edge points n1 -> n2)
-//*    edge(:)%e1, e2  = Left and right elements of each edge
-//*    edge(:)%dav     = Unit directed area vector of each edge
-//*    edge(:)%da      = Magnitude of the directed area vector for each edge
-//*    edge(:)%ev      = Unit edge vector of each edge (vector n1 -> n2)
-//*    edge(:)%e       = Magnitude of the edge vector for each edge
+//*    edge(:).n1, n2  = End nodes of each edge (edge points n1 -> n2)
+//*    edge(:).e1, e2  = Left and right elements of each edge
+//*    edge(:).dav     = Unit directed area vector of each edge
+//*    edge(:).da      = Magnitude of the directed area vector for each edge
+//*    edge(:).ev      = Unit edge vector of each edge (vector n1 -> n2)
+//*    edge(:).e       = Magnitude of the edge vector for each edge
 //*
 //*
 //* 4. Boudnary data
-//*    bound(:)%bnx    = Outward normal at boundary nodes (x-component of unit vector)
-//*    bound(:)%bny    = Outward normal at boundary nodes (y-component of unit vector)
-//*    bound(:)%bn     = Magnitude of (bnx,bny)
+//*    bound(:).bnx    = Outward normal at boundary nodes (x-component of unit vector)
+//*    bound(:).bny    = Outward normal at boundary nodes (y-component of unit vector)
+//*    bound(:).bn     = Magnitude of (bnx,bny)
 //*    NOTE: In this code, the above normal vector at boundary nodes is computed by
 //*          a quadratic fit. It is sufficiently accuarte for 3rd-order schemes.
 //*          See http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2015v281pp518-555_preprint.pdf
 //*          for details on the quadratic approximation for computing more accurate normals.
-//*    bound(:)%bfnx   = Outward normal at boundary nodes (x-component of unit vector)
-//*    bound(:)%bfny   = Outward normal at boundary nodes (y-component of unit vector)
-//*    bound(:)%bfn    = Magnitude of (bfnx,bfny)
-//*    bound(:)%belm   = Element to which the boundary face belongs
+//*    bound(:).bfnx   = Outward normal at boundary nodes (x-component of unit vector)
+//*    bound(:).bfny   = Outward normal at boundary nodes (y-component of unit vector)
+//*    bound(:).bfn    = Magnitude of (bfnx,bfny)
+//*    bound(:).belm   = Element to which the boundary face belongs
 //*
 //********************************************************************************
 
@@ -540,14 +540,14 @@ nedges = 0;
 // //--------------------------------------------------------------------------------
 // // Loop over elements and construct the fololowing data.
 // //
-// // 1. Surrounding elements: node(:)%nelms, node(:)%elm(:)
+// // 1. Surrounding elements: node(:).nelms, node(:).elm(:)
 // //
 // //    Example: Node i is surrounded by the eleemnts, 23, 101, 13, 41.
-// //             node(i)%nelms = 4
-// //             node(i)%elm(1) = 23
-// //             node(i)%elm(2) = 13
-// //             node(i)%elm(3) = 41
-// //             node(i)%elm(4) = 101
+// //             node[i].nelms = 4
+// //             node[i].elm(1) = 23
+// //             node[i].elm(2) = 13
+// //             node[i].elm(3) = 41
+// //             node[i].elm(4) = 101
 // //
 // //        o-------o-------------o
 // //       /        |   .         |
@@ -558,7 +558,7 @@ nedges = 0;
 // //        \          \          | 
 // //         o----------o---------o
 // //
-// // 2. Element quantities  : elm(:)%x,elm(:)%y,elm(:)%vol
+// // 2. Element quantities  : elm(:).x,elm(:).y,elm(:).vol
 // //
 // //  o-----------o            
 // //   \          |            o
@@ -592,19 +592,19 @@ for ( int i = 0; i < nelms; ++i ) {
    * I don't think we need a true dynamic (i.e. resizable) array
    */
    node[v1].nelms = node[v1].nelms + 1;
-   node[v1].elm = new Array2D<int>(node[v1].nelms, 0);
+   node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
    node[v1].elm[node[v1].nelms] = i;
 
    node[v2].nelms = node[v2].nelms + 1;
-   node[v2].elm = new Array2D<int>(node[v2].nelms, 0);
+   node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
    node[v2].elm[node[v2].nelms] = i;
 
    node[v3].nelms = node[v3].nelms + 1;
-   node[v3].elm = new Array2D<int>(node[v3].nelms, 0);
+   node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
    node[v3].elm[node[v3].nelms] = i;
 
 // // Compute the cell center and cell volume.
-   //tri_or_quad : if (elm(i)%nvtx==3) then
+   //tri_or_quad : if (elm(i).nvtx==3) then
    if (elm[i].nvtx==3) {
 
 //   Triangle centroid and volume
@@ -777,7 +777,7 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Loop over elements 2
 // //
 // //  Allocate elm[:].nghbr[:] : elm[:].nnghrs, elm[:].nghr[:]
-// //  Construct element nghbr data: elm(:)%nghbr(:)
+// //  Construct element nghbr data: elm(:).nghbr(:)
 // //  Order of neighbor elements [e1,e2,e3,..] are closely related to
 // //  the order of vertices [v1,v2,v3,..] (see below).
 // //
@@ -796,18 +796,17 @@ for ( int i = 0; i < nelms; ++i ) {
 // //          o
 // //
 
-// Allocate the neighbor array
+   // Allocate the neighbor array
 
    for (int i = 0; i < nelms; i++) {
-      
 
-//  3 neighbors for triangle
+   //  3 neighbors for triangle
       if (elm[i].nvtx==3) {
 
          elm[i].nnghbrs = 3;
          elm[i].nghbr = new Array2D<int>(3,1);
       }
-//  4 neighbors for quadrilateral
+   //  4 neighbors for quadrilateral
       else if (elm[i].nvtx==4) {
 
          elm[i].nnghbrs = 4;
@@ -817,66 +816,73 @@ for ( int i = 0; i < nelms; ++i ) {
 
    }
 
-// // Begin constructing the element-neighbor data
+// Begin constructing the element-neighbor data
 
-//   elements2 : do i = 1, nelms
+   //elements2 : do i = 1, nelms
+   for (int i = 0; i < nelms; i++) {
 
-//    elm_vertex : do k = 1, elm(i)%nvtx
+      //elm_vertex : do k = 1, elm(i).nvtx
+      for (int k = 0; k < elm[i].nvtx; k++) {
+      //   Get the face of the element i:
+      //
+      //             vL      vR
+      //              o------o
+      //             /       |
+      //            /        |
+      //           o---------o
+      //
+      //if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k+1,0); //TLM warning:  apparent step out of bounds 
+         if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k); //TLM dumb fix
+         if (k == elm[i].nvtx) vL = (*elm[i].vtx)(0); 
+         vR = (*elm[i].vtx)(k);
+      //   Loop over the surrounding elements of the node vR,
+      //   and find the element neighbor from them.
+         found = false;
+      //elms_around_vR : do j = 1, node(vR).nelms;
+         for (int j = 0; j < node[vR].nelms; j++) {
+            jelm = (*node[vR].elm)(j); 
+         }}}
+//          //edge_matching : do ii = 1, elm(jelm).nvtx;
+//          // I just remembered that 
+//          //  the "2D" array works just as well as 1D
+//          for (int ii = 0; ii < elm[jelm].nvtx; ii++) {
+//                          v1 = (*elm[jelm].vtx)(ii);
+//             if (ii  > 1) { v2 = (*elm[jelm].vtx)(ii-1); }
+//             if (ii == 1) { v2 = (*elm[jelm].vtx)(elm[jelm].nvtx); }
 
-// //   Get the face of the element i:
-// //
-// //             vL      vR
-// //              o------o
-// //             /       |
-// //            /        |
-// //           o---------o
-// //
-//     if (k  < elm(i)%nvtx) vL = elm(i)%vtx(k+1)
-//     if (k == elm(i)%nvtx) vL = elm(i)%vtx(1)     
-//     vR = elm(i)%vtx(k)
+//             if (v1==vR and v2==vL) {
+//                found = true;
+//                im = ii+1;
+//                if (im > elm[jelm].nvtx) { im = im - elm[jelm].nvtx; }
+//                break; //exit edge_matching
+//             } //endif
+//          } //end do edge_matching
 
-// //   Loop over the surrounding elements of the node vR,
-// //   and find the element neighbor from them.
-//     found = .false.
-//     elms_around_vR : do j = 1, node(vR)%nelms
-//     jelm = node(vR)%elm(j)
+//      //if (found) exit elms_around_vR
+//      if (found) break;
 
-//      edge_matching : do ii = 1, elm(jelm)%nvtx
-//                    v1 = elm(jelm)%vtx(ii)
-//       if (ii  > 1) v2 = elm(jelm)%vtx(ii-1)
-//       if (ii == 1) v2 = elm(jelm)%vtx(elm(jelm)%nvtx)
+//       } //end do elms_around_vR
 
-//       if (v1==vR .and. v2==vL) then
-//        found = .true.
-//        im = ii+1
-//        if (im > elm(jelm)%nvtx) im = im - elm(jelm)%nvtx
-//        exit edge_matching
-//       endif
-//      end do edge_matching
+//       in = k + 2;
+//       if (in > elm[i].nvtx) { in = in - elm[i].nvtx; }
 
-//      if (found) exit elms_around_vR
+//       if (found) {
+//          (*elm[   i].nghbr)(in) = jelm;
+//          (*elm[jelm].nghbr)(im) = i;
+//       }
+//       else {
+//          (*elm[   i].nghbr)(in) = 0;
+//       }
 
-//     end do elms_around_vR
+//       }//    end do elm_vertex
 
-//      in = k + 2
-//      if (in > elm(i)%nvtx) in = in - elm(i)%nvtx
-
-//     if (found) then
-//      elm(   i)%nghbr(in) = jelm
-//      elm(jelm)%nghbr(im) = i
-//     else
-//      elm(   i)%nghbr(in) = 0
-//     endif
-
-//    end do elm_vertex
-
-//   end do elements2
+//    }//   end do elements2
 
 // //--------------------------------------------------------------------------------
 // // Edge-data for node-centered (edge-based) scheme.
 // //
 // // Loop over elements 3
-// // Construct edge data: edge(:)%n1, n2, e1, e2.
+// // Construct edge data: edge(:).n1, n2, e1, e2.
 // // Edge points from node n1 to node n2.
 // //
 // //      n2
@@ -897,41 +903,41 @@ for ( int i = 0; i < nelms; ++i ) {
 
 //   elements0 : do i = 1, nelms
 
-//    v1 = elm(i)%vtx(1)
-//    v2 = elm(i)%vtx(2)
-//    v3 = elm(i)%vtx(3)
+//    v1 = elm[i].vtx(1)
+//    v2 = elm[i].vtx(2)
+//    v3 = elm[i].vtx(3)
 
-//    tri_quad0 : if (elm(i)%nvtx==3) then
+//    tri_quad0 : if (elm[i].nvtx==3) then
 
-//     if ( elm(i)%nghbr(3) > i  .or. elm(i)%nghbr(3)==0 ) then
+//     if ( elm[i].nghbr(3) > i  .or. elm[i].nghbr(3)==0 ) then
 //      nedges = nedges + 1
 //     endif
 
-//     if ( elm(i)%nghbr(1) > i .or. elm(i)%nghbr(1)==0 ) then
+//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1)==0 ) then
 //      nedges = nedges + 1
 //     endif
 
-//     if ( elm(i)%nghbr(2) > i .or. elm(i)%nghbr(2)==0 ) then
+//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2)==0 ) then
 //      nedges = nedges + 1
 //     endif
 
-//    elseif (elm(i)%nvtx==4) then
+//    elseif (elm[i].nvtx==4) then
 
-//     v4 = elm(i)%vtx(4)
+//     v4 = elm[i].vtx(4)
 
-//     if ( elm(i)%nghbr(3) > i .or. elm(i)%nghbr(3) ==0 ) then
+//     if ( elm[i].nghbr(3) > i .or. elm[i].nghbr(3) ==0 ) then
 //      nedges = nedges + 1
 //     endif
 
-//     if ( elm(i)%nghbr(4) > i .or. elm(i)%nghbr(4) ==0 ) then
+//     if ( elm[i].nghbr(4) > i .or. elm[i].nghbr(4) ==0 ) then
 //      nedges = nedges + 1
 //     endif
 
-//     if ( elm(i)%nghbr(1) > i .or. elm(i)%nghbr(1) ==0 ) then
+//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1) ==0 ) then
 //      nedges = nedges + 1
 //     endif
 
-//     if ( elm(i)%nghbr(2) > i .or. elm(i)%nghbr(2) ==0 ) then
+//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2) ==0 ) then
 //      nedges = nedges + 1
 //     endif
 
@@ -942,80 +948,80 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Allocate the edge array.
 //   allocate(edge(nedges))
 //   nedges = 0
-//   edge(:)%e1 = 0
-//   edge(:)%e2 = 0
+//   edge(:).e1 = 0
+//   edge(:).e2 = 0
 
 // // Construct the edge data:
 // //  two end nodes (n1, n2), and left and right elements (e1, e2)
 
 //   elements3 : do i = 1, nelms
 
-//    v1 = elm(i)%vtx(1)
-//    v2 = elm(i)%vtx(2)
-//    v3 = elm(i)%vtx(3)
+//    v1 = elm[i].vtx(1)
+//    v2 = elm[i].vtx(2)
+//    v3 = elm[i].vtx(3)
 
 // // Triangular element
-//    tri_quad2 : if (elm(i)%nvtx==3) then
+//    tri_quad2 : if (elm[i].nvtx==3) then
 
-//     if ( elm(i)%nghbr(3) > i  .or. elm(i)%nghbr(3)==0 ) then
+//     if ( elm[i].nghbr(3) > i  .or. elm[i].nghbr(3)==0 ) then
 //      nedges = nedges + 1
-//      edge(nedges)%n1 = v1
-//      edge(nedges)%n2 = v2
-//      edge(nedges)%e1 = i
-//      edge(nedges)%e2 = elm(i)%nghbr(3)
+//      edge(nedges).n1 = v1
+//      edge(nedges).n2 = v2
+//      edge(nedges).e1 = i
+//      edge(nedges).e2 = elm[i].nghbr(3)
 //     endif
 
-//     if ( elm(i)%nghbr(1) > i .or. elm(i)%nghbr(1)==0 ) then
+//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1)==0 ) then
 //      nedges = nedges + 1
-//      edge(nedges)%n1 = v2
-//      edge(nedges)%n2 = v3
-//      edge(nedges)%e1 = i
-//      edge(nedges)%e2 = elm(i)%nghbr(1)
+//      edge(nedges).n1 = v2
+//      edge(nedges).n2 = v3
+//      edge(nedges).e1 = i
+//      edge(nedges).e2 = elm[i].nghbr(1)
 //     endif
 
-//     if ( elm(i)%nghbr(2) > i .or. elm(i)%nghbr(2)==0 ) then
+//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2)==0 ) then
 //      nedges = nedges + 1
-//      edge(nedges)%n1 = v3
-//      edge(nedges)%n2 = v1
-//      edge(nedges)%e1 = i
-//      edge(nedges)%e2 = elm(i)%nghbr(2)
+//      edge(nedges).n1 = v3
+//      edge(nedges).n2 = v1
+//      edge(nedges).e1 = i
+//      edge(nedges).e2 = elm[i].nghbr(2)
 //     endif
 
 // //  Quadrilateral element
-//    elseif (elm(i)%nvtx==4) then
+//    elseif (elm[i].nvtx==4) then
 
-//     v4 = elm(i)%vtx(4)
+//     v4 = elm[i].vtx(4)
 
-//     if ( elm(i)%nghbr(3) > i .or. elm(i)%nghbr(3) ==0 ) then
+//     if ( elm[i].nghbr(3) > i .or. elm[i].nghbr(3) ==0 ) then
 //      nedges = nedges + 1
-//      edge(nedges)%n1 = v1
-//      edge(nedges)%n2 = v2
-//      edge(nedges)%e1 = i
-//      edge(nedges)%e2 = elm(i)%nghbr(3)
+//      edge(nedges).n1 = v1
+//      edge(nedges).n2 = v2
+//      edge(nedges).e1 = i
+//      edge(nedges).e2 = elm[i].nghbr(3)
 //     endif
 
-//     if ( elm(i)%nghbr(4) > i .or. elm(i)%nghbr(4) ==0 ) then
+//     if ( elm[i].nghbr(4) > i .or. elm[i].nghbr(4) ==0 ) then
 //      nedges = nedges + 1
-//      edge(nedges)%n1 = v2
-//      edge(nedges)%n2 = v3
-//      edge(nedges)%e1 = i
-//      edge(nedges)%e2 = elm(i)%nghbr(4)
+//      edge(nedges).n1 = v2
+//      edge(nedges).n2 = v3
+//      edge(nedges).e1 = i
+//      edge(nedges).e2 = elm[i].nghbr(4)
 //     endif
 
-//     if ( elm(i)%nghbr(1) > i .or. elm(i)%nghbr(1) ==0 ) then
+//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1) ==0 ) then
 //      nedges = nedges + 1
-//      edge(nedges)%n1 = v3
-//      edge(nedges)%n2 = v4
-//      edge(nedges)%e1 = i
-//      edge(nedges)%e2 = elm(i)%nghbr(1)
+//      edge(nedges).n1 = v3
+//      edge(nedges).n2 = v4
+//      edge(nedges).e1 = i
+//      edge(nedges).e2 = elm[i].nghbr(1)
 //     endif
 
-//     if ( elm(i)%nghbr(2) > i .or. elm(i)%nghbr(2) ==0 ) then
+//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2) ==0 ) then
 //      nedges = nedges + 1
-//      edge(nedges)%n1 = v4
-//      edge(nedges)%n2 = v1
-//      edge(nedges)%e1 = i
-//      edge(nedges)%e2 = elm(i)%nghbr(2)
+//      edge(nedges).n1 = v4
+//      edge(nedges).n2 = v1
+//      edge(nedges).e1 = i
+//      edge(nedges).e2 = elm[i].nghbr(2)
 //     endif
 
 //    endif tri_quad2
@@ -1043,29 +1049,29 @@ for ( int i = 0; i < nelms; ++i ) {
 // //
 //   edges : do i = 1, nedges
 
-//    n1 = edge(i)%n1
-//    n2 = edge(i)%n2
-//    e1 = edge(i)%e1
-//    e2 = edge(i)%e2
-//    xm = half*( node(n1)%x + node(n2)%x )
-//    ym = half*( node(n1)%y + node(n2)%y )
+//    n1 = edge[i].n1
+//    n2 = edge[i].n2
+//    e1 = edge[i].e1
+//    e2 = edge[i].e2
+//    xm = half*( node(n1).x + node(n2).x )
+//    ym = half*( node(n1).y + node(n2).y )
 
-//    edge(i)%dav = zero
+//    edge[i].dav = zero
 
 // // Contribution from the left element
 //   if (e1 > 0) then
-//    xc = elm(e1)%x
-//    yc = elm(e1)%y
-//    edge(i)%dav(1) = -(ym-yc)
-//    edge(i)%dav(2) =   xm-xc
+//    xc = elm(e1).x
+//    yc = elm(e1).y
+//    edge[i].dav(1) = -(ym-yc)
+//    edge[i].dav(2) =   xm-xc
 //   endif
 
 // // Contribution from the right element
 //   if (e2 > 0) then
-//    xc = elm(e2)%x
-//    yc = elm(e2)%y
-//    edge(i)%dav(1) = edge(i)%dav(1) -(yc-ym)
-//    edge(i)%dav(2) = edge(i)%dav(2) + xc-xm
+//    xc = elm(e2).x
+//    yc = elm(e2).y
+//    edge[i].dav(1) = edge[i].dav(1) -(yc-ym)
+//    edge[i].dav(2) = edge[i].dav(2) + xc-xm
 //   endif
 
 //   if (e1 < 0 .and. e2 < 0) then
@@ -1073,15 +1079,15 @@ for ( int i = 0; i < nelms; ++i ) {
 //   endif
 
 // // Magnitude and unit vector
-//    edge(i)%da  = sqrt( edge(i)%dav(1)**2 + edge(i)%dav(2)**2 )
-//    edge(i)%dav = edge(i)%dav / edge(i)%da
+//    edge[i].da  = sqrt( edge[i].dav(1)**2 + edge[i].dav(2)**2 )
+//    edge[i].dav = edge[i].dav / edge[i].da
 
 // // Edge vector
 
-//   edge(i)%ev(1) = node(n2)%x - node(n1)%x
-//   edge(i)%ev(2) = node(n2)%y - node(n1)%y
-//   edge(i)%e     = sqrt( edge(i)%ev(1)**2 + edge(i)%ev(2)**2 )
-//   edge(i)%ev    = edge(i)%ev / edge(i)%e
+//   edge[i].ev(1) = node(n2).x - node(n1).x
+//   edge[i].ev(2) = node(n2).y - node(n1).y
+//   edge[i].e     = sqrt( edge[i].ev(1)**2 + edge[i].ev(2)**2 )
+//   edge[i].ev    = edge[i].ev / edge[i].e
 
 //   end do edges
 
@@ -1100,25 +1106,25 @@ for ( int i = 0; i < nelms; ++i ) {
 // //
 
 //   do i = 1, nnodes
-//    node(i)%nnghbrs = 0
+//    node[i].nnghbrs = 0
 //   end do
 
 // // Loop over edges and distribute the node numbers:
 
 //   edges4 : do i = 1, nedges
 
-//    n1 = edge(i)%n1
-//    n2 = edge(i)%n2
+//    n1 = edge[i].n1
+//    n2 = edge[i].n2
 
 // // (1) Add node1 to the neighbor list of n2
-//    node(n1)%nnghbrs = node(n1)%nnghbrs + 1
-//    call my_alloc_int_ptr(node(n1)%nghbr, node(n1)%nnghbrs)
-//    node(n1)%nghbr(node(n1)%nnghbrs) = n2
+//    node(n1).nnghbrs = node(n1).nnghbrs + 1
+//    call my_alloc_int_ptr(node(n1).nghbr, node(n1).nnghbrs)
+//    node(n1).nghbr(node(n1).nnghbrs) = n2
 
 // // (2) Add node2 to the neighbor list of n1
-//    node(n2)%nnghbrs = node(n2)%nnghbrs + 1
-//    call my_alloc_int_ptr(node(n2)%nghbr, node(n2)%nnghbrs)
-//    node(n2)%nghbr(node(n2)%nnghbrs) = n1
+//    node(n2).nnghbrs = node(n2).nnghbrs + 1
+//    call my_alloc_int_ptr(node(n2).nghbr, node(n2).nnghbrs)
+//    node(n2).nghbr(node(n2).nnghbrs) = n1
 
 //   end do edges4
 
@@ -1143,14 +1149,14 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Allocate and initialize the normal vector arrays
 //   do i = 1, nbound
 
-//    allocate(bound(i)%bnx(bound(i)%nbnodes))
-//    allocate(bound(i)%bny(bound(i)%nbnodes))
-//    allocate(bound(i)%bn( bound(i)%nbnodes))
+//    allocate(bound[i].bnx(bound[i].nbnodes))
+//    allocate(bound[i].bny(bound[i].nbnodes))
+//    allocate(bound[i].bn( bound[i].nbnodes))
 
-//    do j = 1, bound(i)%nbnodes
-//     bound(i)%bnx(j) = zero
-//     bound(i)%bny(j) = zero
-//     bound(i)%bn( j) = zero
+//    do j = 1, bound[i].nbnodes
+//     bound[i].bnx(j) = zero
+//     bound[i].bny(j) = zero
+//     bound[i].bn( j) = zero
 //    end do
 
 //   end do
@@ -1163,32 +1169,32 @@ for ( int i = 0; i < nelms; ++i ) {
 // //
 // // Step 1. Compute the outward normals
 //   do i = 1, nbound
-//    do j = 1, bound(i)%nbnodes-1
+//    do j = 1, bound[i].nbnodes-1
 
-//     x1 = node(bound(i)%bnode(j  ))%x
-//     y1 = node(bound(i)%bnode(j  ))%y
+//     x1 = node(bound[i].bnode(j  )).x
+//     y1 = node(bound[i].bnode(j  )).y
 
-//     x2 = node(bound(i)%bnode(j+1))%x
-//     y2 = node(bound(i)%bnode(j+1))%y
+//     x2 = node(bound[i].bnode(j+1)).x
+//     y2 = node(bound[i].bnode(j+1)).y
 
 // //   Normal vector pointing into the domain at this point.
-//     bound(i)%bnx(j) = bound(i)%bnx(j) + half*( -(y2-y1) )
-//     bound(i)%bny(j) = bound(i)%bny(j) + half*(   x2-x1  )
+//     bound[i].bnx(j) = bound[i].bnx(j) + half*( -(y2-y1) )
+//     bound[i].bny(j) = bound[i].bny(j) + half*(   x2-x1  )
 
-//     bound(i)%bnx(j+1) = bound(i)%bnx(j+1) + half*( -(y2-y1) )
-//     bound(i)%bny(j+1) = bound(i)%bny(j+1) + half*(   x2-x1  )
+//     bound[i].bnx(j+1) = bound[i].bnx(j+1) + half*( -(y2-y1) )
+//     bound[i].bny(j+1) = bound[i].bny(j+1) + half*(   x2-x1  )
 
 //    end do
 //   end do
 
 // // Step 2. Compute the magnitude and turn (bnx,bny) into a unit vector
 //   do i = 1, nbound
-//    do j = 1, bound(i)%nbnodes
+//    do j = 1, bound[i].nbnodes
 
-//     bound(i)%bn(j)  = sqrt( bound(i)%bnx(j)**2 + bound(i)%bny(j)**2 )
+//     bound[i].bn(j)  = sqrt( bound[i].bnx(j)**2 + bound[i].bny(j)**2 )
 // //   Minus sign to make it pont out towards the outside of the domain.
-//     bound(i)%bnx(j) =  - bound(i)%bnx(j) / bound(i)%bn(j)
-//     bound(i)%bny(j) =  - bound(i)%bny(j) / bound(i)%bn(j)
+//     bound[i].bnx(j) =  - bound[i].bnx(j) / bound[i].bn(j)
+//     bound[i].bny(j) =  - bound[i].bny(j) / bound[i].bn(j)
 
 //    end do
 //   end do
@@ -1203,39 +1209,39 @@ for ( int i = 0; i < nelms; ++i ) {
 // // for details on the quadratic approximation for computing more accurate normals.
 // // 
 //   boundary_type0 : do i = 1, nbound
-//    boundary_nodes0 : do j = 1, bound(i)%nbnodes
+//    boundary_nodes0 : do j = 1, bound[i].nbnodes
 
 //      if (j==1) then
-//       v1 = bound(i)%bnode(j  )
-//       v2 = bound(i)%bnode(j+1)
-//       v3 = bound(i)%bnode(j+2)
-//      elseif (j==bound(i)%nbnodes) then
-//       v1 = bound(i)%bnode(j-2)
-//       v2 = bound(i)%bnode(j-1)
-//       v3 = bound(i)%bnode(j  )
+//       v1 = bound[i].bnode(j  )
+//       v2 = bound[i].bnode(j+1)
+//       v3 = bound[i].bnode(j+2)
+//      elseif (j==bound[i].nbnodes) then
+//       v1 = bound[i].bnode(j-2)
+//       v2 = bound[i].bnode(j-1)
+//       v3 = bound[i].bnode(j  )
 //      else
-//       v1 = bound(i)%bnode(j-1)
-//       v2 = bound(i)%bnode(j)
-//       v3 = bound(i)%bnode(j+1)
+//       v1 = bound[i].bnode(j-1)
+//       v2 = bound[i].bnode(j)
+//       v3 = bound[i].bnode(j+1)
 //      endif
 
-//      x1 = node(v1)%x
-//      x2 = node(v2)%x
-//      x3 = node(v3)%x
+//      x1 = node(v1).x
+//      x2 = node(v2).x
+//      x3 = node(v3).x
 
-//      y1 = node(v1)%y
-//      y2 = node(v2)%y
-//      y3 = node(v3)%y
+//      y1 = node(v1).y
+//      y2 = node(v2).y
+//      y3 = node(v3).y
 
 // //----------------------------------------------------------------------
 // //   Fit a quadratic over 3 nodes
 
 // //    Skip the last one if the boundary segment is a closed boundary 
 // //    in which case the last node is the same as the first one.
-//      if (j==bound(i)%nbnodes .and. bound(i)%bnode(j)==bound(i)%bnode(1) ) then
-//       bound(i)%bn(j)  = bound(i)%bn(1)
-//       bound(i)%bnx(j) = bound(i)%bnx(1)
-//       bound(i)%bny(j) = bound(i)%bny(1)
+//      if (j==bound[i].nbnodes .and. bound[i].bnode(j)==bound[i].bnode(1) ) then
+//       bound[i].bn(j)  = bound[i].bn(1)
+//       bound[i].bnx(j) = bound[i].bnx(1)
+//       bound[i].bny(j) = bound[i].bny(1)
 //       cycle
 //      endif
 
@@ -1245,8 +1251,8 @@ for ( int i = 0; i < nelms; ++i ) {
 //       dy = dsR*y1/(dsL*(-dsL-dsR))-y2/dsR+y2/dsL+dsL*y3/((dsR+dsL)*dsR)
 
 //      ds  = sqrt( dx**2 + dy**2 )
-//      bound(i)%bnx(j) = -( -dy / ds )
-//      bound(i)%bny(j) = -(  dx / ds )
+//      bound[i].bnx(j) = -( -dy / ds )
+//      bound[i].bny(j) = -(  dx / ds )
 
 //    end do boundary_nodes0
 //   end do boundary_type0
@@ -1262,7 +1268,7 @@ for ( int i = 0; i < nelms; ++i ) {
 // //     o-----*----------o
 // //          /|  edge i
 // //         / |
-// //        /  o        Note: k-th neighbor is given by "node(j)%nghbr(k)"
+// //        /  o        Note: k-th neighbor is given by "node(j).nghbr(k)"
 // //       o
 // //
 // //  Consider the edge i
@@ -1273,13 +1279,13 @@ for ( int i = 0; i < nelms; ++i ) {
 // //
 // //   We store "k" in the edge data structure as
 // //
-// //    edge(i)%kth_nghbr_of_1: n2 is the "edge(i)%kth_nghbr_of_1"-th neighbor of n1
-// //    edge(i)%kth_nghbr_of_2: n1 is the "edge(i)%kth_nghbr_of_3"-th neighbor of n2
+// //    edge[i].kth_nghbr_of_1: n2 is the "edge[i].kth_nghbr_of_1"-th neighbor of n1
+// //    edge[i].kth_nghbr_of_2: n1 is the "edge[i].kth_nghbr_of_3"-th neighbor of n2
 // //
 // //   That is,  we have
 // //
-// //    n2 = node(n1)%nghbr(edge(i)%kth_nghbr_of_1)
-// //    n1 = node(n2)%nghbr(edge(i)%kth_nghbr_of_2)
+// //    n2 = node(n1).nghbr(edge[i].kth_nghbr_of_1)
+// //    n1 = node(n2).nghbr(edge[i].kth_nghbr_of_2)
 // //
 // //   We make use of this data structure to access off-diagonal entries in Jacobian matrix.
 // //
@@ -1288,21 +1294,21 @@ for ( int i = 0; i < nelms; ++i ) {
 
 //   edges5 : do i = 1, nedges
 
-//    n1 = edge(i)%n1
-//    n2 = edge(i)%n2
+//    n1 = edge[i].n1
+//    n2 = edge[i].n2
 
-//    do k = 1, node(n2)%nnghbrs
+//    do k = 1, node(n2).nnghbrs
 
-//     if ( n1 == node(n2)%nghbr(k) ) then
-//      edge(i)%kth_nghbr_of_2 = k
+//     if ( n1 == node(n2).nghbr(k) ) then
+//      edge[i].kth_nghbr_of_2 = k
 //     endif
 
 //    end do
 
-//    do k = 1, node(n1)%nnghbrs
+//    do k = 1, node(n1).nnghbrs
 
-//     if ( n2 == node(n1)%nghbr(k) ) then
-//      edge(i)%kth_nghbr_of_1 = k
+//     if ( n2 == node(n1).nghbr(k) ) then
+//      edge[i].kth_nghbr_of_1 = k
 //     endif
 
 //    end do
@@ -1312,14 +1318,14 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Boundary mark: It should be an array actually because some nodes are associated with
 // //                more than one boundaries.
 //   do i = 1, nnodes
-//    node(i)%bmark   = 0
-//    node(i)%nbmarks = 0
+//    node[i].bmark   = 0
+//    node[i].nbmarks = 0
 //   end do
 
 //   do i = 1, nbound
-//    do j = 1, bound(i)%nbnodes
-//     node( bound(i)%bnode(j) )%bmark   = i
-//     node( bound(i)%bnode(j) )%nbmarks = node( bound(i)%bnode(j) )%nbmarks + 1
+//    do j = 1, bound[i].nbnodes
+//     node( bound[i].bnode(j) ).bmark   = i
+//     node( bound[i].bnode(j) ).nbmarks = node( bound[i].bnode(j) ).nbmarks + 1
 //    end do
 //   end do
 
@@ -1335,43 +1341,43 @@ for ( int i = 0; i < nelms; ++i ) {
 // //
 
 //   do i = 1, nbound
-//    bound(i)%nbfaces = bound(i)%nbnodes-1
-//    allocate(bound(i)%bfnx(    bound(i)%nbfaces   ))
-//    allocate(bound(i)%bfny(    bound(i)%nbfaces   ))
-//    allocate(bound(i)%bfn(     bound(i)%nbfaces   ))
-//    allocate(bound(i)%belm(    bound(i)%nbfaces   ))
-//    allocate(bound(i)%kth_nghbr_of_1(    bound(i)%nbfaces   ))
-//    allocate(bound(i)%kth_nghbr_of_2(    bound(i)%nbfaces   ))
+//    bound[i].nbfaces = bound[i].nbnodes-1
+//    allocate(bound[i].bfnx(    bound[i].nbfaces   ))
+//    allocate(bound[i].bfny(    bound[i].nbfaces   ))
+//    allocate(bound[i].bfn(     bound[i].nbfaces   ))
+//    allocate(bound[i].belm(    bound[i].nbfaces   ))
+//    allocate(bound[i].kth_nghbr_of_1(    bound[i].nbfaces   ))
+//    allocate(bound[i].kth_nghbr_of_2(    bound[i].nbfaces   ))
 //   end do
 
 // // Boundary face vector: outward normal
 //   do i = 1, nbound
-//    do j = 1, bound(i)%nbfaces
+//    do j = 1, bound[i].nbfaces
 
-//     x1 = node(bound(i)%bnode(j  ))%x
-//     y1 = node(bound(i)%bnode(j  ))%y
-//     x2 = node(bound(i)%bnode(j+1))%x
-//     y2 = node(bound(i)%bnode(j+1))%y
+//     x1 = node(bound[i].bnode(j  )).x
+//     y1 = node(bound[i].bnode(j  )).y
+//     x2 = node(bound[i].bnode(j+1)).x
+//     y2 = node(bound[i].bnode(j+1)).y
 
-//     bound(i)%bfn(j)  =  sqrt( (x1-x2)**2 + (y1-y2)**2 )
-//     bound(i)%bfnx(j) = -(y1-y2) / bound(i)%bfn(j)
-//     bound(i)%bfny(j) =  (x1-x2) / bound(i)%bfn(j)
+//     bound[i].bfn(j)  =  sqrt( (x1-x2)**2 + (y1-y2)**2 )
+//     bound[i].bfnx(j) = -(y1-y2) / bound[i].bfn(j)
+//     bound[i].bfny(j) =  (x1-x2) / bound[i].bfn(j)
 
 //    end do
 //   end do
 
 // // Boundary normal vector at nodes: outward normal
 //   do i = 1, nbound
-//    do j = 1, bound(i)%nbfaces
+//    do j = 1, bound[i].nbfaces
 
-//     x1 = node(bound(i)%bnode(j  ))%x
-//     y1 = node(bound(i)%bnode(j  ))%y
-//     x2 = node(bound(i)%bnode(j+1))%x
-//     y2 = node(bound(i)%bnode(j+1))%y
+//     x1 = node(bound[i].bnode(j  )).x
+//     y1 = node(bound[i].bnode(j  )).y
+//     x2 = node(bound[i].bnode(j+1)).x
+//     y2 = node(bound[i].bnode(j+1)).y
 
-//     bound(i)%bfn(j)  =  sqrt( (x1-x2)**2 + (y1-y2)**2 )
-//     bound(i)%bfnx(j) = -(y1-y2) / bound(i)%bfn(j)
-//     bound(i)%bfny(j) =  (x1-x2) / bound(i)%bfn(j)
+//     bound[i].bfn(j)  =  sqrt( (x1-x2)**2 + (y1-y2)**2 )
+//     bound[i].bfnx(j) = -(y1-y2) / bound[i].bfn(j)
+//     bound[i].bfny(j) =  (x1-x2) / bound[i].bfn(j)
 
 //    end do
 //   end do
@@ -1379,20 +1385,20 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Neighbor index over boundary edges (faces)
 
 //   do i = 1, nbound
-//    do j = 1, bound(i)%nbfaces
+//    do j = 1, bound[i].nbfaces
 
-//     n1 = bound(i)%bnode(j  )  //Left node
-//     n2 = bound(i)%bnode(j+1)  //Right node
+//     n1 = bound[i].bnode(j  )  //Left node
+//     n2 = bound[i].bnode(j+1)  //Right node
 
-//     do k = 1, node(n2)%nnghbrs
-//      if ( n1 == node(n2)%nghbr(k) ) then
-//       bound(i)%kth_nghbr_of_2(j) = k
+//     do k = 1, node(n2).nnghbrs
+//      if ( n1 == node(n2).nghbr(k) ) then
+//       bound[i].kth_nghbr_of_2(j) = k
 //      endif
 //     end do
 
-//     do k = 1, node(n1)%nnghbrs
-//      if ( n2 == node(n1)%nghbr(k) ) then
-//       bound(i)%kth_nghbr_of_1(j) = k
+//     do k = 1, node(n1).nnghbrs
+//      if ( n2 == node(n1).nghbr(k) ) then
+//       bound[i].kth_nghbr_of_1(j) = k
 //      endif
 //     end do
 
@@ -1418,23 +1424,23 @@ for ( int i = 0; i < nelms; ++i ) {
 // //
 
 //   do i = 1, nbound
-//    do j = 1, bound(i)%nbfaces
+//    do j = 1, bound[i].nbfaces
 
 // //   bface is defined by the nodes v1 and v2.
-//     v1 = bound(i)%bnode(j  )
-//     v2 = bound(i)%bnode(j+1)
+//     v1 = bound[i].bnode(j  )
+//     v2 = bound[i].bnode(j+1)
 
 //     found = .false.
 // //   Find the element having the bface from the elements
 // //   around the node v1.
-//     do k = 1, node(v1)%nelms
-//      ielm = node(v1)%elm(k)
-//      do ii = 1, elm(ielm)%nvtx
+//     do k = 1, node(v1).nelms
+//      ielm = node(v1).elm(k)
+//      do ii = 1, elm(ielm).nvtx
 //       in = ii
 //       im = ii+1
-//       if (im > elm(ielm)%nvtx) im = im - elm(ielm)%nvtx //return to 1
-//       vt1 = elm(ielm)%vtx(in)
-//       vt2 = elm(ielm)%vtx(im)
+//       if (im > elm(ielm).nvtx) im = im - elm(ielm).nvtx //return to 1
+//       vt1 = elm(ielm).vtx(in)
+//       vt2 = elm(ielm).vtx(im)
 //        if (vt1 == v1 .and. vt2 == v2) then
 //         found = .true.
 //         exit
@@ -1444,7 +1450,7 @@ for ( int i = 0; i < nelms; ++i ) {
 //     end do
 
 //     if (found) then
-//      bound(i)%belm(j) = ielm
+//      bound[i].belm(j) = ielm
 //     else
 //      write(*,*) " Boundary-adjacent element not found. Error..."
 //      stop
@@ -1469,22 +1475,22 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Check the number of neighbor nodes (must have at least 2 neighbors)
 //   write(*,*) " --- Node neighbor data:"
 
-//   ave_nghbr = node(1)%nnghbrs
-//   min_nghbr = node(1)%nnghbrs
-//   max_nghbr = node(1)%nnghbrs
+//   ave_nghbr = node(1).nnghbrs
+//   min_nghbr = node(1).nnghbrs
+//   max_nghbr = node(1).nnghbrs
 //        imin = 1
 //        imax = 1
-//    if (node(1)%nnghbrs==2) then
+//    if (node(1).nnghbrs==2) then
 //     write(*,*) "--- 2 neighbors for the node = ", 1
 //    endif
 
 //   do i = 2, nnodes
-//    ave_nghbr = ave_nghbr + node(i)%nnghbrs
-//    if (node(i)%nnghbrs < min_nghbr) imin = i
-//    if (node(i)%nnghbrs > max_nghbr) imax = i
-//    min_nghbr = min(min_nghbr, node(i)%nnghbrs)
-//    max_nghbr = max(max_nghbr, node(i)%nnghbrs)
-//    if (node(i)%nnghbrs==2) then
+//    ave_nghbr = ave_nghbr + node[i].nnghbrs
+//    if (node[i].nnghbrs < min_nghbr) imin = i
+//    if (node[i].nnghbrs > max_nghbr) imax = i
+//    min_nghbr = min(min_nghbr, node[i].nnghbrs)
+//    max_nghbr = max(max_nghbr, node[i].nnghbrs)
+//    if (node[i].nnghbrs==2) then
 //     write(*,*) "--- 2 neighbors for the node = ", i
 //    endif
 //   end do
@@ -1501,25 +1507,25 @@ for ( int i = 0; i < nelms; ++i ) {
 //   write(*,*) "Generating CC scheme data......"
 
 //   do i = 1, nelms   
-//    allocate(elm(i)%edge( elm(i)%nnghbrs ) )
+//    allocate(elm(i).edge( elm(i).nnghbrs ) )
 //   end do
 
 //   edges3 : do i = 1, nedges
 
-//    e1 = edge(i)%e1
-//    e2 = edge(i)%e2
+//    e1 = edge[i].e1
+//    e2 = edge[i].e2
 
 // // Left element
 //   if (e1 > 0) then
-//    do k = 1, elm(e1)%nnghbrs
-//     if (elm(e1)%nghbr(k)==e2) elm(e1)%edge(k) = i
+//    do k = 1, elm(e1).nnghbrs
+//     if (elm(e1).nghbr(k)==e2) elm(e1).edge(k) = i
 //    end do
 //   endif
 
 // // Right element
 //   if (e2 > 0) then
-//    do k = 1, elm(e2)%nnghbrs
-//     if (elm(e2)%nghbr(k)==e1) elm(e2)%edge(k) = i
+//    do k = 1, elm(e2).nnghbrs
+//     if (elm(e2).nghbr(k)==e1) elm(e2).edge(k) = i
 //    end do
 //   endif
 
@@ -1549,8 +1555,8 @@ for ( int i = 0; i < nelms; ++i ) {
 
 //   nfaces = 0
 //   elements4 : do i = 1, nelms
-//    do k = 1, elm(i)%nnghbrs
-//    jelm = elm(i)%nghbr(k)
+//    do k = 1, elm(i).nnghbrs
+//    jelm = elm(i).nghbr(k)
 //     if (jelm > i) then
 //      nfaces = nfaces + 1
 //     endif
@@ -1562,26 +1568,26 @@ for ( int i = 0; i < nelms; ++i ) {
 //   nfaces = 0
 
 //   elements5 : do i = 1, nelms
-//    do k = 1, elm(i)%nnghbrs
-//    jelm = elm(i)%nghbr(k)
+//    do k = 1, elm(i).nnghbrs
+//    jelm = elm(i).nghbr(k)
 
 //     if (jelm > i) then
 
 //      nfaces = nfaces + 1
 
-//      face(nfaces)%e1 = i
-//      face(nfaces)%e2 = jelm
+//      face(nfaces).e1 = i
+//      face(nfaces).e2 = jelm
 
-//      iedge = elm(i)%edge(k)
-//      v1 = edge(iedge)%n1
-//      v2 = edge(iedge)%n2
+//      iedge = elm(i).edge(k)
+//      v1 = edge(iedge).n1
+//      v2 = edge(iedge).n2
 
-//      if (edge(iedge)%e1 == jelm) then
-//       face(nfaces)%n1 = v1
-//       face(nfaces)%n2 = v2
+//      if (edge(iedge).e1 == jelm) then
+//       face(nfaces).n1 = v1
+//       face(nfaces).n2 = v2
 //      else
-//       face(nfaces)%n1 = v2
-//       face(nfaces)%n2 = v1
+//       face(nfaces).n1 = v2
+//       face(nfaces).n2 = v1
 //      endif
    
 //     elseif (jelm == 0) then
@@ -1596,16 +1602,16 @@ for ( int i = 0; i < nelms; ++i ) {
 
 //   faces : do i = 1, nfaces
 
-//    n1 = face(i)%n1
-//    n2 = face(i)%n2
-//    e1 = face(i)%e1
-//    e2 = face(i)%e2
+//    n1 = face(i).n1
+//    n2 = face(i).n2
+//    e1 = face(i).e1
+//    e2 = face(i).e2
 
 // // Face vector
-//   face(i)%dav(1) = -( node(n2)%y - node(n1)%y )
-//   face(i)%dav(2) =    node(n2)%x - node(n1)%x
-//   face(i)%da     = sqrt( face(i)%dav(1)**2 + face(i)%dav(2)**2 )
-//   face(i)%dav    = face(i)%dav / face(i)%da
+//   face(i).dav(1) = -( node(n2).y - node(n1).y )
+//   face(i).dav(2) =    node(n2).x - node(n1).x
+//   face(i).da     = sqrt( face(i).dav(1)**2 + face(i).dav(2)**2 )
+//   face(i).dav    = face(i).dav / face(i).da
 
 //   end do faces
 
@@ -1631,8 +1637,8 @@ for ( int i = 0; i < nelms; ++i ) {
 //   write(*,*) " --- Vertex-neighbor data:"
 
 //   do i = 1, nelms
-//    elm(i)%nvnghbrs = 1
-//    call my_alloc_int_ptr(elm(i)%vnghbr, 1)
+//    elm(i).nvnghbrs = 1
+//    call my_alloc_int_ptr(elm(i).vnghbr, 1)
 //   end do
 
 //   ave_nghbr = 0
@@ -1643,33 +1649,33 @@ for ( int i = 0; i < nelms; ++i ) {
 
 // // Initialization
 //   elements6 : do i = 1, nelms
-//    elm(i)%nvnghbrs = 0
+//    elm(i).nvnghbrs = 0
 //   end do elements6
 
 // // Collect vertex-neighbors
 //   elements7 : do i = 1, nelms
 
 // // (1)Add face-neighbors
-//    do k = 1, elm(i)%nnghbrs
-//     if ( elm(i)%nghbr(k) > 0 ) then
-//      elm(i)%nvnghbrs = elm(i)%nvnghbrs + 1
-//      call my_alloc_int_ptr(elm(i)%vnghbr, elm(i)%nvnghbrs)
-//      elm(i)%vnghbr(elm(i)%nvnghbrs) = elm(i)%nghbr(k)
+//    do k = 1, elm(i).nnghbrs
+//     if ( elm(i).nghbr(k) > 0 ) then
+//      elm(i).nvnghbrs = elm(i).nvnghbrs + 1
+//      call my_alloc_int_ptr(elm(i).vnghbr, elm(i).nvnghbrs)
+//      elm(i).vnghbr(elm(i).nvnghbrs) = elm(i).nghbr(k)
 //     endif
 //    end do
 
 // // (2)Add vertex-neighbors
-//    do k = 1, elm(i)%nvtx
-//     v1 = elm(i)%vtx(k)
+//    do k = 1, elm(i).nvtx
+//     v1 = elm(i).vtx(k)
 
-//     velms : do j = 1, node(v1)%nelms
-//      e1 = node(v1)%elm(j)
+//     velms : do j = 1, node(v1).nelms
+//      e1 = node(v1).elm(j)
 //      if (e1 == i) cycle velms
 
 // //    Check if the element is already added.
 //        found = .false.
-//      do ii = 1, elm(i)%nvnghbrs
-//       if ( e1 == elm(i)%vnghbr(ii) ) then
+//      do ii = 1, elm(i).nvnghbrs
+//       if ( e1 == elm(i).vnghbr(ii) ) then
 //        found = .true.
 //        exit
 //       endif
@@ -1677,22 +1683,22 @@ for ( int i = 0; i < nelms; ++i ) {
 
 // //    Add the element, e1, if not added yet.
 //      if (.not.found) then
-//       elm(i)%nvnghbrs = elm(i)%nvnghbrs + 1
-//       call my_alloc_int_ptr(elm(i)%vnghbr, elm(i)%nvnghbrs)
-//       elm(i)%vnghbr(elm(i)%nvnghbrs) = e1
+//       elm(i).nvnghbrs = elm(i).nvnghbrs + 1
+//       call my_alloc_int_ptr(elm(i).vnghbr, elm(i).nvnghbrs)
+//       elm(i).vnghbr(elm(i).nvnghbrs) = e1
 //      endif
 //     end do velms
 
 //    end do
 
-//    ave_nghbr = ave_nghbr + elm(i)%nvnghbrs
-//    if (elm(i)%nvnghbrs < min_nghbr) imin = i
-//    if (elm(i)%nvnghbrs > max_nghbr) imax = i
-//    min_nghbr = min(min_nghbr, elm(i)%nvnghbrs)
-//    max_nghbr = max(max_nghbr, elm(i)%nvnghbrs)
-//    if (elm(i)%nvnghbrs < 3) then
+//    ave_nghbr = ave_nghbr + elm(i).nvnghbrs
+//    if (elm(i).nvnghbrs < min_nghbr) imin = i
+//    if (elm(i).nvnghbrs > max_nghbr) imax = i
+//    min_nghbr = min(min_nghbr, elm(i).nvnghbrs)
+//    max_nghbr = max(max_nghbr, elm(i).nvnghbrs)
+//    if (elm(i).nvnghbrs < 3) then
 //     write(*,*) "--- Not enough neighbors: elm = ", i, &
-//                "elm(i)%nvnghbrs=",elm(i)%nvnghbrs
+//                "elm(i).nvnghbrs=",elm(i).nvnghbrs
 //    endif
 
 //   end do elements7
@@ -1704,13 +1710,13 @@ for ( int i = 0; i < nelms; ++i ) {
 
 
 //   do i = 1, nelms
-//    elm(i)%bmark = 0
+//    elm(i).bmark = 0
 //   end do
 
 //   bc_loop : do i = 1, nbound
-//    if (trim(bound(i)%bc_type) == "dirichlet") then
-//     do j = 1, bound(i)%nbfaces
-//      elm( bound(i)%belm(j) )%bmark = 1
+//    if (trim(bound[i].bc_type) == "dirichlet") then
+//     do j = 1, bound[i].nbfaces
+//      elm( bound[i].belm(j) ).bmark = 1
 //     end do
 //    endif
 //   end do bc_loop

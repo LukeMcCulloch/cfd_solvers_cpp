@@ -266,16 +266,16 @@ public:
 
       elm_type(){}
       ~elm_type(){
-        delete vtx;
-        delete nghbr;
-        delete edge;
-        delete u;
-        delete uexact;
-        delete gradu;
-        delete res;
-        delete vnghbr;
-        delete lsq2x2_cx;
-        delete lsq2x2_cy;
+        // delete vtx;
+        // delete nghbr;
+        // delete edge;
+        // delete u;
+        // delete uexact;
+        // delete gradu;
+        // delete res;
+        // delete vnghbr;
+        // delete lsq2x2_cx;
+        // delete lsq2x2_cy;
       }
       //  to be read from a grid file
       int nvtx;                   //number of vertices
