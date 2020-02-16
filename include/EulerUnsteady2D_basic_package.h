@@ -170,7 +170,8 @@ struct cell_data{
     Array2D<real> res = Array2D<real>(4,1);  // Residual = f_{j+1/2) - f_{j-1/2)
 };
 
-
+//fwd declare
+class elm_type;
 
 //----------------------------------------------------------
 // Data type for nodal quantities (used for node-centered schemes)
@@ -190,7 +191,7 @@ public:
     Array2D<int>*  nghbr;        //list of neighbors
 
     int nelms;     //number of elements
-    Array2D<int>*  elm;        //list of elements
+    Array2D<elm_type>*  elm;        //list of elements
     //vector<int> elm;            //list of elements
 
     real vol;                   //dual-cell volume

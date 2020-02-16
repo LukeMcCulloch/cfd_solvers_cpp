@@ -306,7 +306,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          in >> type;                  //and read the first whitespace-separated token
 
 
-         float x, y, z;
+         int x, y, z;
          in >> x >> y >> z;       //now read the whitespace-separated floats
          elm[i].vtx[0] = x;
          elm[i].vtx[1] = y;
@@ -332,7 +332,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          elm[ntria+i].nvtx = 4;
          elm[ntria+i].vtx = new Array2D<int>(4,1);
 
-         float x1,x2,x3,x4;
+         int x1,x2,x3,x4;
          in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated floats
          elm[ntria+i].vtx[0] = x1;
          elm[ntria+i].vtx[1] = x2;
