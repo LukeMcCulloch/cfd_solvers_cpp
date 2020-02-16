@@ -576,7 +576,7 @@ for ( int j = 0; j < nelms; ++j ) {
 //    v2 = elm(i)%vtx(2)
 //    v3 = elm(i)%vtx(3)
    std::cout << "elm[i] = " << elm[i].vtx  << std::endl;
-   //v1 = elm[i].vtx[0]
+   v1 = (*elm[i].vtx)(0);
 
 //    x1 = node(v1)%x
 //    x2 = node(v2)%x
