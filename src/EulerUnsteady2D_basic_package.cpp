@@ -831,7 +831,7 @@ for ( int i = 0; i < nelms; ++i ) {
       //            /        |
       //           o---------o
       //
-      //if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k+1,0); //TLM warning:  apparent step out of bounds 
+         //if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k+1); //TLM warning:  apparent step out of bounds 
          if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k); //TLM dumb fix
          if (k == elm[i].nvtx) vL = (*elm[i].vtx)(0); 
          vR = (*elm[i].vtx)(k);
@@ -856,25 +856,27 @@ for ( int i = 0; i < nelms; ++i ) {
                break; //exit edge_matching
             } //endif
          } //end do edge_matching
-//      //if (found) exit elms_around_vR
-//      if (found) break;
+     //if (found) exit elms_around_vR
+     if (found) break;
 
-//       } //end do elms_around_vR
+      } //end do elms_around_vR
 
-//       in = k + 2;
-//       if (in > elm[i].nvtx) { in = in - elm[i].nvtx; }
+      //in = k + 2; // why is this k+2 when we already loop all the way to nvtx?
+      in = k + 0; 
+      if (in > elm[i].nvtx) { in = in - elm[i].nvtx; }
 
-//       if (found) {
-//          (*elm[   i].nghbr)(in) = jelm;
-//          (*elm[jelm].nghbr)(im) = i;
-//       }
-//       else {
-//          (*elm[   i].nghbr)(in) = 0;
-//       }
+      if (found) {
+         (*elm[   i].nghbr)(in) = jelm;
+         (*elm[jelm].nghbr)(im) = i;
+      }
+      else {
+         //(*elm[   i].nghbr)(in) = 0;
+         (*elm[   i].nghbr)(in) = 0;
+      }
 
-//       }//    end do elm_vertex
+      }//    end do elm_vertex
 
-//    }//   end do elements2
+   }//   end do elements2
 
 // //--------------------------------------------------------------------------------
 // // Edge-data for node-centered (edge-based) scheme.
