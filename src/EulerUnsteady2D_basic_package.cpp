@@ -691,9 +691,9 @@ for (int i = 0; i < nnodes; i++) {
 for ( int i = 0; i < nelms; ++i ) {
    
 
-   v1 = (*elm[i].vtx)(0,0);
-   v2 = (*elm[i].vtx)(1,0);
-   v3 = (*elm[i].vtx)(2,0);
+   v1 = (*elm[i].vtx)(0);
+   v2 = (*elm[i].vtx)(1);
+   v3 = (*elm[i].vtx)(2);
 
 //    tri_or_quadv : 
    if (elm[i].nvtx==3) {
