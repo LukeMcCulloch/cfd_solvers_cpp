@@ -674,25 +674,26 @@ for ( int i = 0; i < nelms; ++i ) {
 
 //  Distribution of element number to the 4th node of the quadrilateral
    node[v4].nelms = node[v4].nelms + 1;
-   //call my_alloc_int_ptr(node(v4)%elm, node(v4)%nelms)
    node[v4].elm = new Array2D<int>(node[v4].nelms, 0);
    (*node[v4].elm)[node[v4].nelms][0] = i;
 
    }//    endif tri_or_quad
 
-}//   end do elements
+}//   end do elements (i loop)
 
 // // Median dual volume
 
-//   do i = 1, nnodes
-//    node(i)%vol = zero
-//   end do
+for (int i = 0; i < nnodes; i++) {
+   node[i].vol = zero;
+}
 
 //   elementsv : do i = 1, nelms
+for ( int i = 0; i < nelms; ++i ) {
+   
 
-//    v1 = elm(i)%vtx(1)
-//    v2 = elm(i)%vtx(2)
-//    v3 = elm(i)%vtx(3)
+   v1 = (*elm[i].vtx)(0,0);
+   v2 = (*elm[i].vtx)(1,0);
+   v3 = (*elm[i].vtx)(2,0);
 
 //    tri_or_quadv : if (elm(i)%nvtx==3) then
 // //   Dual volume is exactly 1/3 of the volume of the triangle.
@@ -765,7 +766,7 @@ for ( int i = 0; i < nelms; ++i ) {
  
 //    endif tri_or_quadv
 
-//   end do elementsv
+}//   end do elementsv
 
 // //--------------------------------------------------------------------------------
 // // Loop over elements 2
