@@ -265,28 +265,23 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
 
    // // READ: Read the nodal coordinates
+   cout << "reading nodal coords" << endl;
    for (size_t i = 0; i < nnodes; i++) {
       std::getline(infile, line);
       std::istringstream iss(line);
       iss >> node[i].x >> node[i].y ;
-      //std::cout << node[i].x << node[i].y << std::endl;
-      this->node[i].u     = new Array2D<real>(nq,1);
-      this->node[i].du    = new Array2D<real>(nq,1);
-      this->node[i].w     = new Array2D<real>(nq,1);
-      this->node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
-      this->node[i].res   = new Array2D<real>(nq,1);
-
-      // seg fault
-      // Array2D<real> (*node[i].u)(nq,1);
-      // Array2D<real> (*node[i].du)(nq,1);
-      // Array2D<real> (*node[i].w)(nq,1);
-      // Array2D<real> (*node[i].gradw)(nq,1); //<- 2: x and y components.
-      // Array2D<real> (*node[i].res)(nq,1);
+      // could declare here:
+      // node[i].u     = new Array2D<real>(nq,1);
+      // node[i].du    = new Array2D<real>(nq,1);
+      // node[i].w     = new Array2D<real>(nq,1);
+      // node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
+      // node[i].res   = new Array2D<real>(nq,1);
 
       node[i].nelms = 0;
       //std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
 
    }
+   cout << "done reading nodal coords" << endl;
 
       
    // Read element-connectivity information
@@ -341,12 +336,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          elm[ntria+i].vtx = new Array2D<int>(4,1);
 
          int x1,x2,x3,x4;
-         in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated floats
-         // elm[ntria+i].vtx[0] = x1;
-         // elm[ntria+i].vtx[1] = x2;
-         // elm[ntria+i].vtx[2] = x3;
-         // elm[ntria+i].vtx[3] = x4;
-
+         in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated ...ints
          (*elm[ntria+i].vtx)(0,0) = x1;
          (*elm[ntria+i].vtx)(1,0) = x2;
          (*elm[ntria+i].vtx)(2,0) = x3;
@@ -388,7 +378,12 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          std::istringstream in(line);
          int init;
          in >> init;
-         bound[i].bnode[j] = init;
+         (*bound[i].bnode)[j][0] = init;
+         //(*bound[i].bnode)(j,0) = init;
+
+         // testing array access:
+         //int some = (*bound[i].bnode)[j][0];
+         //cout << "get some " << some << endl;
       }
    }
 
@@ -545,9 +540,9 @@ cout << "construct grid data" << endl;
 //    nedges = 0
 
 // moved to read grid data 
-for (size_t i = 0; i < nnodes; i++) {
-   //node[i].nelms = 0;
-} 
+// for (size_t i = 0; i < nnodes; i++) {
+//    node[i].nelms = 0;
+// } 
 
 nedges = 0;
 
@@ -583,14 +578,21 @@ nedges = 0;
 // //        o-----o       o---------o
 
 //   elements : do i = 1, nelms
+
+
+cout << "here1" << endl;
 for ( int j = 0; j < nelms; ++j ) {
+   //cout << "here2" << endl;
 
 //    v1 = elm(i)%vtx(1)
 //    v2 = elm(i)%vtx(2)
 //    v3 = elm(i)%vtx(3)
-   std::cout << "elm[i] = " << elm[i].vtx  << std::endl;
-   v1 = (*elm[i].vtx)(0);
+   //std::cout << "elm[i] = " << (*elm[i].vtx)(0,0)  << std::endl;
+   //v1 = elm[i].vtx(0);
+   //v1 = (*elm[i].vtx)(0,0);
+   //
 
+   //cout << "here3" << endl;
 //    x1 = node(v1)%x
 //    x2 = node(v2)%x
 //    x3 = node(v3)%x
@@ -1717,7 +1719,7 @@ for ( int j = 0; j < nelms; ++j ) {
 
 // //--------------------------------------------------------------------------------
 
-//  return
+   return;
 };
 //  end subroutine construct_grid_data
 

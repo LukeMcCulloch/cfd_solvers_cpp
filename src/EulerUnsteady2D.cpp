@@ -224,34 +224,48 @@ EulerSolver2D::MainData2D::MainData2D(std::string datafile_grid_in,
       //std::cout << "i = " << i << " of " << nnodes << std::endl;
       //std::cout << node[i].x << std::endl;
 
-    // declare within the class
-      // node[i].u     = new Array2D<real>(E2Ddata.nq,1);
-      // node[i].du    = new Array2D<real>(E2Ddata.nq,1);
-      // node[i].w     = new Array2D<real>(E2Ddata.nq,1);
-      // node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
-      // node[i].res   = new Array2D<real>(E2Ddata.nq,1);
+      node[i].u     = new Array2D<real>(nq,1);
+      node[i].du    = new Array2D<real>(nq,1);
+      node[i].w     = new Array2D<real>(nq,1);
+      node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
+      node[i].res   = new Array2D<real>(nq,1);
       //SE2Ddata.node[i].cell
    }
 
    std::cout << "E2Ddata.nq, = " << nq << std::endl;
 // (2) Construct grid data
    construct_grid_data();
+
+   cout << "end of grid constructor" << endl;
 }
 
 
 
 
 EulerSolver2D::MainData2D::~MainData2D() {
-   delete [] node;
-   delete [] elm;
-   delete [] bound;
+   printf("destruct MainData2D");
+
+   // seg faults..
+   delete [] node; //ok
+   delete [] elm; //ok
+   // delete [] edge;  //sf never allocated
+   delete [] bound; //ok
+   // delete [] face;  //sf never allocated
+
+   // invalid pointers
+   // delete node;
+   // delete elm;
+   // delete edge;
+   // delete bound;
+   // delete face;
 }
 
 EulerSolver2D::Solver::Solver(){}
 
 
 EulerSolver2D::Solver::~Solver(){
-    }
+   printf("destruct Solver");
+}
 
 
 //********************************************************************************
@@ -336,6 +350,7 @@ void program_2D_euler_rk2(){
 
 // (3) Check the grid data (It is always good to check them before use//)
 //       check_grid_data();
+   cout << "now in program_2D_euler_rk2" << endl;
 
 // // (4) Prepare LSQ gradients
 //       compute_lsq_coeff_nc();

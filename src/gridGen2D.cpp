@@ -100,13 +100,23 @@
 
 
 Grid2D::gridGen2D::~gridGen2D(){
-    printf("destruct");
+    printf("destruct gridGen2D");
     delete xs;
     delete ys;
     delete tria;
     delete quad;
     delete x;
     delete y;
+
+    // xs, etc. is an Array2D, dynamically allocated
+    // this merely calls it's destructor.
+    // -> so do not attempt to deconstruct the array itself here.
+    // delete [] xs;
+    // delete [] ys;
+    // delete [] tria;
+    // delete [] quad;
+    // delete [] x;
+    // delete [] y;
 
 }
 

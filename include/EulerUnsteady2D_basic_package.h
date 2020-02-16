@@ -181,18 +181,45 @@ class node_type
 {
 
 public:
+
+    node_type(){}
+    ~node_type(){
+
+      delete nghbr;
+      delete elm;
+      delete lsq2x2_cx;
+      delete lsq2x2_cy;
+      delete lsq5x5_cx;
+      delete lsq5x5_cy;
+      delete dx;
+      delete dy;
+      delete dw;
+
+      delete u;
+      delete du;
+      delete gradu;
+      delete w;
+      delete gradw;
+      delete res;
+
+      delete r_temp;
+      delete u_temp;
+      delete w_temp;
+    }
     //  to be read from a grid file
     real x, y;                  //nodal coordinates
     //  to be constructed in the code
 
+
+
     int nnghbrs;   //number of neighbors
     //int,   dimension(:), pointer  :: nghbr     //list of neighbors
-    //vector<int> nghbr;          //list of neighbors
-    Array2D<int>*  nghbr;        //list of neighbors
+    //vector<int> nghbr;        //list of neighbors
+    int*  nghbr;                //list of neighbors
 
-    int nelms;     //number of elements
-    Array2D<elm_type>*  elm;        //list of elements
-    //vector<int> elm;            //list of elements
+    int nelms;                  //number of elements
+    int*  elm;                  //list of elements
+    //vector<int> elm;          //list of elements
 
     real vol;                   //dual-cell volume
     int bmark;                  //Boundary mark
@@ -205,7 +232,8 @@ public:
     Array2D<real>* lsq2x2_cy;   //    Linear LSQ coefficient for uy
     Array2D<real>* lsq5x5_cx;   // Quadratic LSQ coefficient for ux
     Array2D<real>* lsq5x5_cy;   // Quadratic LSQ coefficient for uy
-    Array2D<real>* dx, dy;      // Extra data used by Quadratic LSQ
+    Array2D<real>* dx;          // Extra data used by Quadratic LSQ
+    Array2D<real>* dy;          // Extra data used by Quadratic LSQ
     //Array2D<real>* dw         // Extra data used by Quadratic LSQ
     Array2D<real>* dw;          // Extra data used by Quadratic LSQ (2D)
 
@@ -235,6 +263,20 @@ public:
 //----------------------------------------------------------
   class elm_type{
     public:
+
+      elm_type(){}
+      ~elm_type(){
+        delete vtx;
+        delete nghbr;
+        delete edge;
+        delete u;
+        delete uexact;
+        delete gradu;
+        delete res;
+        delete vnghbr;
+        delete lsq2x2_cx;
+        delete lsq2x2_cy;
+      }
       //  to be read from a grid file
       int nvtx;                   //number of vertices
       Array2D<int>*  vtx;         //list of vertices
@@ -266,6 +308,14 @@ public:
 // Note: Each edge has the following data.
 //----------------------------------------------------------
   class edge_type{
+
+    public:
+    edge_type(){}
+    
+    ~edge_type(){
+      delete dav;
+      delete ev;
+    }
     //  to be constructed in the code
     int n1, n2;            //associated nodes
     int e1, e2;            //associated elements
@@ -284,6 +334,19 @@ public:
 //----------------------------------------------------------
   class bgrid_type{
     public:
+
+      bgrid_type(){}
+      ~bgrid_type(){
+        delete bfnx;
+        delete bfny;
+        delete bfn;
+        delete bnx;
+        delete bny;
+        delete bn;
+        delete belm;
+        delete kth_nghbr_of_1;
+        delete kth_nghbr_of_2;
+      }
       //  to be read from a boundary grid file
       char bc_type[80];     //type of boundary condition
       int nbnodes; //# of boundary nodes
