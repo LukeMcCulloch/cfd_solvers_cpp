@@ -55,7 +55,7 @@ Vector<T>::Vector( void )
   z( 0. )
 {
     printf("\n1");
-};
+}
 
 
 template <class T>
@@ -68,7 +68,7 @@ Vector<T>::Vector( T x0,
   z( z0 )
 {
     printf("\n2");
-};
+}
 
 
 template <class T>
@@ -79,7 +79,7 @@ Vector<T>::Vector(const  Vector& v )
   z( v.z )
 {
     printf("\n3\n");
-};
+}
 
 
 template<class T>
