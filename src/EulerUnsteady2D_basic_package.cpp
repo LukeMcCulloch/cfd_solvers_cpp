@@ -878,34 +878,35 @@ for ( int i = 0; i < nelms; ++i ) {
 
    }//   end do elements2
 
-// //--------------------------------------------------------------------------------
-// // Edge-data for node-centered (edge-based) scheme.
-// //
-// // Loop over elements 3
-// // Construct edge data: edge(:).n1, n2, e1, e2.
-// // Edge points from node n1 to node n2.
-// //
-// //      n2
-// //       o------------o
-// //     .  \         .
-// //    .    \   e2  .
-// //   .  e1  \    .
-// //  .        \ .         Directed area is positive: n1 -> n2
-// // o----------o         e1: left element
-// //             n1       e2: right element (e2 > e1 or e2 = 0)
+//--------------------------------------------------------------------------------
+// Edge-data for node-centered (edge-based) scheme.
+//
+// Loop over elements 3
+// Construct edge data: edge(:).n1, n2, e1, e2.
+// Edge points from node n1 to node n2.
+//
+//      n2
+//       o------------o
+//     .  \         .
+//    .    \   e2  .
+//   .  e1  \    .
+//  .        \ .         Directed area is positive: n1 -> n2
+// o----------o         e1: left element
+//             n1       e2: right element (e2 > e1 or e2 = 0)
 
-// // First count the number of edges.
-// //
-// // NOTE: Count edges only if the neighbor element number is
-// //       greater than the current element (i) to avoid double
-// //       count. Zero element number indicates that it is outside
-// //       the domain (boundary face).
+// First count the number of edges.
+//
+// NOTE: Count edges only if the neighbor element number is
+//       greater than the current element (i) to avoid double
+//       count. Zero element number indicates that it is outside
+//       the domain (boundary face).
 
-//   elements0 : do i = 1, nelms
+   //   elements0 : do i = 1, nelms
+   for (int i = 0; i < nelms; i++) {
 
-//    v1 = elm[i].vtx(1)
-//    v2 = elm[i].vtx(2)
-//    v3 = elm[i].vtx(3)
+      v1 = (*elm[i].vtx)(0);
+      v2 = (*elm[i].vtx)(1);
+      v3 = (*elm[i].vtx)(2);
 
 //    tri_quad0 : if (elm[i].nvtx==3) then
 
@@ -943,7 +944,7 @@ for ( int i = 0; i < nelms; ++i ) {
 
 //    endif tri_quad0
 
-//   end do elements0
+   }//   end do elements0
 
 // // Allocate the edge array.
 //   allocate(edge(nedges))
