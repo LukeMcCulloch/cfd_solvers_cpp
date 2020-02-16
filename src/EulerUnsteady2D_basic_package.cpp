@@ -251,6 +251,10 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::getline(infile, line);
    std::istringstream iss(line);
    iss >> nnodes >> ntria >> nquad;
+   cout <<  "File Found " <<
+            " nnodes =  " << nnodes << 
+            "   ntria = " <<  ntria <<  
+            "   nquad = " <<  nquad << endl;
    nelms = ntria + nquad;
 
    // //  Allocate node and element arrays.
@@ -277,7 +281,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       // node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
       // node[i].res   = new Array2D<real>(nq,1);
 
-      node[i].nelms = 0;
+      //node[i].nelms = 0;
       //std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
 
    }
@@ -393,12 +397,12 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       for (size_t i = 0; i < 2; i++) {
          std::cout <<  " boundary = " << i << 
                      "   bnodes = " <<  bound[i].nbnodes <<  
-                     "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
+                     "   bfaces = " <<  bound[i].nbnodes << std::endl;
       }
       for (size_t i = nbound-2; i < nbound; i++) {
          std::cout <<  " boundary = " << i << 
                      "   bnodes = " <<  bound[i].nbnodes <<  
-                     "   bfaces = " <<  bound[i].nbnodes-1 << std::endl;
+                     "   bfaces = " <<  bound[i].nbnodes << std::endl;
       }
    
 
@@ -540,10 +544,9 @@ cout << "construct grid data" << endl;
 //    nedges = 0
 
 // moved to read grid data 
-// for (size_t i = 0; i < nnodes; i++) {
-//    node[i].nelms = 0;
-// } 
-
+for (size_t i = 0; i < nnodes; i++) {
+   node[i].nelms = 0;
+} 
 nedges = 0;
 
 // //--------------------------------------------------------------------------------
@@ -580,7 +583,6 @@ nedges = 0;
 //   elements : do i = 1, nelms
 
 
-cout << "here1" << endl;
 for ( int j = 0; j < nelms; ++j ) {
    //cout << "here2" << endl;
 
