@@ -1160,49 +1160,50 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //       right half added to the node j+1.
 //
 
-// // Allocate and initialize the normal vector arrays
-//   do i = 1, nbound
+// Allocate and initialize the normal vector arrays
    for (size_t i = 0; i < nbound; i++) {
 
-//    allocate(bound[i].bnx(bound[i].nbnodes))
-//    allocate(bound[i].bny(bound[i].nbnodes))
-//    allocate(bound[i].bn( bound[i].nbnodes))
-
       bound[i].bnx = new Array2D<real>( bound[i].nbnodes, 1 );
+      bound[i].bny = new Array2D<real>( bound[i].nbnodes, 1 );
+      bound[i].bn  = new Array2D<real>( bound[i].nbnodes, 1 );
 
-//    do j = 1, bound[i].nbnodes
-//     bound[i].bnx(j) = zero
-//     bound[i].bny(j) = zero
-//     bound[i].bn( j) = zero
-//    end do
+      for (size_t j = 0; j < bound[i].nbnodes; j++) {
+         (*bound[i].bnx)(j) = zero;
+         (*bound[i].bny)(j) = zero;
+         (*bound[i].bn)( j) = zero;
+      }
 
-   }//   end do
+   }
 
-// // Normal vector at boundary nodes
-// // Note: Below it describes normals of linear approximation.
-// //       We will overwrite it by a quadratic approximation.
-// //
-// // Linear approximation:
-// //
-// // Step 1. Compute the outward normals
-//   do i = 1, nbound
-//    do j = 1, bound[i].nbnodes-1
+// Normal vector at boundary nodes
+// Note: Below it describes normals of linear approximation.
+//       We will overwrite it by a quadratic approximation.
+//
+// Linear approximation:
+//
+// Step 1. Compute the outward normals
+  for (size_t i = 0; i < nbound; i++) {
+      //do j = 1, bound[i].nbnodes-1
+      for (size_t j = 0; j < bound[i].nbnodes-1; j++) {
 
-//     x1 = node(bound[i].bnode(j  )).x
-//     y1 = node(bound[i].bnode(j  )).y
+         // quick for understanding:
+         // int num = (*bound[i].bnode)(j);
+         // x1 = node[num].x;
+         x1 = node[ (*bound[i].bnode)[j  ][0] ].x;
+         y1 = node[ (*bound[i].bnode)[j  ][0] ].y;
 
-//     x2 = node(bound[i].bnode(j+1)).x
-//     y2 = node(bound[i].bnode(j+1)).y
+         x2 = node[ (*bound[i].bnode)[j+1][0] ].x;
+         y2 = node[ (*bound[i].bnode)[j+1][0] ].y;
 
-// //   Normal vector pointing into the domain at this point.
-//     bound[i].bnx(j) = bound[i].bnx(j) + half*( -(y2-y1) )
-//     bound[i].bny(j) = bound[i].bny(j) + half*(   x2-x1  )
+      //   Normal vector pointing into the domain at this point.
+         (*bound[i].bnx)(j) = (*bound[i].bnx)(j) + half*( -(y2-y1) );
+         (*bound[i].bny)(j) = (*bound[i].bny)(j) + half*(   x2-x1  );
 
-//     bound[i].bnx(j+1) = bound[i].bnx(j+1) + half*( -(y2-y1) )
-//     bound[i].bny(j+1) = bound[i].bny(j+1) + half*(   x2-x1  )
+         (*bound[i].bnx)(j+1) = (*bound[i].bnx)(j+1) + half*( -(y2-y1) );
+         (*bound[i].bny)(j+1) = (*bound[i].bny)(j+1) + half*(   x2-x1  );
 
-//    end do
-//   end do
+      }
+   }
 
 // // Step 2. Compute the magnitude and turn (bnx,bny) into a unit vector
 //   do i = 1, nbound
