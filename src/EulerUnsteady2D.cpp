@@ -242,14 +242,15 @@ EulerSolver2D::MainData2D::MainData2D(std::string datafile_grid_in,
 
 
 EulerSolver2D::MainData2D::~MainData2D() {
-   delete[] node;
+   delete [] node;
+   delete [] elm;
+   delete [] bound;
 }
 
 EulerSolver2D::Solver::Solver(){}
 
 
 EulerSolver2D::Solver::~Solver(){
-    //delete[] cell;
     }
 
 

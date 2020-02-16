@@ -270,11 +270,19 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       std::istringstream iss(line);
       iss >> node[i].x >> node[i].y ;
       //std::cout << node[i].x << node[i].y << std::endl;
-      node[i].u     = new Array2D<real>(nq,1);
-      node[i].du    = new Array2D<real>(nq,1);
-      node[i].w     = new Array2D<real>(nq,1);
-      node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
-      node[i].res   = new Array2D<real>(nq,1);
+      this->node[i].u     = new Array2D<real>(nq,1);
+      this->node[i].du    = new Array2D<real>(nq,1);
+      this->node[i].w     = new Array2D<real>(nq,1);
+      this->node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
+      this->node[i].res   = new Array2D<real>(nq,1);
+
+      // seg fault
+      // Array2D<real> (*node[i].u)(nq,1);
+      // Array2D<real> (*node[i].du)(nq,1);
+      // Array2D<real> (*node[i].w)(nq,1);
+      // Array2D<real> (*node[i].gradw)(nq,1); //<- 2: x and y components.
+      // Array2D<real> (*node[i].res)(nq,1);
+
       node[i].nelms = 0;
       //std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
 
@@ -308,9 +316,9 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x, y, z;
          in >> x >> y >> z;       //now read the whitespace-separated floats
-         elm[i].vtx[0] = x;
-         elm[i].vtx[1] = y;
-         elm[i].vtx[2] = z;
+         (*elm[i].vtx)(0,0) = x;
+         (*elm[i].vtx)(1,0) = y;
+         (*elm[i].vtx)(2,0) = z;
       }
    }
    // // Quads: assumed that the vertices are ordered counterclockwise
@@ -334,10 +342,15 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x1,x2,x3,x4;
          in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated floats
-         elm[ntria+i].vtx[0] = x1;
-         elm[ntria+i].vtx[1] = x2;
-         elm[ntria+i].vtx[2] = x3;
-         elm[ntria+i].vtx[2] = x4;
+         // elm[ntria+i].vtx[0] = x1;
+         // elm[ntria+i].vtx[1] = x2;
+         // elm[ntria+i].vtx[2] = x3;
+         // elm[ntria+i].vtx[3] = x4;
+
+         (*elm[ntria+i].vtx)(0,0) = x1;
+         (*elm[ntria+i].vtx)(1,0) = x2;
+         (*elm[ntria+i].vtx)(2,0) = x3;
+         (*elm[ntria+i].vtx)(3,0) = x4;
       }
    }
 
