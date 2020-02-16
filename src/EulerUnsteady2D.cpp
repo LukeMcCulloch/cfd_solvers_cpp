@@ -212,7 +212,7 @@ EulerSolver2D::MainData2D::~MainData2D() {
    // seg faults..
    delete [] node; //ok
    delete [] elm; //ok
-   // delete [] edge;  //sf never allocated
+   delete [] edge;  //ok
    delete [] bound; //ok
    // delete [] face;  //sf never allocated
 

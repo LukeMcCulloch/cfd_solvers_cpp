@@ -949,9 +949,12 @@ for ( int i = 0; i < nelms; ++i ) {
 
 // // Allocate the edge array.
 //   allocate(edge(nedges))
-//   nedges = 0
-//   edge(:).e1 = 0
-//   edge(:).e2 = 0
+   edge = new edge_type[nedges];
+   nedges = 0;
+   for (int i = 0; i < nedges; i++) {
+      edge[i].e1 = 0;
+      edge[i].e2 = 0;
+   }
 
 // // Construct the edge data:
 // //  two end nodes (n1, n2), and left and right elements (e1, e2)
