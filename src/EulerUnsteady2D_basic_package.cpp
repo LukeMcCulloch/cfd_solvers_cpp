@@ -796,25 +796,26 @@ for ( int i = 0; i < nelms; ++i ) {
 // //          o
 // //
 
-// // Allocate the neighbor array
+// Allocate the neighbor array
 
-//   do i = 1, nelms
+   for (int i = 0; i < nelms; i++) {
+      
 
-// //  3 neighbors for triangle
-//    if (elm(i)%nvtx==3) then
+//  3 neighbors for triangle
+      if (elm[i].nvtx==3) {
 
-//     elm(i)%nnghbrs = 3
-//     allocate(elm(i)%nghbr(3))
+         elm[i].nnghbrs = 3;
+         elm[i].nghbr = new Array2D<int>(3,1);
+      }
+//  4 neighbors for quadrilateral
+      else if (elm[i].nvtx==4) {
 
-// //  4 neighbors for quadrilateral
-//    elseif (elm(i)%nvtx==4) then
+         elm[i].nnghbrs = 4;
+         elm[i].nghbr = new Array2D<int>(4,1);
 
-//     elm(i)%nnghbrs = 4
-//     allocate(elm(i)%nghbr(4))
+      }
 
-//    endif
-
-//   end do
+   }
 
 // // Begin constructing the element-neighbor data
 
