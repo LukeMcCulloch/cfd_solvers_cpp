@@ -841,23 +841,21 @@ for ( int i = 0; i < nelms; ++i ) {
       //elms_around_vR : do j = 1, node(vR).nelms;
          for (int j = 0; j < node[vR].nelms; j++) {
             jelm = (*node[vR].elm)(j); 
-         }}}
-//          //edge_matching : do ii = 1, elm(jelm).nvtx;
-//          // I just remembered that 
-//          //  the "2D" array works just as well as 1D
-//          for (int ii = 0; ii < elm[jelm].nvtx; ii++) {
-//                          v1 = (*elm[jelm].vtx)(ii);
-//             if (ii  > 1) { v2 = (*elm[jelm].vtx)(ii-1); }
-//             if (ii == 1) { v2 = (*elm[jelm].vtx)(elm[jelm].nvtx); }
+         //edge_matching : do ii = 1, elm(jelm).nvtx;
+         // I just remembered that 
+         //  the "2D" array works just as well as 1D
+         for (int ii = 0; ii < elm[jelm].nvtx; ii++) {
+                           v1 = (*elm[jelm].vtx)(ii);
+            if (ii  > 1) { v2 = (*elm[jelm].vtx)(ii-1); }
+            if (ii == 1) { v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); } //TLM fix: array bounds overrun fixed here
 
-//             if (v1==vR and v2==vL) {
-//                found = true;
-//                im = ii+1;
-//                if (im > elm[jelm].nvtx) { im = im - elm[jelm].nvtx; }
-//                break; //exit edge_matching
-//             } //endif
-//          } //end do edge_matching
-
+            if (v1==vR and v2==vL) {
+               found = true;
+               im = ii+1;
+               if (im > elm[jelm].nvtx) { im = im - elm[jelm].nvtx; }
+               break; //exit edge_matching
+            } //endif
+         } //end do edge_matching
 //      //if (found) exit elms_around_vR
 //      if (found) break;
 
