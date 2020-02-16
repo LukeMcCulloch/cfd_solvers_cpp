@@ -65,6 +65,11 @@
 #include <sstream>
 #include <string>
 
+//======================================
+// mesh-y math-y functions
+#include "../include/MathGeometry.h" 
+
+
 using std::cout;
 using std::endl;
 
@@ -600,30 +605,31 @@ for ( int i = 0; i < nelms; ++i ) {
 // // Distribute the element index to nodes.
 
    /*
-   * DESIGN CHOICE HERE -- use std<vector?>
+   * DESIGN CHOICE HERE -- use std<vector?> or similar?
    * I don't think we need a true dynamic (i.e. resizable) array
    */
    node[v1].nelms = node[v1].nelms + 1;
    node[v1].elm = new Array2D<int>(node[v1].nelms, 0);
    node[v1].elm[node[v1].nelms] = i;
 
-//    node(v2)%nelms = node(v2)%nelms + 1
-//    call my_alloc_int_ptr(node(v2)%elm, node(v2)%nelms)
-//    node(v2)%elm(node(v2)%nelms) = i
+   node[v2].nelms = node[v2].nelms + 1;
+   node[v2].elm = new Array2D<int>(node[v2].nelms, 0);
+   node[v2].elm[node[v2].nelms] = i;
 
-//    node(v3)%nelms = node(v3)%nelms + 1
-//    call my_alloc_int_ptr(node(v3)%elm, node(v3)%nelms)
-//    node(v3)%elm(node(v3)%nelms) = i
+   node[v3].nelms = node[v3].nelms + 1;
+   node[v3].elm = new Array2D<int>(node[v3].nelms, 0);
+   node[v3].elm[node[v3].nelms] = i;
 
 // // Compute the cell center and cell volume.
-//    tri_or_quad : if (elm(i)%nvtx==3) then
+   //tri_or_quad : if (elm(i)%nvtx==3) then
+   if (elm[i].nvtx==3) {
 
-// //   Triangle centroid and volume
-//     elm(i)%x   = third*(x1+x2+x3)
-//     elm(i)%y   = third*(y1+y2+y3)
-//     elm(i)%vol = tri_area(x1,x2,x3,y1,y2,y3)
-
-//    elseif (elm(i)%nvtx==4) then
+//   Triangle centroid and volume
+    elm[i].x   = third*(x1+x2+x3);
+    elm[i].y   = third*(y1+y2+y3);
+    elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
+   }
+   else if (elm[i].nvtx==4) {
 
 // //   OK, this is a quad. Get the 4th vertex.
 //     v4 = elm(i)%vtx(4)
@@ -687,7 +693,7 @@ for ( int i = 0; i < nelms; ++i ) {
 //    call my_alloc_int_ptr(node(v4)%elm, node(v4)%nelms)
 //    node(v4)%elm(node(v4)%nelms) = i
 
-//    endif tri_or_quad
+   }//    endif tri_or_quad
 
 }//   end do elements
 
@@ -1724,3 +1730,4 @@ for ( int i = 0; i < nelms; ++i ) {
 //  end subroutine construct_grid_data
 
 //********************************************************************************
+

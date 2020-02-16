@@ -42,7 +42,7 @@ EXECUTABLE = solver
 
 
 
-OBJECTS = EulerShockTube1D.o gridGen2D.o EulerUnsteady2D_basic_package.o EulerUnsteady2D.o driver.o
+OBJECTS = MathGeometry.o EulerShockTube1D.o gridGen2D.o EulerUnsteady2D_basic_package.o EulerUnsteady2D.o driver.o
 
 
 
@@ -50,11 +50,12 @@ OBJECTS = EulerShockTube1D.o gridGen2D.o EulerUnsteady2D_basic_package.o EulerUn
  
 
 $(BUILD_DIR)/solver: 	$(SRC_DIRS)/EulerShockTube1D.o \
+						$(SRC_DIRS)/MathGeometry.o \
 						$(SRC_DIRS)/gridGen2D.o \
 						$(SRC_DIRS)/EulerUnsteady2D_basic_package.o \
 						$(SRC_DIRS)/EulerUnsteady2D.o \
 						$(SRC_DIRS)/driver.o 
-	$(CXX) 	 $(SRC_DIRS)/gridGen2D.cpp   $(SRC_DIRS)/EulerShockTube1D.cpp  $(SRC_DIRS)/EulerUnsteady2D_basic_package.cpp $(SRC_DIRS)/EulerUnsteady2D.cpp  $(SRC_DIRS)/driver.cpp    -o $(BUILD_DIR)/solver 
+	$(CXX) 	 $(SRC_DIRS)/gridGen2D.cpp   $(SRC_DIRS)/EulerShockTube1D.cpp  $(SRC_DIRS)/MathGeometry.cpp $(SRC_DIRS)/EulerUnsteady2D_basic_package.cpp $(SRC_DIRS)/EulerUnsteady2D.cpp  $(SRC_DIRS)/driver.cpp    -o $(BUILD_DIR)/solver 
 
 
 
