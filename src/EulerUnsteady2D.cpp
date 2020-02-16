@@ -199,42 +199,42 @@ EulerSolver2D::MainData2D::MainData2D(std::string datafile_grid_in,
                                                std::string datafile_bcmap_in) {
 
 
-   M_inf             = 0.0;                  // Freestream Mach number to be set in the function
-                                             //    -> "initial_solution_shock_diffraction"
-                                             //    (Specify M_inf here for other problems.)
-   gamma             = 1.4;                  // Ratio of specific heats
-   CFL               = 0.95;                 // CFL number
-   t_final           = 0.18;                 // Final time to stop the calculation.
-   time_step_max     = 5000;                 // Max time steps (just a big enough number)
-   inviscid_flux     = "rhll";               // = Rotated-RHLL      , "roe"  = Roe flux
-   limiter_type      = "vanalbada";          // = Van Albada limiter, "none" = No limiter
-   nq        = 4;                    // The number of equtaions/variables in the target equtaion.
-   gradient_type     = "linear";             // or "quadratic2 for a quadratic LSQ.
-   gradient_weight   = "none";               // or "inverse_distance"
-   gradient_weight_p =  EulerSolver2D::one;  // or any other real value
+   // M_inf             = 0.0;                  // Freestream Mach number to be set in the function
+   //                                           //    -> "initial_solution_shock_diffraction"
+   //                                           //    (Specify M_inf here for other problems.)
+   // gamma             = 1.4;                  // Ratio of specific heats
+   // CFL               = 0.95;                 // CFL number
+   // t_final           = 0.18;                 // Final time to stop the calculation.
+   // time_step_max     = 5000;                 // Max time steps (just a big enough number)
+   // inviscid_flux     = "rhll";               // = Rotated-RHLL      , "roe"  = Roe flux
+   // limiter_type      = "vanalbada";          // = Van Albada limiter, "none" = No limiter
+   // nq        = 4;                    // The number of equtaions/variables in the target equtaion.
+   // gradient_type     = "linear";             // or "quadratic2 for a quadratic LSQ.
+   // gradient_weight   = "none";               // or "inverse_distance"
+   // gradient_weight_p =  EulerSolver2D::one;  // or any other real value
 
 
    // (1) Read grid files
-   read_grid(datafile_grid_in, datafile_bcmap_in);
+   //read_grid(datafile_grid_in, datafile_bcmap_in);
 
-   std::cout << "Allocate arrays" << std::endl;
-   std::cout << "there are " << nnodes << " nodes " << std::endl;
+   // std::cout << "Allocate arrays" << std::endl;
+   // std::cout << "there are " << nnodes << " nodes " << std::endl;
 
-   for (size_t i = 0; i < nnodes; i++) {
-      //std::cout << "i = " << i << " of " << nnodes << std::endl;
-      //std::cout << node[i].x << std::endl;
+   // for (size_t i = 0; i < nnodes; i++) {
+   //    //std::cout << "i = " << i << " of " << nnodes << std::endl;
+   //    //std::cout << node[i].x << std::endl;
 
-      node[i].u     = new Array2D<real>(nq,1);
-      node[i].du    = new Array2D<real>(nq,1);
-      node[i].w     = new Array2D<real>(nq,1);
-      node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
-      node[i].res   = new Array2D<real>(nq,1);
-      //SE2Ddata.node[i].cell
-   }
+   //    node[i].u     = new Array2D<real>(nq,1);
+   //    node[i].du    = new Array2D<real>(nq,1);
+   //    node[i].w     = new Array2D<real>(nq,1);
+   //    node[i].gradw = new Array2D<real>(nq,2); //<- 2: x and y components.
+   //    node[i].res   = new Array2D<real>(nq,1);
+   //    //SE2Ddata.node[i].cell
+   // }
 
-   std::cout << "E2Ddata.nq, = " << nq << std::endl;
-// (2) Construct grid data
-   construct_grid_data();
+//    std::cout << "E2Ddata.nq, = " << nq << std::endl;
+// // (2) Construct grid data
+//    construct_grid_data();
 
    cout << "end of grid constructor" << endl;
 }
@@ -309,44 +309,43 @@ void program_2D_euler_rk2(){
    EulerSolver2D::MainData2D E2Ddata(datafile_grid_in, datafile_bcmap_in);
    //2Ddata = new EulerSolver2D();
 
-   //              E2Ddata.M_inf  = 0.0;         // Freestream Mach number to be set in the function
-   //                                  //    -> "initial_solution_shock_diffraction"
-   //                                  //    (Specify M_inf here for other problems.)
-   //              E2Ddata.gamma = 1.4;         // Ratio of specific heats
-   //                E2Ddata.CFL = 0.95;        // CFL number
-   //            E2Ddata.t_final = 0.18;        // Final time to stop the calculation.
-   //      E2Ddata.time_step_max = 5000;        // Max time steps (just a big enough number)
-   //      E2Ddata.inviscid_flux = "rhll";      // = Rotated-RHLL      , "roe"  = Roe flux
-   //       E2Ddata.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
-   //                 E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
-   //  E2Ddata.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
-   //  E2Ddata.gradient_weight   = "none";      // or "inverse_distance"
-   //  E2Ddata.gradient_weight_p =  EulerSolver2D::one;        // or any other real value
+                E2Ddata.M_inf  = 0.0;        // Freestream Mach number to be set in the function
+                                             //    -> "initial_solution_shock_diffraction"
+                                             //    (Specify M_inf here for other problems.)
+                E2Ddata.gamma = 1.4;         // Ratio of specific heats
+                  E2Ddata.CFL = 0.95;        // CFL number
+              E2Ddata.t_final = 0.18;        // Final time to stop the calculation.
+        E2Ddata.time_step_max = 5000;        // Max time steps (just a big enough number)
+        E2Ddata.inviscid_flux = "rhll";      // = Rotated-RHLL      , "roe"  = Roe flux
+         E2Ddata.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
+                   E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
+    E2Ddata.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
+    E2Ddata.gradient_weight   = "none";      // or "inverse_distance"
+    E2Ddata.gradient_weight_p =  EulerSolver2D::one;  // or any other real value
 //--------------------------------------------------------------------------------
 // Solve the Euler equations and write the output datafile.
 //
 // // (1) Read grid files
-//    E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
+   E2Ddata.read_grid(datafile_grid_in, datafile_bcmap_in);
 
-//    std::cout << "Allocate arrays" << std::endl;
-//    std::cout << "there are " << E2Ddata.nnodes << " nodes " << std::endl;
+   std::cout << "Allocate arrays" << std::endl;
+   std::cout << "there are " << E2Ddata.nnodes << " nodes " << std::endl;
 
-//    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-//       std::cout << "i = " << i << " of " << E2Ddata.nnodes << std::endl;
-//       //std::cout << E2Ddata.node[i].x << std::endl;
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+      //std::cout << "i = " << i << " of " << E2Ddata.nnodes << std::endl;
+      //std::cout << E2Ddata.node[i].x << std::endl;
 
-//     // declare within the class
-//       // E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
-//       // E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
-//       // E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
-//       // E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
-//       // E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
-//       //SE2Ddata.node[i].cell
-//    }
+    // declare within the class
+      E2Ddata.node[i].u     = new Array2D<real>(E2Ddata.nq,1);
+      E2Ddata.node[i].du    = new Array2D<real>(E2Ddata.nq,1);
+      E2Ddata.node[i].w     = new Array2D<real>(E2Ddata.nq,1);
+      E2Ddata.node[i].gradw = new Array2D<real>(E2Ddata.nq,2); //<- 2: x and y components.
+      E2Ddata.node[i].res   = new Array2D<real>(E2Ddata.nq,1);
+   }
 
-//    std::cout << "E2Ddata.nq, = " << E2Ddata.nq << std::endl;
-// // (2) Construct grid data
-//    E2Ddata.construct_grid_data();
+   std::cout << "E2Ddata.nq, = " << E2Ddata.nq << std::endl;
+// (2) Construct grid data
+   E2Ddata.construct_grid_data();
 
 // (3) Check the grid data (It is always good to check them before use//)
 //       check_grid_data();
