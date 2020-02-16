@@ -831,9 +831,9 @@ for ( int i = 0; i < nelms; ++i ) {
       //            /        |
       //           o---------o
       //
-         //if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k+1); //TLM warning:  apparent step out of bounds 
-         if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k); //TLM dumb fix
-         if (k == elm[i].nvtx) vL = (*elm[i].vtx)(0); 
+         //TLM warning:  apparent step out of bounds 
+         if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k); //k+1 - 1
+         if (k == elm[i].nvtx) vL = (*elm[i].vtx)(0); //1-1
          vR = (*elm[i].vtx)(k);
       //   Loop over the surrounding elements of the node vR,
       //   and find the element neighbor from them.
@@ -861,9 +861,9 @@ for ( int i = 0; i < nelms; ++i ) {
 
       } //end do elms_around_vR
 
-      //in = k + 2; // why is this k+2 when we already loop all the way to nvtx?
-      in = k + 0; 
-      if (in > elm[i].nvtx) { in = in - elm[i].nvtx; }
+      // why is this k+2 when we already loop all the way to nvtx?
+      in = k + 2; 
+      if (in > elm[i].nvtx-1) { in = in - elm[i].nvtx; } // simple fix here: in > elm[i].nvtx had to be ammended
 
       if (found) {
          (*elm[   i].nghbr)(in) = jelm;
