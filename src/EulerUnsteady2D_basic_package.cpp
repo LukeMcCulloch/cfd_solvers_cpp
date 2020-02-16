@@ -909,40 +909,41 @@ for ( int i = 0; i < nelms; ++i ) {
       v3 = (*elm[i].vtx)(2);
 
 //    tri_quad0 : if (elm[i].nvtx==3) then
+      if (elm[i].nvtx==3) {
 
-//     if ( elm[i].nghbr(3) > i  .or. elm[i].nghbr(3)==0 ) then
-//      nedges = nedges + 1
-//     endif
+         if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==0 ) {
+            nedges = nedges + 1;
+         }
 
-//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1)==0 ) then
-//      nedges = nedges + 1
-//     endif
+         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
+            nedges = nedges + 1;
+         }
 
-//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2)==0 ) then
-//      nedges = nedges + 1
-//     endif
+         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
+            nedges = nedges + 1;
+         }
+      }
+      else if (elm[i].nvtx==4) {
 
-//    elseif (elm[i].nvtx==4) then
+      v4 = (*elm[i].vtx)(3);
 
-//     v4 = elm[i].vtx(4)
+      if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) ==0 ) {
+         nedges = nedges + 1;
+      }
 
-//     if ( elm[i].nghbr(3) > i .or. elm[i].nghbr(3) ==0 ) then
-//      nedges = nedges + 1
-//     endif
+      if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
+         nedges = nedges + 1;
+      }
 
-//     if ( elm[i].nghbr(4) > i .or. elm[i].nghbr(4) ==0 ) then
-//      nedges = nedges + 1
-//     endif
+      if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) ==0 ) {
+         nedges = nedges + 1;
+      }
 
-//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1) ==0 ) then
-//      nedges = nedges + 1
-//     endif
+      if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
+       nedges = nedges + 1;
+      }
 
-//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2) ==0 ) then
-//      nedges = nedges + 1
-//     endif
-
-//    endif tri_quad0
+      }//    endif tri_quad0
 
    }//   end do elements0
 
@@ -962,68 +963,68 @@ for ( int i = 0; i < nelms; ++i ) {
 //    v3 = elm[i].vtx(3)
 
 // // Triangular element
-//    tri_quad2 : if (elm[i].nvtx==3) then
+//    tri_quad2 : if (elm[i].nvtx==3) {
 
-//     if ( elm[i].nghbr(3) > i  .or. elm[i].nghbr(3)==0 ) then
+//     if ( (*elm[i].nghbr)(3) > i  or (*elm[i].nghbr)(3)==0 ) {
 //      nedges = nedges + 1
 //      edge(nedges).n1 = v1
 //      edge(nedges).n2 = v2
 //      edge(nedges).e1 = i
-//      edge(nedges).e2 = elm[i].nghbr(3)
-//     endif
+//      edge(nedges).e2 = (*elm[i].nghbr)(3)
+//     }
 
-//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1)==0 ) then
+//     if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
 //      nedges = nedges + 1
 //      edge(nedges).n1 = v2
 //      edge(nedges).n2 = v3
 //      edge(nedges).e1 = i
-//      edge(nedges).e2 = elm[i].nghbr(1)
-//     endif
+//      edge(nedges).e2 = (*elm[i].nghbr)(1)
+//     }
 
-//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2)==0 ) then
+//     if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2)==0 ) {
 //      nedges = nedges + 1
 //      edge(nedges).n1 = v3
 //      edge(nedges).n2 = v1
 //      edge(nedges).e1 = i
-//      edge(nedges).e2 = elm[i].nghbr(2)
-//     endif
+//      edge(nedges).e2 = (*elm[i].nghbr)(2)
+//     }
 
 // //  Quadrilateral element
-//    elseif (elm[i].nvtx==4) then
+//    elseif (elm[i].nvtx==4) {
 
 //     v4 = elm[i].vtx(4)
 
-//     if ( elm[i].nghbr(3) > i .or. elm[i].nghbr(3) ==0 ) then
+//     if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
 //      nedges = nedges + 1
 //      edge(nedges).n1 = v1
 //      edge(nedges).n2 = v2
 //      edge(nedges).e1 = i
-//      edge(nedges).e2 = elm[i].nghbr(3)
-//     endif
+//      edge(nedges).e2 = (*elm[i].nghbr)(3)
+//     }
 
-//     if ( elm[i].nghbr(4) > i .or. elm[i].nghbr(4) ==0 ) then
+//     if ( (*elm[i].nghbr)(4) > i or (*elm[i].nghbr)(4) ==0 ) {
 //      nedges = nedges + 1
 //      edge(nedges).n1 = v2
 //      edge(nedges).n2 = v3
 //      edge(nedges).e1 = i
-//      edge(nedges).e2 = elm[i].nghbr(4)
-//     endif
+//      edge(nedges).e2 = (*elm[i].nghbr)(4)
+//     }
 
-//     if ( elm[i].nghbr(1) > i .or. elm[i].nghbr(1) ==0 ) then
+//     if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
 //      nedges = nedges + 1
 //      edge(nedges).n1 = v3
 //      edge(nedges).n2 = v4
 //      edge(nedges).e1 = i
-//      edge(nedges).e2 = elm[i].nghbr(1)
-//     endif
+//      edge(nedges).e2 = (*elm[i].nghbr)(1)
+//     }
 
-//     if ( elm[i].nghbr(2) > i .or. elm[i].nghbr(2) ==0 ) then
+//     if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) ==0 ) {
 //      nedges = nedges + 1
 //      edge(nedges).n1 = v4
 //      edge(nedges).n2 = v1
 //      edge(nedges).e1 = i
-//      edge(nedges).e2 = elm[i].nghbr(2)
-//     endif
+//      edge(nedges).e2 = (*elm[i].nghbr)(2)
+//     }
 
 //    endif tri_quad2
 
@@ -1060,24 +1061,24 @@ for ( int i = 0; i < nelms; ++i ) {
 //    edge[i].dav = zero
 
 // // Contribution from the left element
-//   if (e1 > 0) then
+//   if (e1 > 0) {
 //    xc = elm(e1).x
 //    yc = elm(e1).y
 //    edge[i].dav(1) = -(ym-yc)
 //    edge[i].dav(2) =   xm-xc
-//   endif
+//   }
 
 // // Contribution from the right element
-//   if (e2 > 0) then
+//   if (e2 > 0) {
 //    xc = elm(e2).x
 //    yc = elm(e2).y
 //    edge[i].dav(1) = edge[i].dav(1) -(yc-ym)
 //    edge[i].dav(2) = edge[i].dav(2) + xc-xm
-//   endif
+//   }
 
-//   if (e1 < 0 .and. e2 < 0) then
+//   if (e1 < 0 .and. e2 < 0) {
 //    write(*,*) "////////// e1 and e2 are both negative... No way..."
-//   endif
+//   }
 
 // // Magnitude and unit vector
 //    edge[i].da  = sqrt( edge[i].dav(1)**2 + edge[i].dav(2)**2 )
@@ -1212,11 +1213,11 @@ for ( int i = 0; i < nelms; ++i ) {
 //   boundary_type0 : do i = 1, nbound
 //    boundary_nodes0 : do j = 1, bound[i].nbnodes
 
-//      if (j==1) then
+//      if (j==1) {
 //       v1 = bound[i].bnode(j  )
 //       v2 = bound[i].bnode(j+1)
 //       v3 = bound[i].bnode(j+2)
-//      elseif (j==bound[i].nbnodes) then
+//      elseif (j==bound[i].nbnodes) {
 //       v1 = bound[i].bnode(j-2)
 //       v2 = bound[i].bnode(j-1)
 //       v3 = bound[i].bnode(j  )
@@ -1224,7 +1225,7 @@ for ( int i = 0; i < nelms; ++i ) {
 //       v1 = bound[i].bnode(j-1)
 //       v2 = bound[i].bnode(j)
 //       v3 = bound[i].bnode(j+1)
-//      endif
+//      }
 
 //      x1 = node(v1).x
 //      x2 = node(v2).x
@@ -1239,12 +1240,12 @@ for ( int i = 0; i < nelms; ++i ) {
 
 // //    Skip the last one if the boundary segment is a closed boundary 
 // //    in which case the last node is the same as the first one.
-//      if (j==bound[i].nbnodes .and. bound[i].bnode(j)==bound[i].bnode(1) ) then
+//      if (j==bound[i].nbnodes .and. bound[i].bnode(j)==bound[i].bnode(1) ) {
 //       bound[i].bn(j)  = bound[i].bn(1)
 //       bound[i].bnx(j) = bound[i].bnx(1)
 //       bound[i].bny(j) = bound[i].bny(1)
 //       cycle
-//      endif
+//      }
 
 //      dsL = sqrt( (x2-x1)**2 + (y2-y1)**2 )
 //      dsR = sqrt( (x3-x2)**2 + (y3-y2)**2 )
@@ -1300,17 +1301,17 @@ for ( int i = 0; i < nelms; ++i ) {
 
 //    do k = 1, node(n2).nnghbrs
 
-//     if ( n1 == node(n2).nghbr(k) ) then
+//     if ( n1 == node(n2).nghbr(k) ) {
 //      edge[i].kth_nghbr_of_2 = k
-//     endif
+//     }
 
 //    end do
 
 //    do k = 1, node(n1).nnghbrs
 
-//     if ( n2 == node(n1).nghbr(k) ) then
+//     if ( n2 == node(n1).nghbr(k) ) {
 //      edge[i].kth_nghbr_of_1 = k
-//     endif
+//     }
 
 //    end do
 
@@ -1392,15 +1393,15 @@ for ( int i = 0; i < nelms; ++i ) {
 //     n2 = bound[i].bnode(j+1)  //Right node
 
 //     do k = 1, node(n2).nnghbrs
-//      if ( n1 == node(n2).nghbr(k) ) then
+//      if ( n1 == node(n2).nghbr(k) ) {
 //       bound[i].kth_nghbr_of_2(j) = k
-//      endif
+//      }
 //     end do
 
 //     do k = 1, node(n1).nnghbrs
-//      if ( n2 == node(n1).nghbr(k) ) then
+//      if ( n2 == node(n1).nghbr(k) ) {
 //       bound[i].kth_nghbr_of_1(j) = k
-//      endif
+//      }
 //     end do
 
 //    end do
@@ -1442,20 +1443,20 @@ for ( int i = 0; i < nelms; ++i ) {
 //       if (im > elm(ielm).nvtx) im = im - elm(ielm).nvtx //return to 1
 //       vt1 = elm(ielm).vtx(in)
 //       vt2 = elm(ielm).vtx(im)
-//        if (vt1 == v1 .and. vt2 == v2) then
+//        if (vt1 == v1 .and. vt2 == v2) {
 //         found = .true.
 //         exit
-//        endif
+//        }
 //      end do
 //      if (found) exit
 //     end do
 
-//     if (found) then
+//     if (found) {
 //      bound[i].belm(j) = ielm
 //     else
 //      write(*,*) " Boundary-adjacent element not found. Error..."
 //      stop
-//     endif
+//     }
 
 //    end do
 //   end do
@@ -1481,9 +1482,9 @@ for ( int i = 0; i < nelms; ++i ) {
 //   max_nghbr = node(1).nnghbrs
 //        imin = 1
 //        imax = 1
-//    if (node(1).nnghbrs==2) then
+//    if (node(1).nnghbrs==2) {
 //     write(*,*) "--- 2 neighbors for the node = ", 1
-//    endif
+//    }
 
 //   do i = 2, nnodes
 //    ave_nghbr = ave_nghbr + node[i].nnghbrs
@@ -1491,9 +1492,9 @@ for ( int i = 0; i < nelms; ++i ) {
 //    if (node[i].nnghbrs > max_nghbr) imax = i
 //    min_nghbr = min(min_nghbr, node[i].nnghbrs)
 //    max_nghbr = max(max_nghbr, node[i].nnghbrs)
-//    if (node[i].nnghbrs==2) then
+//    if (node[i].nnghbrs==2) {
 //     write(*,*) "--- 2 neighbors for the node = ", i
-//    endif
+//    }
 //   end do
 
 //   write(*,*) "      ave_nghbr = ", ave_nghbr/nnodes
@@ -1517,18 +1518,18 @@ for ( int i = 0; i < nelms; ++i ) {
 //    e2 = edge[i].e2
 
 // // Left element
-//   if (e1 > 0) then
+//   if (e1 > 0) {
 //    do k = 1, elm(e1).nnghbrs
 //     if (elm(e1).nghbr(k)==e2) elm(e1).edge(k) = i
 //    end do
-//   endif
+//   }
 
 // // Right element
-//   if (e2 > 0) then
+//   if (e2 > 0) {
 //    do k = 1, elm(e2).nnghbrs
 //     if (elm(e2).nghbr(k)==e1) elm(e2).edge(k) = i
 //    end do
-//   endif
+//   }
 
 //   end do edges3
 
@@ -1558,9 +1559,9 @@ for ( int i = 0; i < nelms; ++i ) {
 //   elements4 : do i = 1, nelms
 //    do k = 1, elm(i).nnghbrs
 //    jelm = elm(i).nghbr(k)
-//     if (jelm > i) then
+//     if (jelm > i) {
 //      nfaces = nfaces + 1
-//     endif
+//     }
 //    end do
 //   end do elements4
 
@@ -1572,7 +1573,7 @@ for ( int i = 0; i < nelms; ++i ) {
 //    do k = 1, elm(i).nnghbrs
 //    jelm = elm(i).nghbr(k)
 
-//     if (jelm > i) then
+//     if (jelm > i) {
 
 //      nfaces = nfaces + 1
 
@@ -1583,17 +1584,17 @@ for ( int i = 0; i < nelms; ++i ) {
 //      v1 = edge(iedge).n1
 //      v2 = edge(iedge).n2
 
-//      if (edge(iedge).e1 == jelm) then
+//      if (edge(iedge).e1 == jelm) {
 //       face(nfaces).n1 = v1
 //       face(nfaces).n2 = v2
 //      else
 //       face(nfaces).n1 = v2
 //       face(nfaces).n2 = v1
-//      endif
+//      }
    
-//     elseif (jelm == 0) then
+//     elseif (jelm == 0) {
 // //    Skip boundary faces.
-//     endif
+//     }
 
 //    end do
 //   end do elements5
@@ -1658,11 +1659,11 @@ for ( int i = 0; i < nelms; ++i ) {
 
 // // (1)Add face-neighbors
 //    do k = 1, elm(i).nnghbrs
-//     if ( elm(i).nghbr(k) > 0 ) then
+//     if ( elm(i).nghbr(k) > 0 ) {
 //      elm(i).nvnghbrs = elm(i).nvnghbrs + 1
 //      call my_alloc_int_ptr(elm(i).vnghbr, elm(i).nvnghbrs)
 //      elm(i).vnghbr(elm(i).nvnghbrs) = elm(i).nghbr(k)
-//     endif
+//     }
 //    end do
 
 // // (2)Add vertex-neighbors
@@ -1676,18 +1677,18 @@ for ( int i = 0; i < nelms; ++i ) {
 // //    Check if the element is already added.
 //        found = .false.
 //      do ii = 1, elm(i).nvnghbrs
-//       if ( e1 == elm(i).vnghbr(ii) ) then
+//       if ( e1 == elm(i).vnghbr(ii) ) {
 //        found = .true.
 //        exit
-//       endif
+//       }
 //      end do
 
 // //    Add the element, e1, if not added yet.
-//      if (.not.found) then
+//      if (.not.found) {
 //       elm(i).nvnghbrs = elm(i).nvnghbrs + 1
 //       call my_alloc_int_ptr(elm(i).vnghbr, elm(i).nvnghbrs)
 //       elm(i).vnghbr(elm(i).nvnghbrs) = e1
-//      endif
+//      }
 //     end do velms
 
 //    end do
@@ -1697,10 +1698,10 @@ for ( int i = 0; i < nelms; ++i ) {
 //    if (elm(i).nvnghbrs > max_nghbr) imax = i
 //    min_nghbr = min(min_nghbr, elm(i).nvnghbrs)
 //    max_nghbr = max(max_nghbr, elm(i).nvnghbrs)
-//    if (elm(i).nvnghbrs < 3) then
+//    if (elm(i).nvnghbrs < 3) {
 //     write(*,*) "--- Not enough neighbors: elm = ", i, &
 //                "elm(i).nvnghbrs=",elm(i).nvnghbrs
-//    endif
+//    }
 
 //   end do elements7
 
@@ -1715,11 +1716,11 @@ for ( int i = 0; i < nelms; ++i ) {
 //   end do
 
 //   bc_loop : do i = 1, nbound
-//    if (trim(bound[i].bc_type) == "dirichlet") then
+//    if (trim(bound[i].bc_type) == "dirichlet") {
 //     do j = 1, bound[i].nbfaces
 //      elm( bound[i].belm(j) ).bmark = 1
 //     end do
-//    endif
+//    }
 //   end do bc_loop
 
 // //--------------------------------------------------------------------------------
