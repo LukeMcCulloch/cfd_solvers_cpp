@@ -323,9 +323,6 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          (*elm[i].vtx)(0) = x;
          (*elm[i].vtx)(1) = y;
          (*elm[i].vtx)(2) = z;
-         //if (i<20) cout << x << " " << y << " " << z << endl;
-         if (i<20) cout << (*elm[i].vtx)(0) << " " << (*elm[i].vtx)(1) << " " << (*elm[i].vtx)(2) << endl;
-   
       }
    }
    // // Quads: assumed that the vertices are ordered counterclockwise
@@ -822,7 +819,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       //            /        |
       //           o---------o
       //
-         //TLM warning:  apparent step out of bounds 
+         //TLM warning:  fixed step out of bounds 
          if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k); //k+1 - 1
          if (k == elm[i].nvtx) vL = (*elm[i].vtx)(0); //1-1
          vR = (*elm[i].vtx)(k);
@@ -940,11 +937,11 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
 // Allocate the edge array.
    edge = new edge_type[nedges];
-   nedges = 0;
    for (size_t i = 0; i < nedges; i++) {
       edge[i].e1 = 0;
       edge[i].e2 = 0;
    }
+   nedges = -1; //TLM fence post fix!
 
 // Construct the edge data:
 //  two end nodes (n1, n2), and left and right elements (e1, e2)
@@ -957,10 +954,6 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       v2 = (*elm[i].vtx)(1);
       v3 = (*elm[i].vtx)(2);
 
-
-      //if (i<20) cout << (*elm[i].vtx)(0) << " " << (*elm[i].vtx)(1) << " " << (*elm[i].vtx)(2) << endl;
-   
-      //if (i<20) cout << v1 << " " << v2<< " " << v3 << endl;
    
    // Triangular element
       //tri_quad2 : 
@@ -968,15 +961,12 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
          if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==0 ) {
 
-            //cout << "\n i = " << i << endl;
-            //if (i<20) cout << v1 << " " << v2<< " " << v3 << endl;
             nedges = nedges + 1;
             edge[nedges].n1 = v1;
             edge[nedges].n2 = v2;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(2);
-            //cout << "at fail " << v1 << " " << v2<< " " << v3 << endl;
-            //assert(v1 /= v2), "Fail" //TLM found issue here
+            // assert(v1 != v2 && "v1 should not be equal to v2 -1");
          }
 
          if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
@@ -985,6 +975,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             edge[nedges].n2 = v3;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(0);
+            // assert(v1 != v2 && "v1 should not be equal to v2 -2" );
          }
 
          if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
@@ -993,6 +984,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             edge[nedges].n2 = v1;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(1);
+            // assert(v1 != v2 && "v1 should not be equal to v2 -3");
          }
       }
    //  Quadrilateral element
@@ -1006,6 +998,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             edge[nedges].n2 = v2;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(2);
+            // assert(v1 != v2 && "v1 should not be equal to v2 -q1");
          }
 
          if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
@@ -1014,6 +1007,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             edge[nedges].n2 = v3;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(3);
+            // assert(v1 != v2 && "v1 should not be equal to v2 -q2");
          }
 
          if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) ==0 ) {
@@ -1022,6 +1016,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             edge[nedges].n2 = v4;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(0);
+            // assert(v1 != v2 && "v1 should not be equal to v2 -q3");
          }
 
          if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
@@ -1030,6 +1025,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             edge[nedges].n2 = v1;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(1);
+            // assert(v1 != v2 && "v1 should not be equal to v2 -q4");
          }
 
       }//    endif tri_quad2
@@ -1127,7 +1123,6 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    //edges4 : do i = 1, nedges
    for (size_t i = 0; i < nedges; i++) {
-   //for (size_t i = 0; i < 10; i++) {
 
       n1 = edge[i].n1;
       n2 = edge[i].n2;
@@ -1135,20 +1130,16 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       // (1) Add n1 to the neighbor list of n2
       node[n1].nnghbrs = node[n1].nnghbrs + 1;
-      // node[n1].nghbr = new Array2D<int>(node[n1].nnghbrs, 1);
-      // (*node[n1].nghbr)(node[n1].nnghbrs) = n2;
+      node[n1].nghbr = new Array2D<int>(node[n1].nnghbrs, 1);
+      (*node[n1].nghbr)( node[n1].nnghbrs - 1 ) = n2; // more fence post trickery
 
 
       // (2) Add n2 to the neighbor list of n1
       node[n2].nnghbrs = node[n2].nnghbrs + 1;
-      // node[n2].nghbr = new Array2D<int>(node[n2].nnghbrs, 1);
-      // (*node[n2].nghbr)(node[n2].nnghbrs) = n1;
+      node[n2].nghbr = new Array2D<int>(node[n2].nnghbrs, 1);
+      (*node[n2].nghbr)( node[n2].nnghbrs - 1 ) = n1;
 
 
-      // cout << "e n1    = " << n1 << endl;
-      // cout << "e n2    = " << n2 << endl;
-      // cout << "n1 nbrs = " << node[n1].nnghbrs << endl;
-      // cout << "n2 nbrs = " << node[n1].nnghbrs << endl;
 
    } //end do edges4
 
