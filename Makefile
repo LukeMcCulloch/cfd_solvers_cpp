@@ -1,114 +1,60 @@
-# TLM 2019 c++ makefile
-#
-# build in /src
-# place exe in /build
-#
+##########################################################################################
 
+# Specify library locations here (add or remove "#" marks to comment/uncomment lines for your platform)
 
+# Mac OS X
+# INCLUDE_PATH      =
+# LIBRARY_PATH      =
+# BLAS_LIBS         = -framework Accelerate
+# SUITESPARSE_LIBS  = -lspqr -lumfpack -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -ltbb -lm -lsuitesparseconfig
+# OPENGL_LIBS       = -framework OpenGL -framework GLUT
 
-FXX = gfortran
-CXX = g++ #-Wall
-NXX = nvcc -x cu  -arch=sm_30  -rdc=true -lcudadevrt
-CFLAGS =  -Wall #Wall: warn all unused variables  -g -O0 `sdl-config --cflags --libs`
-LDFLAGS = #-lGL -lGLU -lglut -lpthread  -lSDL_mixer -lGLEW -lcuda
-NVFLAGS = -g -G -O0
+# # Linux
+INCLUDE_PATH      = -I./include -I./src
+LIBRARY_PATH      =
+BLAS_LIBS         = -llapack -lblas -lgfortran
+# SUITESPARSE_LIBS  = -lspqr -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -lm
+# OPENGL_LIBS       = -lglut -lGL -lGLU -lX11
+SUITESPARSE_LIBS  = -lspqr -lcholmod -lcolamd -lccolamd -lcamd -lamd -lm -lumfpack -lamd #-lmetis 
+OPENGL_LIBS       = -lGL -lGLU -lglut -lGLEW #-lX11
 
+# # Windows / Cygwin
+# INCLUDE_PATH      = -I/usr/include/opengl -I/usr/include/suitesparse
+# LIBRARY_PATH      = -L/usr/lib/w32api -L/usr/lib/suitesparse
+# BLAS_LIBS         = -llapack -lblas
+# SUITESPARSE_LIBS  = -lspqr -lcholmod -lcolamd -lccolamd -lcamd -lamd -lm
+# OPENGL_LIBS       = -lglut32 -lglu32 -lopengl32
 
-.SUFFIXES: 
+########################################################################################
 
-.SUFFIXES:  .cpp .c .cu .o
+TARGET = run/ADcpp
+CC = g++
+LD = g++
+USESTRD = -std=c++11 
+WARNS =  -Werror=c++-compat  -pedantic -Wall -ansi 
+CFLAGS = -O3 $(INCLUDE_PATH)  $(WARNS)  $(USESTRD) #USESTRD has to come after the warnings
+LFLAGS = -O3 $(LIBRARY_PATH)  $(WARNS)  $(USESTRD)
+LIBS = $(OPENGL_LIBS) $(SUITESPARSE_LIBS) $(BLAS_LIBS)
 
+########################################################################################
+## !! Do not edit below this line
 
-.c.o:
-	echo Compiling C
+HEADERS := $(wildcard include/*.h) $(wildcard include/*.hpp)
+SOURCES := $(wildcard src/*.cpp)
+OBJECTS := $(addprefix obj/,$(notdir $(SOURCES:.cpp=.o)))
 
-.cpp.o:
-	echo Compiling CPP
+all: $(TARGET)
 
-.cu.o:
-	echo Compiling NVCC
+$(TARGET): $(OBJECTS)
+	@echo "headers = " $(HEADERS)
+	@echo "sources = " $(SOURCES)
+	@echo "objects = " $(OBJECTS)
+	$(LD) $(OBJECTS) -o $(TARGET) $(CFLAGS) $(LFLAGS) $(LIBS)
 
-#BUILD_DIR ?= .././build
-#ODIR ?= ./
-#SRC_DIRS ?= ./
+obj/%.o: src/%.cpp ${HEADERS}
+	$(CC) -c $< -o $@ $(CFLAGS) 
 
-BUILD_DIR ?= ./build
-TEST_DIR ?= ./tests
-ODIR ?= ./src
-SRC_DIRS ?= ./src
-
-EXECUTABLE = solver
-
-
-
-
-OBJECTS = MathGeometry.o EulerShockTube1D.o gridGen2D.o EulerUnsteady2D_basic_package.o EulerUnsteady2D.o driver.o
-
-
-
-
- 
-
-$(BUILD_DIR)/solver: 	$(SRC_DIRS)/EulerShockTube1D.o \
-						$(SRC_DIRS)/MathGeometry.o \
-						$(SRC_DIRS)/gridGen2D.o \
-						$(SRC_DIRS)/EulerUnsteady2D_basic_package.o \
-						$(SRC_DIRS)/EulerUnsteady2D.o \
-						$(SRC_DIRS)/driver.o 
-	$(CXX) 	 $(SRC_DIRS)/gridGen2D.cpp   $(SRC_DIRS)/EulerShockTube1D.cpp  $(SRC_DIRS)/MathGeometry.cpp $(SRC_DIRS)/EulerUnsteady2D_basic_package.cpp $(SRC_DIRS)/EulerUnsteady2D.cpp  $(SRC_DIRS)/driver.cpp    -o $(BUILD_DIR)/solver 
-
-
-
-
-
-
-# vanilla overloaded array testing:
-#$(BUILD_DIR)/EulerShockTube1D.o: $(TEST_DIR)/EulerShockTube1D.cpp 
-#	$(NXX) -g -c $(TEST_DIR)/EulerShockTube1D.cpp
-
-
-
-# expression template testing:
-#$(BUILD_DIR)/tests_etarray.o: $(TEST_DIR)/tests_etarray.cu 
-#	$(NXX) -g -c $(TEST_DIR)/tests_etarray.cu
-
-#$(SRC_DIRS)/tests_etarray.cuh
-
-
-
-# vanilla overloaded array testing:
-# $(BUILD_DIR)/EulerShockTube1D.o: $(SRC_DIRS)/EulerShockTube1D.cpp 
-# 	$(NXX) -g -c $(SRC_DIRS)/EulerShockTube1D.cpp
-
-
-# # expression template testing:
-# $(BUILD_DIR)/tests_etarray.o: $(SRC_DIRS)/tests_etarray.cu 
-# 	$(NXX) -g -c $(SRC_DIRS)/tests_etarray.cu 
-
-
-
-
-
-# $(BUILD_DIR)/main.o: 	$(SRC_DIRS)/main.cpp  
-# 	$(NXX) -g -c $(SRC_DIRS)/main.cpp
-
-
-
-
-
-
-
-$(OBJECTS): EulerShockTube1D.o gridGen2D.o EulerUnsteady2D_basic_package.o EulerUnsteady2D.o driver.o
-
-.PHONY: clean
-
-
-clean: 
-	-rm -f  \
-			$(SRC_DIRS)/*.o  
-
-
-realclean: 
-	-rm -f  \
-			$(SRC_DIRS)/*.o  \
-			$(BUILD_DIR)/$(EXECUTABLE)
+clean:
+	rm -f $(OBJECTS)
+	rm -f $(TARGET)
+	rm -f $(TARGET).exe

@@ -696,10 +696,10 @@ for ( int i = 0; i < nelms; ++i ) {
    v3 = (*elm[i].vtx)(2,0);
 
 //    tri_or_quadv : if (elm(i)%nvtx==3) then
-// //   Dual volume is exactly 1/3 of the volume of the triangle.
-//     node(v1)%vol = node(v1)%vol + third*elm(i)%vol
-//     node(v2)%vol = node(v2)%vol + third*elm(i)%vol
-//     node(v3)%vol = node(v3)%vol + third*elm(i)%vol
+//   Dual volume is exactly 1/3 of the volume of the triangle.
+    node[v1].vol = node[v1].vol + third*elm[i].vol;
+    node[v2].vol = node[v2].vol + third*elm[i].vol;
+    node[v3].vol = node[v3].vol + third*elm[i].vol;
 
 //    elseif (elm(i)%nvtx==4) then
 //     v4 = elm(i)%vtx(4)
