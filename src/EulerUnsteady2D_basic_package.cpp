@@ -632,9 +632,9 @@ for ( int i = 0; i < nelms; ++i ) {
    else if (elm[i].nvtx==4) {
 
 // //   OK, this is a quad. Get the 4th vertex.
-//     v4 = elm(i)%vtx(4)
-//     x4 = node(v4)%x
-//     y4 = node(v4)%y
+    v4 = (*elm[i].vtx)(4,0);
+    x4 = node[v4].x;
+    y4 = node[v4].y;
 // //   Centroid: median dual
 // //   (Note: There is an alternative. See Appendix B in Nishikawa AIAA2010-5093.)
 //     xm1 = half*(x1+x2)
