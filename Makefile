@@ -27,7 +27,7 @@ OPENGL_LIBS       = -lGL -lGLU -lglut -lGLEW #-lX11
 
 ########################################################################################
 
-TARGET = run/ADcpp
+TARGET = run/Euler2D
 CC = g++
 LD = g++
 USESTRD = -std=c++11 
