@@ -695,83 +695,88 @@ for ( int i = 0; i < nelms; ++i ) {
    v2 = (*elm[i].vtx)(1,0);
    v3 = (*elm[i].vtx)(2,0);
 
-//    tri_or_quadv : if (elm(i)%nvtx==3) then
+//    tri_or_quadv : 
+   if (elm[i].nvtx==3) {
 //   Dual volume is exactly 1/3 of the volume of the triangle.
-    node[v1].vol = node[v1].vol + third*elm[i].vol;
-    node[v2].vol = node[v2].vol + third*elm[i].vol;
-    node[v3].vol = node[v3].vol + third*elm[i].vol;
+      node[v1].vol = node[v1].vol + third*elm[i].vol;
+      node[v2].vol = node[v2].vol + third*elm[i].vol;
+      node[v3].vol = node[v3].vol + third*elm[i].vol;
 
-//    elseif (elm(i)%nvtx==4) then
-//     v4 = elm(i)%vtx(4)
+   }  else if (elm[i].nvtx==4) {
+         v4 = (*elm[i].vtx)(4,0);
 
-//     x1 = node(v1)%x
-//     x2 = node(v2)%x
-//     x3 = node(v3)%x
-//     x4 = node(v4)%x
-//     xc = elm(i)%x
+         x1 = node[v1].x;
+         x2 = node[v2].x;
+         x3 = node[v3].x;
+         x4 = node[v4].x;
+         xc = elm[i].x;
 
-//     y1 = node(v1)%y
-//     y2 = node(v2)%y
-//     y3 = node(v3)%y
-//     y4 = node(v4)%y
-//     yc = elm(i)%y
+         y1 = node[v1].y;
+         y2 = node[v2].y;
+         y3 = node[v3].y;
+         y4 = node[v4].y;
+         yc = elm[i].y;
 
-// // - Vertex 1
-//      xj = node(v1)%x
-//      yj = node(v1)%y
-//     xm1 = half*(xj+x2)
-//     ym1 = half*(yj+y2)
-//     xm2 = half*(xj+x4)
-//     ym2 = half*(yj+y4)
+// - Vertex 1
+         xj = node[v1].x;
+         yj = node[v1].y;
+         xm1 = half*(xj+x2);
+         ym1 = half*(yj+y2);
+         xm2 = half*(xj+x4);
+         ym2 = half*(yj+y4);
 
-// //   Median volume is computed as a sum of two triangles.
-//     node(v1)%vol = node(v1)%vol + & 
-//                    tri_area(xj,xm1,xc,yj,ym1,yc) + tri_area(xj,xc,xm2,yj,yc,ym2)
+//   Median volume is computed as a sum of two triangles.
+         node[v1].vol = node[v1].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
 
-// // - Vertex 2
-//      xj = node(v2)%x
-//      yj = node(v2)%y
-//     xm1 = half*(xj+x3)
-//     ym1 = half*(yj+y3)
-//     xm2 = half*(xj+x1)
-//     ym2 = half*(yj+y1)
+// - Vertex 2
+         xj = node[v2].x;
+         yj = node[v2].y;
+         xm1 = half*(xj+x3);
+         ym1 = half*(yj+y3);
+         xm2 = half*(xj+x1);
+         ym2 = half*(yj+y1);
 
-// //   Median volume is computed as a sum of two triangles.
-//     node(v2)%vol = node(v2)%vol + &
-//                    tri_area(xj,xm1,xc,yj,ym1,yc) + tri_area(xj,xc,xm2,yj,yc,ym2)
+//   Median volume is computed as a sum of two triangles.
+         node[v2].vol = node[v2].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
 
-// // - Vertex 3
-//      xj = node(v3)%x
-//      yj = node(v3)%y
-//     xm1 = half*(xj+x4)
-//     ym1 = half*(yj+y4)
-//     xm2 = half*(xj+x2)
-//     ym2 = half*(yj+y2)
+// - Vertex 3
+         xj = node[v3].x;
+         yj = node[v3].y;
+         xm1 = half*(xj+x4);
+         ym1 = half*(yj+y4);
+         xm2 = half*(xj+x2);
+         ym2 = half*(yj+y2);
 
-// //   Median volume is computed as a sum of two triangles.
-//     node(v3)%vol = node(v3)%vol + &
-//                    tri_area(xj,xm1,xc,yj,ym1,yc) + tri_area(xj,xc,xm2,yj,yc,ym2)
+//   Median volume is computed as a sum of two triangles.
+         node[v3].vol = node[v3].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
 
-// // - Vertex 4
-//      xj = node(v4)%x
-//      yj = node(v4)%y
-//     xm1 = half*(xj+x1)
-//     ym1 = half*(yj+y1)
-//     xm2 = half*(xj+x3)
-//     ym2 = half*(yj+y3)
+   // - Vertex 4
+         xj = node[v4].x;
+         yj = node[v4].y;
+         xm1 = half*(xj+x1);
+         ym1 = half*(yj+y1);
+         xm2 = half*(xj+x3);
+         ym2 = half*(yj+y3);
 
-// //   Median volume is computed as a sum of two triangles.
-//     node(v4)%vol = node(v4)%vol + &
-//                    tri_area(xj,xm1,xc,yj,ym1,yc) + tri_area(xj,xc,xm2,yj,yc,ym2)
+//   Median volume is computed as a sum of two triangles.
+         node[v4].vol = node[v4].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
  
-//    endif tri_or_quadv
+   }//    endif tri_or_quadv
 
 }//   end do elementsv
 
 // //--------------------------------------------------------------------------------
 // // Loop over elements 2
 // //
-// //  Allocate elm(:)%nghbr(:) : elm(:)%nnghrs, elm(:)%nghr(:)
+// //  Allocate elm[:].nghbr[:] : elm[:].nnghrs, elm[:].nghr[:]
 // //  Construct element nghbr data: elm(:)%nghbr(:)
 // //  Order of neighbor elements [e1,e2,e3,..] are closely related to
 // //  the order of vertices [v1,v2,v3,..] (see below).
