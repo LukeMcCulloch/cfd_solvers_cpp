@@ -947,7 +947,6 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //  two end nodes (n1, n2), and left and right elements (e1, e2)
 
    //elements3 : do i = 1, nelms
-   cout << "\nthe issue\n" << endl;
    for (size_t i = 0; i < nelms; i++) {
 
       v1 = (*elm[i].vtx)(0);
@@ -1143,30 +1142,33 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    } //end do edges4
 
-// //--------------------------------------------------------------------------------
-// // Boundary normal at nodes constructed by accumulating the contribution
-// // from each boundary face normal. This vector will be used to enforce
-// // the tangency condition, for example.
-// //
-// //
-// //        Interior domain      /
-// //                            o
-// //                  .        /
-// //                  .       /
-// // --o-------o-------------o
-// //           j   |  .  |   j+1
-// //               v  .  v
-// //
-// //        Left half added to the node j, and
-// //       right half added to the node j+1.
-// //
+//--------------------------------------------------------------------------------
+// Boundary normal at nodes constructed by accumulating the contribution
+// from each boundary face normal. This vector will be used to enforce
+// the tangency condition, for example.
+//
+//
+//        Interior domain      /
+//                            o
+//                  .        /
+//                  .       /
+// --o-------o-------------o
+//           j   |  .  |   j+1
+//               v  .  v
+//
+//        Left half added to the node j, and
+//       right half added to the node j+1.
+//
 
 // // Allocate and initialize the normal vector arrays
 //   do i = 1, nbound
+   for (size_t i = 0; i < nbound; i++) {
 
 //    allocate(bound[i].bnx(bound[i].nbnodes))
 //    allocate(bound[i].bny(bound[i].nbnodes))
 //    allocate(bound[i].bn( bound[i].nbnodes))
+
+      bound[i].bnx = new Array2D<real>( bound[i].nbnodes, 1 );
 
 //    do j = 1, bound[i].nbnodes
 //     bound[i].bnx(j) = zero
@@ -1174,7 +1176,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //     bound[i].bn( j) = zero
 //    end do
 
-//   end do
+   }//   end do
 
 // // Normal vector at boundary nodes
 // // Note: Below it describes normals of linear approximation.
