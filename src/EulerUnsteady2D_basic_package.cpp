@@ -314,15 +314,18 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          elm[i].nvtx = 3;
          elm[i].vtx = new Array2D<int>(3,1) ;
 
-         std::string type;
-         in >> type;                  //and read the first whitespace-separated token
+         //std::string type;
+         //in >> type;                  //and read the first whitespace-separated token
 
 
          int x, y, z;
-         in >> x >> y >> z;       //now read the whitespace-separated floats
-         (*elm[i].vtx)(0,0) = x;
-         (*elm[i].vtx)(1,0) = y;
-         (*elm[i].vtx)(2,0) = z;
+         in >> x >> y >> z;       //now read the whitespace-separated ints
+         (*elm[i].vtx)(0) = x;
+         (*elm[i].vtx)(1) = y;
+         (*elm[i].vtx)(2) = z;
+         //if (i<20) cout << x << " " << y << " " << z << endl;
+         if (i<20) cout << (*elm[i].vtx)(0) << " " << (*elm[i].vtx)(1) << " " << (*elm[i].vtx)(2) << endl;
+   
       }
    }
    // // Quads: assumed that the vertices are ordered counterclockwise
@@ -517,7 +520,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    im = 0;
    jelm = 0;
 
-   //   write(*,*) "Constructing grid data...."
+   cout << " " << endl;
    cout << "construct grid data...." << endl;
 
    // // Initializations
@@ -670,7 +673,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
 // Median dual volume
 
-   for (int i = 0; i < nnodes; i++) {
+   for (size_t i = 0; i < nnodes; i++) {
       node[i].vol = zero;
    }
 
@@ -786,7 +789,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    // Allocate the neighbor array
    // narrow stencil
 
-   for (int i = 0; i < nelms; i++) {
+   for (size_t i = 0; i < nelms; i++) {
 
    //  3 neighbors for triangle
       if (elm[i].nvtx==3) {
@@ -807,7 +810,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 // Begin constructing the element-neighbor data
 
    //elements2 : do i = 1, nelms
-   for (int i = 0; i < nelms; i++) {
+   for (size_t i = 0; i < nelms; i++) {
 
       //elm_vertex : do k = 1, elm(i).nvtx
       for (int k = 0; k < elm[i].nvtx; k++) {
@@ -832,7 +835,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          //edge_matching : do ii = 1, elm(jelm).nvtx;
          // I just remembered that 
          //  the "2D" array works just as well as 1D
-         for (int ii = 0; ii < elm[jelm].nvtx; ii++) {
+         for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
                            v1 = (*elm[jelm].vtx)(ii);
             if (ii  > 1) { v2 = (*elm[jelm].vtx)(ii-1); }
             if (ii == 1) { v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); } //TLM fix: array bounds overrun fixed here
@@ -890,7 +893,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //       the domain (boundary face).
 
    //   elements0 : do i = 1, nelms
-   for (int i = 0; i < nelms; i++) {
+   for (size_t i = 0; i < nelms; i++) {
 
       v1 = (*elm[i].vtx)(0);
       v2 = (*elm[i].vtx)(1);
@@ -938,7 +941,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 // Allocate the edge array.
    edge = new edge_type[nedges];
    nedges = 0;
-   for (int i = 0; i < nedges; i++) {
+   for (size_t i = 0; i < nedges; i++) {
       edge[i].e1 = 0;
       edge[i].e2 = 0;
    }
@@ -947,21 +950,33 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //  two end nodes (n1, n2), and left and right elements (e1, e2)
 
    //elements3 : do i = 1, nelms
-   for (int i = 0; i < nelms; i++) {
+   cout << "\nthe issue\n" << endl;
+   for (size_t i = 0; i < nelms; i++) {
 
       v1 = (*elm[i].vtx)(0);
       v2 = (*elm[i].vtx)(1);
       v3 = (*elm[i].vtx)(2);
+
+
+      //if (i<20) cout << (*elm[i].vtx)(0) << " " << (*elm[i].vtx)(1) << " " << (*elm[i].vtx)(2) << endl;
+   
+      //if (i<20) cout << v1 << " " << v2<< " " << v3 << endl;
+   
    // Triangular element
       //tri_quad2 : 
       if (elm[i].nvtx==3) {
 
          if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==0 ) {
+
+            //cout << "\n i = " << i << endl;
+            //if (i<20) cout << v1 << " " << v2<< " " << v3 << endl;
             nedges = nedges + 1;
             edge[nedges].n1 = v1;
             edge[nedges].n2 = v2;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(2);
+            //cout << "at fail " << v1 << " " << v2<< " " << v3 << endl;
+            //assert(v1 /= v2), "Fail" //TLM found issue here
          }
 
          if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
@@ -1041,7 +1056,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //                n1
 //
 //   edges : do i = 1, nedges
-   for (int i = 0; i < nedges; i++) {
+   for (size_t i = 0; i < nedges; i++) {
 
       n1 = edge[i].n1;
       n2 = edge[i].n2;
@@ -1087,6 +1102,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
                                   edge[i].ev(1) * edge[i].ev(1) );
       edge[i].ev    = edge[i].ev / edge[i].e;
 
+      
    }//   end do edges
 
 //--------------------------------------------------------------------------------
@@ -1103,18 +1119,19 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //       o            o: neighbors (edge-connected nghbrs)
 //
 
-   for (int i = 0; i < nnodes; i++) {
+   for (size_t i = 0; i < nnodes; i++) {
       node[i].nnghbrs = 0;
    }
 
 // Loop over edges and distribute the node numbers:
 
    //edges4 : do i = 1, nedges
-   //for (int i = 0; i < nedges; i++) {
-   for (int i = 0; i < 10; i++) {
+   for (size_t i = 0; i < nedges; i++) {
+   //for (size_t i = 0; i < 10; i++) {
 
       n1 = edge[i].n1;
       n2 = edge[i].n2;
+      
 
       // (1) Add n1 to the neighbor list of n2
       node[n1].nnghbrs = node[n1].nnghbrs + 1;
@@ -1128,10 +1145,10 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       // (*node[n2].nghbr)(node[n2].nnghbrs) = n1;
 
 
-      cout << "e n1    = " << n1 << endl;
-      cout << "e n2    = " << n2 << endl;
-      cout << "n1 nbrs = " << node[n1].nnghbrs << endl;
-      cout << "n2 nbrs = " << node[n1].nnghbrs << endl;
+      // cout << "e n1    = " << n1 << endl;
+      // cout << "e n2    = " << n2 << endl;
+      // cout << "n1 nbrs = " << node[n1].nnghbrs << endl;
+      // cout << "n2 nbrs = " << node[n1].nnghbrs << endl;
 
    } //end do edges4
 
@@ -1480,7 +1497,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 // //
 
 // // Check the number of neighbor nodes (must have at least 2 neighbors)
-//   write(*,*) " --- Node neighbor data:"
+  cout << " --- Node neighbor data:" << endl;
 
 //   ave_nghbr = node[1).nnghbrs
 //   min_nghbr = node[1).nnghbrs
