@@ -509,25 +509,14 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //  use EulerSolver2D    , only : p2, zero, half, third
 //  use EulerSolver2D, only : my_alloc_int_ptr, my_alloc_p2_ptr, my_alloc_p2_matrix_ptr
 
-//  implicit none
-
 // //Local variables
-//  integer  ::  i, j, k, ii, in, im, jelm, v1, v2, v3, v4
 int i, j, k, ii, in, im, jelm, v1, v2, v3, v4;
-//  real(p2) :: x1, x2, x3, x4, y1, y2, y3, y4, xm, ym, xc, yc
 real x1, x2, x3, x4, y1, y2, y3, y4, xm, ym, xc, yc;
-//  real(p2) :: xj, yj, xm1, ym1, xm2, ym2, dsL,dsR,dx,dy
 real xj, yj, xm1, ym1, xm2, ym2, dsL,dsR,dx,dy;
-//  logical  :: found
 bool found;
-//  integer  :: vL, vR, n1, n2, e1, e2
 int vL, vR, n1, n2, e1, e2;
-//  integer  :: vt1, vt2, ielm
 int vt1, vt2, ielm;
-//  integer  :: ave_nghbr, min_nghbr, max_nghbr, imin, imax
 int ave_nghbr, min_nghbr, max_nghbr, imin, imax;
-
-//  integer :: iedge4
 int iedge;
 
 //  real(p2)                          :: ds
@@ -543,12 +532,6 @@ real ds;
 cout << "construct grid data...." << endl;
 
 // // Initializations
-//   do i = 1, nnodes
-//    node(i)%nelms = 0
-//   end do
-//    nedges = 0
-
-// moved to read grid data 
 for (size_t i = 0; i < nnodes; i++) {
    node[i].nelms = 0;
 } 
@@ -631,62 +614,63 @@ for ( int i = 0; i < nelms; ++i ) {
    }
    else if (elm[i].nvtx==4) {
 
-// //   OK, this is a quad. Get the 4th vertex.
-    v4 = (*elm[i].vtx)(4,0);
-    x4 = node[v4].x;
-    y4 = node[v4].y;
-// //   Centroid: median dual
-// //   (Note: There is an alternative. See Appendix B in Nishikawa AIAA2010-5093.)
-//     xm1 = half*(x1+x2)
-//     ym1 = half*(y1+y2)
-//     xm2 = half*(x3+x4)
-//     ym2 = half*(y3+y4)
-//     elm(i)%x   = half*(xm1+xm2)
-//     elm(i)%y   = half*(ym1+ym2)
-// //   Volume is computed as a sum of two triangles: 1-2-3 and 1-3-4.
-//     elm(i)%vol = tri_area(x1,x2,x3,y1,y2,y3) + tri_area(x1,x3,x4,y1,y3,y4)
+//   this is a quad. Get the 4th vertex.
+      v4 = (*elm[i].vtx)(4,0);
+      x4 = node[v4].x;
+      y4 = node[v4].y;
+//   Centroid: median dual
+//   (Note: There is an alternative. See Appendix B in Nishikawa AIAA2010-5093.)
+      xm1 = half*(x1+x2);
+      ym1 = half*(y1+y2);
+      xm2 = half*(x3+x4);
+      ym2 = half*(y3+y4);
+      elm[i].x   = half*(xm1+xm2);
+      elm[i].y   = half*(ym1+ym2);
+//   Volume is computed as a sum of two triangles: 1-2-3 and 1-3-4.
+      elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3) + \
+                  tri_area(x1,x3,x4,y1,y3,y4);
 
-//      xc = elm(i)%x
-//      yc = elm(i)%y
-//     if (tri_area(x1,x2,xc,y1,y2,yc)<zero) then
-//      write(*,*) " Centroid outside the quad element 12c: i=",i
-//      write(*,'(a10,2es10.2)') "  (x1,y1)=",x1,y1
-//      write(*,'(a10,2es10.2)') "  (x2,y2)=",x2,y2
-//      write(*,'(a10,2es10.2)') "  (x3,y3)=",x3,y3
-//      write(*,'(a10,2es10.2)') "  (x4,y4)=",x4,y4
-//      write(*,'(a10,2es10.2)') "  (xc,yc)=",xc,yc
-//      stop
-//     endif
+     xc = elm[i].x;
+     yc = elm[i].y;
+    if (tri_area(x1,x2,xc,y1,y2,yc)<zero) {
+     cout << " Centroid outside the quad element 12c: i=" << i << endl;
+     cout << "  (x1,y1)=" << x1 << y1  << endl;
+     cout << "  (x2,y2)=" << x2 << y2  << endl;
+     cout << "  (x3,y3)=" << x3 << y3  << endl;
+     cout << "  (x4,y4)=" << x4 << y4  << endl;
+     cout << "  (xc,yc)=" << xc << yc  << endl;
+     //stop
+    }
 
-//     if (tri_area(x2,x3,xc,y2,y3,yc)<zero) then
-//      write(*,*) " Centroid outside the quad element 23c: i=",i
-//      write(*,'(a10,2es10.2)') "  (x1,y1)=",x1,y1
-//      write(*,'(a10,2es10.2)') "  (x2,y2)=",x2,y2
-//      write(*,'(a10,2es10.2)') "  (x3,y3)=",x3,y3
-//      write(*,'(a10,2es10.2)') "  (x4,y4)=",x4,y4
-//      write(*,'(a10,2es10.2)') "  (xc,yc)=",xc,yc
-//      stop
-//     endif
+    if (tri_area(x2,x3,xc,y2,y3,yc)<zero) {
+     cout << " Centroid outside the quad element 23c: i=" << i << endl;
+     cout << "  (x1,y1)=" << x1 << y1  << endl;
+     cout << "  (x2,y2)=" << x2 << y2  << endl;
+     cout << "  (x3,y3)=" << x3 << y3  << endl;
+     cout << "  (x4,y4)=" << x4 << y4  << endl;
+     cout << "  (xc,yc)=" << xc << yc  << endl;
+     //stop
+    }
 
-//     if (tri_area(x3,x4,xc,y3,y4,yc)<zero) then
-//      write(*,*) " Centroid outside the quad element 34c: i=",i
-//      write(*,'(a10,2es10.2)') "  (x1,y1)=",x1,y1
-//      write(*,'(a10,2es10.2)') "  (x2,y2)=",x2,y2
-//      write(*,'(a10,2es10.2)') "  (x3,y3)=",x3,y3
-//      write(*,'(a10,2es10.2)') "  (x4,y4)=",x4,y4
-//      write(*,'(a10,2es10.2)') "  (xc,yc)=",xc,yc
-//      stop
-//     endif
+    if (tri_area(x3,x4,xc,y3,y4,yc)<zero) {
+     cout << " Centroid outside the quad element 34c: i=" << i << endl;
+     cout << "  (x1,y1)=" << x1 << y1 << endl;
+     cout << "  (x2,y2)=" << x2 << y2 << endl;
+     cout << "  (x3,y3)=" << x3 << y3 << endl;
+     cout << "  (x4,y4)=" << x4 << y4 << endl;
+     cout << "  (xc,yc)=" << xc << yc << endl;
+     //stop
+    }
 
-//     if (tri_area(x4,x1,xc,y4,y1,yc)<zero) then
-//      write(*,*) " Centroid outside the quad element 41c: i=",i
-//      write(*,'(a10,2es10.2)') "  (x1,y1)=",x1,y1
-//      write(*,'(a10,2es10.2)') "  (x2,y2)=",x2,y2
-//      write(*,'(a10,2es10.2)') "  (x3,y3)=",x3,y3
-//      write(*,'(a10,2es10.2)') "  (x4,y4)=",x4,y4
-//      write(*,'(a10,2es10.2)') "  (xc,yc)=",xc,yc
-//      stop
-//     endif
+    if (tri_area(x4,x1,xc,y4,y1,yc)<zero) {
+     cout << " Centroid outside the quad element 41c: i=" << i << endl;
+     cout << "  (x1,y1)=" << x1 << y1  << endl;
+     cout << "  (x2,y2)=" << x2 << y2  << endl;
+     cout << "  (x3,y3)=" << x3 << y3  << endl;
+     cout << "  (x4,y4)=" << x4 << y4  << endl;
+     cout << "  (xc,yc)=" << xc << yc  << endl;
+     //stop
+    }
 
 // //  Distribution of element number to the 4th node of the quadrilateral
 //    node(v4)%nelms = node(v4)%nelms + 1
