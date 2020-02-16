@@ -630,52 +630,53 @@ for ( int i = 0; i < nelms; ++i ) {
       elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3) + \
                   tri_area(x1,x3,x4,y1,y3,y4);
 
-     xc = elm[i].x;
-     yc = elm[i].y;
-    if (tri_area(x1,x2,xc,y1,y2,yc)<zero) {
-     cout << " Centroid outside the quad element 12c: i=" << i << endl;
-     cout << "  (x1,y1)=" << x1 << y1  << endl;
-     cout << "  (x2,y2)=" << x2 << y2  << endl;
-     cout << "  (x3,y3)=" << x3 << y3  << endl;
-     cout << "  (x4,y4)=" << x4 << y4  << endl;
-     cout << "  (xc,yc)=" << xc << yc  << endl;
-     //stop
-    }
+      xc = elm[i].x;
+      yc = elm[i].y;
+      if (tri_area(x1,x2,xc,y1,y2,yc)<zero) {
+         cout << " Centroid outside the quad element 12c: i=" << i << endl;
+         cout << "  (x1,y1)=" << x1 << y1  << endl;
+         cout << "  (x2,y2)=" << x2 << y2  << endl;
+         cout << "  (x3,y3)=" << x3 << y3  << endl;
+         cout << "  (x4,y4)=" << x4 << y4  << endl;
+         cout << "  (xc,yc)=" << xc << yc  << endl;
+         //stop
+      }
 
-    if (tri_area(x2,x3,xc,y2,y3,yc)<zero) {
-     cout << " Centroid outside the quad element 23c: i=" << i << endl;
-     cout << "  (x1,y1)=" << x1 << y1  << endl;
-     cout << "  (x2,y2)=" << x2 << y2  << endl;
-     cout << "  (x3,y3)=" << x3 << y3  << endl;
-     cout << "  (x4,y4)=" << x4 << y4  << endl;
-     cout << "  (xc,yc)=" << xc << yc  << endl;
-     //stop
-    }
+      if (tri_area(x2,x3,xc,y2,y3,yc)<zero) {
+         cout << " Centroid outside the quad element 23c: i=" << i << endl;
+         cout << "  (x1,y1)=" << x1 << y1  << endl;
+         cout << "  (x2,y2)=" << x2 << y2  << endl;
+         cout << "  (x3,y3)=" << x3 << y3  << endl;
+         cout << "  (x4,y4)=" << x4 << y4  << endl;
+         cout << "  (xc,yc)=" << xc << yc  << endl;
+         //stop
+      }
 
-    if (tri_area(x3,x4,xc,y3,y4,yc)<zero) {
-     cout << " Centroid outside the quad element 34c: i=" << i << endl;
-     cout << "  (x1,y1)=" << x1 << y1 << endl;
-     cout << "  (x2,y2)=" << x2 << y2 << endl;
-     cout << "  (x3,y3)=" << x3 << y3 << endl;
-     cout << "  (x4,y4)=" << x4 << y4 << endl;
-     cout << "  (xc,yc)=" << xc << yc << endl;
-     //stop
-    }
+      if (tri_area(x3,x4,xc,y3,y4,yc)<zero) {
+         cout << " Centroid outside the quad element 34c: i=" << i << endl;
+         cout << "  (x1,y1)=" << x1 << y1 << endl;
+         cout << "  (x2,y2)=" << x2 << y2 << endl;
+         cout << "  (x3,y3)=" << x3 << y3 << endl;
+         cout << "  (x4,y4)=" << x4 << y4 << endl;
+         cout << "  (xc,yc)=" << xc << yc << endl;
+         //stop
+      }
 
-    if (tri_area(x4,x1,xc,y4,y1,yc)<zero) {
-     cout << " Centroid outside the quad element 41c: i=" << i << endl;
-     cout << "  (x1,y1)=" << x1 << y1  << endl;
-     cout << "  (x2,y2)=" << x2 << y2  << endl;
-     cout << "  (x3,y3)=" << x3 << y3  << endl;
-     cout << "  (x4,y4)=" << x4 << y4  << endl;
-     cout << "  (xc,yc)=" << xc << yc  << endl;
-     //stop
-    }
+      if (tri_area(x4,x1,xc,y4,y1,yc)<zero) {
+         cout << " Centroid outside the quad element 41c: i=" << i << endl;
+         cout << "  (x1,y1)=" << x1 << y1  << endl;
+         cout << "  (x2,y2)=" << x2 << y2  << endl;
+         cout << "  (x3,y3)=" << x3 << y3  << endl;
+         cout << "  (x4,y4)=" << x4 << y4  << endl;
+         cout << "  (xc,yc)=" << xc << yc  << endl;
+         //stop
+      }
 
-// //  Distribution of element number to the 4th node of the quadrilateral
-//    node(v4)%nelms = node(v4)%nelms + 1
-//    call my_alloc_int_ptr(node(v4)%elm, node(v4)%nelms)
-//    node(v4)%elm(node(v4)%nelms) = i
+//  Distribution of element number to the 4th node of the quadrilateral
+   node[v4].nelms = node[v4].nelms + 1;
+   //call my_alloc_int_ptr(node(v4)%elm, node(v4)%nelms)
+   node[v4].elm = new Array2D<int>(node[v4].nelms, 0);
+   (*node[v4].elm)[node[v4].nelms][0] = i;
 
    }//    endif tri_or_quad
 
