@@ -1186,7 +1186,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       //do j = 1, bound[i].nbnodes-1
       for (size_t j = 0; j < bound[i].nbnodes-1; j++) {
 
-         // quick for understanding:
+         // quick expansion for understanding:
          // int num = (*bound[i].bnode)(j);
          // x1 = node[num].x;
          x1 = node[ (*bound[i].bnode)[j  ][0] ].x;
@@ -1205,51 +1205,57 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }
    }
 
-// // Step 2. Compute the magnitude and turn (bnx,bny) into a unit vector
-//   do i = 1, nbound
-//    do j = 1, bound[i].nbnodes
+// Step 2. Compute the magnitude and turn (bnx,bny) into a unit vector
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbnodes; j++) {
 
-//     bound[i].bn(j)  = sqrt( bound[i].bnx(j)**2 + bound[i].bny(j)**2 )
-// //   Minus sign to make it pont out towards the outside of the domain.
-//     bound[i].bnx(j) =  - bound[i].bnx(j) / bound[i].bn(j)
-//     bound[i].bny(j) =  - bound[i].bny(j) / bound[i].bn(j)
+         (*bound[i].bn)(j)  = sqrt( (*bound[i].bnx)(j) * (*bound[i].bnx)(j) + \
+                                     (*bound[i].bny)(j) * (*bound[i].bny)(j) );
+         //   Minus sign for outward pointing normal
+         (*bound[i].bnx)(j) =  - (*bound[i].bnx)(j) / (*bound[i].bn)(j);
+         (*bound[i].bny)(j) =  - (*bound[i].bny)(j) / (*bound[i].bn)(j);
 
-//    end do
-//   end do
+      }
+   }
 
-// // Now, ignore the linear approximation, and let us construct
-// // more accurate surfae normal vectors and replace the linear ones.
-// // So, we will overwrite the unit normal vectors: bnx, bny.
-// // Note: We keep the magnitude of the normal vector.
-// //
-// // Quadratic approximation:
-// // See http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2015v281pp518-555_preprint.pdf
-// // for details on the quadratic approximation for computing more accurate normals.
-// // 
+// Now, ignore the linear approximation, and let us construct
+// more accurate surfae normal vectors and replace the linear ones.
+// So, we will overwrite the unit normal vectors: bnx, bny.
+// Note: We keep the magnitude of the normal vector.
+//
+// Quadratic approximation:
+// See http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2015v281pp518-555_preprint.pdf
+// for details on the quadratic approximation for computing more accurate normals.
+// 
+
 //   boundary_type0 : do i = 1, nbound
 //    boundary_nodes0 : do j = 1, bound[i].nbnodes
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbnodes; j++) {
 
-//      if (j==1) {
-//       v1 = bound[i].bnode(j  )
-//       v2 = bound[i].bnode(j+1)
-//       v3 = bound[i].bnode(j+2)
-//      elseif (j==bound[i].nbnodes) {
-//       v1 = bound[i].bnode(j-2)
-//       v2 = bound[i].bnode(j-1)
-//       v3 = bound[i].bnode(j  )
-//      else
-//       v1 = bound[i].bnode(j-1)
-//       v2 = bound[i].bnode(j)
-//       v3 = bound[i].bnode(j+1)
-//      }
+         if (j==0) {
+            v1 = (*bound[i].bnode)(j  );
+            v2 = (*bound[i].bnode)(j+1);
+            v3 = (*bound[i].bnode)(j+2);
+         }
+         else if (j==bound[i].nbnodes-1) {
+            v1 = (*bound[i].bnode)(j-2);
+            v2 = (*bound[i].bnode)(j-1);
+            v3 = (*bound[i].bnode)(j  );
+         }
+         else {
+            v1 = (*bound[i].bnode)(j-1);
+            v2 = (*bound[i].bnode)(j);
+            v3 = (*bound[i].bnode)(j+1);
+         }
 
-//      x1 = node[v1).x
-//      x2 = node[v2).x
-//      x3 = node[v3).x
+         x1 = node[v1].x;
+         x2 = node[v2].x;
+         x3 = node[v3].x;
 
-//      y1 = node[v1).y
-//      y2 = node[v2).y
-//      y3 = node[v3).y
+         y1 = node[v1].y;
+         y2 = node[v2].y;
+         y3 = node[v3].y;
 
 // //----------------------------------------------------------------------
 // //   Fit a quadratic over 3 nodes
@@ -1272,8 +1278,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //      bound[i].bnx(j) = -( -dy / ds )
 //      bound[i].bny(j) = -(  dx / ds )
 
-//    end do boundary_nodes0
-//   end do boundary_type0
+      }//    end do boundary_nodes0
+}  //   end do boundary_type0
 
 // //--------------------------------------------------------------------------------
 // // Construct neighbor index over edges
