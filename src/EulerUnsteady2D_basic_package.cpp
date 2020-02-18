@@ -1281,63 +1281,66 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }//    end do boundary_nodes0
 }  //   end do boundary_type0
 
-// //--------------------------------------------------------------------------------
-// // Construct neighbor index over edges
-// //
-// //  Example:
-// //
-// //        o     o
-// //         \   / 
-// //          \j/       k-th neighbor
-// //     o-----*----------o
-// //          /|  edge i
-// //         / |
-// //        /  o        Note: k-th neighbor is given by "node(j).nghbr(k)"
-// //       o
-// //
-// //  Consider the edge i
-// //
-// //   node j        k-th neighbor
-// //       *----------o
-// //      n1  edge i  n2
-// //
-// //   We store "k" in the edge data structure as
-// //
-// //    edge[i].kth_nghbr_of_1: n2 is the "edge[i].kth_nghbr_of_1"-th neighbor of n1
-// //    edge[i].kth_nghbr_of_2: n1 is the "edge[i].kth_nghbr_of_3"-th neighbor of n2
-// //
-// //   That is,  we have
-// //
-// //    n2 = node[n1].nghbr(edge[i].kth_nghbr_of_1)
-// //    n1 = node[n2].nghbr(edge[i].kth_nghbr_of_2)
-// //
-// //   We make use of this data structure to access off-diagonal entries in Jacobian matrix.
-// //
+//--------------------------------------------------------------------------------
+// Construct neighbor index over edges
+//
+//  Example:
+//
+//        o     o
+//         \   / 
+//          \j/       k-th neighbor
+//     o-----*----------o
+//          /|  edge i
+//         / |
+//        /  o        Note: k-th neighbor is given by "node(j).nghbr(k)"
+//       o
+//
+//  Consider the edge i
+//
+//   node j        k-th neighbor
+//       *----------o
+//      n1  edge i  n2
+//
+//   We store "k" in the edge data structure as
+//
+//    edge[i].kth_nghbr_of_1: n2 is the "edge[i].kth_nghbr_of_1"-th neighbor of n1
+//    edge[i].kth_nghbr_of_2: n1 is the "edge[i].kth_nghbr_of_3"-th neighbor of n2
+//
+//   That is,  we have
+//
+//    n2 = node[n1].nghbr(edge[i].kth_nghbr_of_1)
+//    n1 = node[n2].nghbr(edge[i].kth_nghbr_of_2)
+//
+//   We make use of this data structure to access off-diagonal entries in Jacobian matrix.
+//
 
 // // Loop over edges
 
 //   edges5 : do i = 1, nedges
+   for (size_t i = 0; i < nedges; i++) {
 
-//    n1 = edge[i].n1
-//    n2 = edge[i].n2
+      n1 = edge[i].n1;
+      n2 = edge[i].n2;
 
-//    do k = 1, node[n2].nnghbrs
+      //do k = 1, node[n2].nnghbrs
+      for (size_t k = 0; k < node[n2].nnghbrs; k++) {
 
-//     if ( n1 == node[n2].nghbr(k) ) {
-//      edge[i].kth_nghbr_of_2 = k
-//     }
+         if ( n1 == (*node[n2].nghbr)(k) ) {
+         edge[i].kth_nghbr_of_2 = k;
+         }
 
-//    end do
+      }//   end do
 
-//    do k = 1, node[n1].nnghbrs
+      //do k = 1, node[n1].nnghbrs
+      for (size_t k = 0; k < node[n1].nnghbrs; k++) {
 
-//     if ( n2 == node[n1].nghbr(k) ) {
-//      edge[i].kth_nghbr_of_1 = k
-//     }
+         if ( n2 == (*node[n1].nghbr)(k) ) {
+         edge[i].kth_nghbr_of_1 = k;
+         }
 
-//    end do
+      }//end do
 
-//   end do edges5
+   }//end do edges5
 
 // // Boundary mark: It should be an array actually because some nodes are associated with
 // //                more than one boundaries.
