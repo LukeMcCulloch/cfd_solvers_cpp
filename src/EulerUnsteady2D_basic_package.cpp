@@ -1260,23 +1260,23 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 // //----------------------------------------------------------------------
 // //   Fit a quadratic over 3 nodes
 
-// //    Skip the last one if the boundary segment is a closed boundary 
-// //    in which case the last node is the same as the first one.
-//      if (j==bound[i].nbnodes .and. bound[i].bnode(j)==bound[i].bnode(1) ) {
-//       bound[i].bn(j)  = bound[i].bn(1)
-//       bound[i].bnx(j) = bound[i].bnx(1)
-//       bound[i].bny(j) = bound[i].bny(1)
-//       cycle
-//      }
+//    Skip the last one if the boundary segment is a closed boundary 
+//    in which case the last node is the same as the first one.
+      if (j==bound[i].nbnodes and (*bound[i].bnode)(j)==(*bound[i].bnode)(0) ) {
+         (*bound[i].bn)(j)  = (*bound[i].bn)(0);
+         (*bound[i].bnx)(j) = (*bound[i].bnx)(0);
+         (*bound[i].bny)(j) = (*bound[i].bny)(0);
+         continue; // cycle
+      }
 
-//      dsL = sqrt( (x2-x1)**2 + (y2-y1)**2 )
-//      dsR = sqrt( (x3-x2)**2 + (y3-y2)**2 )
-//       dx = dsR*x1/(dsL*(-dsL-dsR))-x2/dsR+x2/dsL+dsL*x3/((dsR+dsL)*dsR)
-//       dy = dsR*y1/(dsL*(-dsL-dsR))-y2/dsR+y2/dsL+dsL*y3/((dsR+dsL)*dsR)
+     dsL = sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
+     dsR = sqrt( (x3-x2)*(x3-x2) + (y3-y2)*(y3-y2) );
+      dx = dsR*x1/(dsL*(-dsL-dsR))-x2/dsR+x2/dsL+dsL*x3/((dsR+dsL)*dsR);
+      dy = dsR*y1/(dsL*(-dsL-dsR))-y2/dsR+y2/dsL+dsL*y3/((dsR+dsL)*dsR);
 
-//      ds  = sqrt( dx**2 + dy**2 )
-//      bound[i].bnx(j) = -( -dy / ds )
-//      bound[i].bny(j) = -(  dx / ds )
+     ds  = sqrt( dx*dx + dy*dy );
+     (*bound[i].bnx)(j) = -( -dy / ds );
+     (*bound[i].bny)(j) = -(  dx / ds );
 
       }//    end do boundary_nodes0
 }  //   end do boundary_type0
