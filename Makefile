@@ -30,7 +30,7 @@ OPENGL_LIBS       = -lGL -lGLU -lglut -lGLEW #-lX11
 TARGET = run/Euler2D
 CC = g++
 LD = g++
-USESTRD = -std=c++11 
+USESTRD = -std=c++17 
 WARNS =  -Werror=c++-compat  -pedantic -Wall -ansi 
 CFLAGS = -O3 $(INCLUDE_PATH)  $(WARNS)  $(USESTRD) #USESTRD has to come after the warnings
 LFLAGS = -O3 $(LIBRARY_PATH)  $(WARNS)  $(USESTRD)
