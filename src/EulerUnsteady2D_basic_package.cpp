@@ -1314,7 +1314,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //   We make use of this data structure to access off-diagonal entries in Jacobian matrix.
 //
 
-// // Loop over edges
+// Loop over edges
 
 //   edges5 : do i = 1, nedges
    for (size_t i = 0; i < nedges; i++) {
@@ -1342,19 +1342,21 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    }//end do edges5
 
-// // Boundary mark: It should be an array actually because some nodes are associated with
-// //                more than one boundaries.
-//   do i = 1, nnodes
-//    node[i].bmark   = 0
-//    node[i].nbmarks = 0
-//   end do
+// Boundary mark: It should be an array actually because some nodes are associated with
+//                more than one boundaries.
+   for (size_t i = 0; i < nnodes; i++) {
+      node[i].bmark   = 0;
+      node[i].nbmarks = 0;
+   }
 
-//   do i = 1, nbound
-//    do j = 1, bound[i].nbnodes
-//     node( bound[i].bnode(j) ).bmark   = i
-//     node( bound[i].bnode(j) ).nbmarks = node( bound[i].bnode(j) ).nbmarks + 1
-//    end do
-//   end do
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbnodes; j++) {
+
+         node[ (*bound[i].bnode)[j][0] ].bmark   = i;
+         node[ (*bound[i].bnode)[j][0] ].nbmarks = node[ (*bound[i].bnode)[j][0] ].nbmarks + 1;
+
+      }
+   }
 
 // //--------------------------------------------------------------------------------
 // // Boundary face data
