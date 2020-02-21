@@ -312,7 +312,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          std::getline(infile, line);
          std::istringstream in(line);
          elm[i].nvtx = 3;
-         elm[i].vtx = new Array2D<int>(3,1) ;
+         elm[i].vtx = new Array2D<int>(3,1);
 
          //std::string type;
          //in >> type;                  //and read the first whitespace-separated token
@@ -1358,26 +1358,29 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }
    }
 
-// //--------------------------------------------------------------------------------
-// // Boundary face data
-// //
-// //      |     Domain      |
-// //      |                 |
-// //      o--o--o--o--o--o--o  <- Boundary segment
-// //   j= 1  2  3  4  5  6  7
-// //
-// //   In the above case, nbnodes = 7, nbfaces = 6
-// //
+//--------------------------------------------------------------------------------
+// Boundary face data
+//
+//      |     Domain      |
+//      |                 |
+//      o--o--o--o--o--o--o  <- Boundary segment
+//   j= 1  2  3  4  5  6  7
+//
+//   In the above case, nbnodes = 7, nbfaces = 6
+//
 
-//   do i = 1, nbound
-//    bound[i].nbfaces = bound[i].nbnodes-1
-//    allocate(bound[i].bfnx(    bound[i].nbfaces   ))
-//    allocate(bound[i].bfny(    bound[i].nbfaces   ))
-//    allocate(bound[i].bfn(     bound[i].nbfaces   ))
-//    allocate(bound[i].belm(    bound[i].nbfaces   ))
-//    allocate(bound[i].kth_nghbr_of_1(    bound[i].nbfaces   ))
-//    allocate(bound[i].kth_nghbr_of_2(    bound[i].nbfaces   ))
-//   end do
+   for (size_t i = 0; i < nbound; i++) {
+      bound[i].nbfaces = bound[i].nbnodes-1;
+
+      bound[i].bfnx = new Array2D<real>( bound[i].nbfaces , 0 );
+      bound[i].bfny = new Array2D<real>( bound[i].nbfaces , 0 );
+      bound[i].bfn  = new Array2D<real>( bound[i].nbfaces , 0 );
+      bound[i].belm = new Array2D<int>(  bound[i].nbfaces , 0 );
+      bound[i].kth_nghbr_of_1 = new Array2D<int>( bound[i].nbfaces , 0 );
+      bound[i].kth_nghbr_of_2 = new Array2D<int>( bound[i].nbfaces , 0 );
+
+
+   }
 
 // // Boundary face vector: outward normal
 //   do i = 1, nbound
