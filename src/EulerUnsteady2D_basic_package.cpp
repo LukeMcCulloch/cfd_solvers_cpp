@@ -1371,32 +1371,33 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    for (size_t i = 0; i < nbound; i++) {
       bound[i].nbfaces = bound[i].nbnodes-1;
+      //cout << "nbfaces = " << bound[i].nbfaces << endl;
 
-      bound[i].bfnx = new Array2D<real>( bound[i].nbfaces , 0 );
-      bound[i].bfny = new Array2D<real>( bound[i].nbfaces , 0 );
-      bound[i].bfn  = new Array2D<real>( bound[i].nbfaces , 0 );
-      bound[i].belm = new Array2D<int>(  bound[i].nbfaces , 0 );
-      bound[i].kth_nghbr_of_1 = new Array2D<int>( bound[i].nbfaces , 0 );
-      bound[i].kth_nghbr_of_2 = new Array2D<int>( bound[i].nbfaces , 0 );
+      bound[i].bfnx = new Array2D<real>( bound[i].nbfaces , 1 );
+      bound[i].bfny = new Array2D<real>( bound[i].nbfaces , 1 );
+      bound[i].bfn  = new Array2D<real>( bound[i].nbfaces , 1 );
+      bound[i].belm = new Array2D<int>(  bound[i].nbfaces , 1 );
+      bound[i].kth_nghbr_of_1 = new Array2D<int>( bound[i].nbfaces , 1 );
+      bound[i].kth_nghbr_of_2 = new Array2D<int>( bound[i].nbfaces , 1 );
 
 
    }
 
-// // Boundary face vector: outward normal
-//   do i = 1, nbound
-//    do j = 1, bound[i].nbfaces
+// Boundary face vector: outward normal
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-//     x1 = node(bound[i].bnode(j  )).x
-//     y1 = node(bound[i].bnode(j  )).y
-//     x2 = node(bound[i].bnode(j+1)).x
-//     y2 = node(bound[i].bnode(j+1)).y
+         x1 = node[ (*bound[i].bnode)(j  ,0)].x;
+         y1 = node[ (*bound[i].bnode)(j  ,0)].y;
+         x2 = node[ (*bound[i].bnode)(j+1,0)].x;
+         y2 = node[ (*bound[i].bnode)(j+1,0)].y;
 
-//     bound[i].bfn(j)  =  sqrt( (x1-x2)**2 + (y1-y2)**2 )
-//     bound[i].bfnx(j) = -(y1-y2) / bound[i].bfn(j)
-//     bound[i].bfny(j) =  (x1-x2) / bound[i].bfn(j)
+         (*bound[i].bfn)(j,0)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
+         (*bound[i].bfnx)(j,0) = -(y1-y2) / (*bound[i].bfn)(j);
+         (*bound[i].bfny)(j) =  (x1-x2) / (*bound[i].bfn)(j);
 
-//    end do
-//   end do
+      }
+   }
 
 // // Boundary normal vector at nodes: outward normal
 //   do i = 1, nbound
