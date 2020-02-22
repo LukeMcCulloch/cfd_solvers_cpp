@@ -845,7 +845,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             } //endif
          } //end do edge_matching
      //if (found) exit elms_around_vR
-     if (found) break;
+     if (found) {break;}
 
       } //end do elms_around_vR
 
@@ -1278,7 +1278,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
      (*bound[i].bnx)(j) = -( -dy / ds );
      (*bound[i].bny)(j) = -(  dx / ds );
 
-      }//    end do boundary_nodes0
+   }//    end do boundary_nodes0
 }  //   end do boundary_type0
 
 //--------------------------------------------------------------------------------
@@ -1387,10 +1387,10 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-         x1 = node[ (*bound[i].bnode)(j  ,0)].x;
-         y1 = node[ (*bound[i].bnode)(j  ,0)].y;
-         x2 = node[ (*bound[i].bnode)(j+1,0)].x;
-         y2 = node[ (*bound[i].bnode)(j+1,0)].y;
+         x1 = node[ (*bound[i].bnode)(j  ) ].x;
+         y1 = node[ (*bound[i].bnode)(j  ) ].y;
+         x2 = node[ (*bound[i].bnode)(j+1) ].x;
+         y2 = node[ (*bound[i].bnode)(j+1) ].y;
 
          (*bound[i].bfn)(j,0)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j,0) = -(y1-y2) / (*bound[i].bfn)(j);
@@ -1399,113 +1399,121 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }
    }
 
-// // Boundary normal vector at nodes: outward normal
+// Boundary normal vector at nodes: outward normal
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbfaces; j++) {
+
+         x1 = node[(*bound[i].bnode)(j  ) ].x;
+         y1 = node[(*bound[i].bnode)(j  ) ].y;
+         x2 = node[(*bound[i].bnode)(j+1) ].x;
+         y2 = node[(*bound[i].bnode)(j+1) ].y;
+
+         (*bound[i].bfn)(j)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
+         (*bound[i].bfnx)(j) = -(y1-y2) / (*bound[i].bfn)(j);
+         (*bound[i].bfny)(j) =  (x1-x2) / (*bound[i].bfn)(j);
+
+      }
+   }
+
+// Neighbor index over boundary edges (faces)
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbfaces; j++) {
+
+         n1 = (*bound[i].bnode)(j  );  //Left node
+         n2 = (*bound[i].bnode)(j+1);  //Right node
+
+
+         for (size_t k = 0; k < node[n2].nnghbrs; k++) {
+            if ( n1 == (*node[n2].nghbr)(k) ) {
+               (*bound[i].kth_nghbr_of_2)(j) = k;
+            }
+         }
+
+         for (size_t k = 0; k < node[n1].nnghbrs; k++) {
+            if ( n2 == (*node[n1].nghbr)(k) ) {
+               (*bound[i].kth_nghbr_of_1)(j) = k;
+            }
+         }
+
+      }
+   }
+
+// Find element adjacent to the face: belm
+//
+//  NOTE: This is useful to figure out what element
+//        each boundary face belongs to. Boundary flux needs
+//        special weighting depending on the element.
+//
+//      |_________|_________|________|
+//      |         |         |        | 
+//      |         |         |        | 
+//      |_________|_________|________|
+//      |         |         |        |     <- Grid (e.g., quads)
+//      |         | elmb(j) |        |
+//   ---o---------o---------o--------o---  <- Boundary segment
+//                 j-th face
+//
+// elmb(j) is the element number of the element having the j-th boundary face.
+//
+
 //   do i = 1, nbound
 //    do j = 1, bound[i].nbfaces
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-//     x1 = node(bound[i].bnode(j  )).x
-//     y1 = node(bound[i].bnode(j  )).y
-//     x2 = node(bound[i].bnode(j+1)).x
-//     y2 = node(bound[i].bnode(j+1)).y
+         //   bface is defined by the nodes v1 and v2.
+         v1 = (*bound[i].bnode)(j  );
+         v2 = (*bound[i].bnode)(j+1);
 
-//     bound[i].bfn(j)  =  sqrt( (x1-x2)**2 + (y1-y2)**2 )
-//     bound[i].bfnx(j) = -(y1-y2) / bound[i].bfn(j)
-//     bound[i].bfny(j) =  (x1-x2) / bound[i].bfn(j)
+         found = false;
 
-//    end do
-//   end do
+      //   Find the element having the bface from the elements
+      //   around the node v1.
 
-// // Neighbor index over boundary edges (faces)
+         //do k = 1, node[v1).nelms
+         for (size_t k = 0; k < node[v1].nelms; k ++) {
+            ielm = (*node[v1].elm)(k);
+            //do ii = 1, elm[ielm].nvtx;
+            for (size_t ii = 0; ii < elm[ielm].nvtx; ii++) {
+               in = ii;
+               im = ii+1;
+               if (im >= elm[ielm].nvtx ) { im = im - (elm[ielm].nvtx); }//return to 0
+               vt1 = (*elm[ielm].vtx)(in);
+               vt2 = (*elm[ielm].vtx)(im);
+               if (vt1 == v1 and vt2 == v2) {
+                  found = true;
+                  break; //exit
+               }
+            } //end do
+            if (found) {break;} //exit
+         }//end do
 
-//   do i = 1, nbound
-//    do j = 1, bound[i].nbfaces
+         if (found) {
+            (*bound[i].belm)(j) = ielm;
+         }
+         else {
+            cout << " Boundary-adjacent element not found. Error..." << endl;
+            std::exit(0);//stop
+         }
 
-//     n1 = bound[i].bnode(j  )  //Left node
-//     n2 = bound[i].bnode(j+1)  //Right node
 
-//     do k = 1, node[n2].nnghbrs
-//      if ( n1 == node[n2].nghbr(k) ) {
-//       bound[i].kth_nghbr_of_2(j) = k
-//      }
-//     end do
+      }
+   }
 
-//     do k = 1, node[n1].nnghbrs
-//      if ( n2 == node[n1].nghbr(k) ) {
-//       bound[i].kth_nghbr_of_1(j) = k
-//      }
-//     end do
+//--------------------------------------------------------------------------------
+// Construct least-squares matrix for node-centered schemes.
+//
+//        o     o
+//         \   / 
+//          \ /
+//     o-----*-----o
+//          /|
+//         / |
+//        /  o        *: node in interest
+//       o            o: neighbors (edge-connected nghbrs)
+//
 
-//    end do
-//   end do
-
-// // Find element adjacent to the face: belm
-// //
-// //  NOTE: This is useful to figure out what element
-// //        each boundary face belongs to. Boundary flux needs
-// //        special weighting depending on the element.
-// //
-// //      |_________|_________|________|
-// //      |         |         |        | 
-// //      |         |         |        | 
-// //      |_________|_________|________|
-// //      |         |         |        |     <- Grid (e.g., quads)
-// //      |         | elmb(j) |        |
-// //   ---o---------o---------o--------o---  <- Boundary segment
-// //                 j-th face
-// //
-// // elmb(j) is the element number of the element having the j-th boundary face.
-// //
-
-//   do i = 1, nbound
-//    do j = 1, bound[i].nbfaces
-
-// //   bface is defined by the nodes v1 and v2.
-//     v1 = bound[i].bnode(j  )
-//     v2 = bound[i].bnode(j+1)
-
-//     found = .false.
-// //   Find the element having the bface from the elements
-// //   around the node v1.
-//     do k = 1, node[v1).nelms
-//      ielm = node[v1).elm(k)
-//      do ii = 1, elm(ielm).nvtx
-//       in = ii
-//       im = ii+1
-//       if (im > elm(ielm).nvtx) im = im - elm(ielm).nvtx //return to 1
-//       vt1 = elm(ielm).vtx(in)
-//       vt2 = elm(ielm).vtx(im)
-//        if (vt1 == v1 .and. vt2 == v2) {
-//         found = .true.
-//         exit
-//        }
-//      end do
-//      if (found) exit
-//     end do
-
-//     if (found) {
-//      bound[i].belm(j) = ielm
-//     else
-//      write(*,*) " Boundary-adjacent element not found. Error..."
-//      stop
-//     }
-
-//    end do
-//   end do
-
-// //--------------------------------------------------------------------------------
-// // Construct least-squares matrix for node-centered schemes.
-// //
-// //        o     o
-// //         \   / 
-// //          \ /
-// //     o-----*-----o
-// //          /|
-// //         / |
-// //        /  o        *: node in interest
-// //       o            o: neighbors (edge-connected nghbrs)
-// //
-
-// // Check the number of neighbor nodes (must have at least 2 neighbors)
+// Check the number of neighbor nodes (must have at least 2 neighbors)
   cout << " --- Node neighbor data:" << endl;
 
 //   ave_nghbr = node[1).nnghbrs
