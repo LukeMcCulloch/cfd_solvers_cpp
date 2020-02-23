@@ -378,7 +378,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       std::getline(infile, line);
       std::istringstream in(line);
       in >> bound[i].nbnodes;
-      bound[i].bnode = new Array2D<int>(bound[i].nbnodes,1);
+      bound[i].bnode = new Array2D<int>(bound[i].nbnodes , 1);
    }
 
    // // READ: Read boundary nodes
@@ -389,6 +389,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          int init;
          in >> init;
          (*bound[i].bnode)[j][0] = init;
+         //TLM bnode issue here?
          //(*bound[i].bnode)(j,0) = init;
 
          // testing array access:
@@ -561,8 +562,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    for ( int i = 0; i < nelms; ++i ) {
 
       v1 = (*elm[i].vtx)(0,0);
-      v2 = (*elm[i].vtx)(0,0);
-      v3 = (*elm[i].vtx)(0,0);
+      v2 = (*elm[i].vtx)(1,0);
+      v3 = (*elm[i].vtx)(2,0);
 
       x1 = node[v1].x;
       x2 = node[v2].x;
@@ -665,7 +666,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    //  Distribution of element number to the 4th node of the quadrilateral
       node[v4].nelms = node[v4].nelms + 1;
       node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
-      (*node[v4].elm)[ node[v4].nelms ][0] = i;
+      (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
 
       }//    endif tri_or_quad
 
@@ -1486,7 +1487,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 
          //   bface is defined by the nodes v1 and v2.
          v1 = (*bound[i].bnode)[j][0] ;
-         v2 = (*bound[i].bnode)[j][0] ;
+         v2 = (*bound[i].bnode)[j+1][0] ;
 
          found = false;
 
@@ -1495,22 +1496,20 @@ cout << "DONE constructing the element-neighbor data " << endl;
 
          //do k = 1, node[v1).nelms
          for (size_t k = 0; k < node[v1].nelms; k ++) {
-            ielm = (*node[v1].elm)[k][0];
+            ielm = (*node[v1].elm)(k); //[k][0];
             //do ii = 1, elm[ielm].nvtx;
             for (size_t ii = 0; ii < elm[ielm].nvtx; ii++) {
                in = ii;
                im = ii+1;
-               if (im == elm[ielm].nvtx ) { im = im - (elm[ielm].nvtx); }//return to 0? (cannot use im = 0; }//)
+               if (im > elm[ielm].nvtx-1 ) { im = im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
               
-               //if (im == elm[ielm].nvtx ) { im = im - (elm[ielm].nvtx); }//return to 0? (cannot use im = 0; }//)
-               
-               if (im > elm[ielm].nvtx ) { cout << "error: im is off the map" << endl;; }//return to 0
                vt1 = (*elm[ielm].vtx)(in);
                vt2 = (*elm[ielm].vtx)(im);
-               cout << "    " << ielm << "    " << in << "    " << im << endl;
+               //cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
+               cout << "    " << ielm << "    " << im << "    " << in << endl;
                if (vt1 == v1 and vt2 == v2) {
-               cout << " " << ielm << " " << in << " " << im << endl;
                   found = true;
+                  cout << "found " << ielm << " " << in << " " << im << endl;
                   break; //continue; //exit
                }
                if (found) {break;} //exit  //extra break needed to account for exit behavior!
