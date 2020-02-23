@@ -580,15 +580,18 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       */
       node[v1].nelms = node[v1].nelms + 1;
       node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      node[v1].elm[node[v1].nelms] = i;
+      (*node[v1].elm)[node[v1].nelms-1][0] = i;
 
       node[v2].nelms = node[v2].nelms + 1;
       node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      node[v2].elm[node[v2].nelms] = i;
+      (*node[v2].elm)[node[v2].nelms-1][0] = i;
 
       node[v3].nelms = node[v3].nelms + 1;
       node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      node[v3].elm[node[v3].nelms] = i;
+      (*node[v3].elm)[node[v3].nelms-1][0] = i;
+
+      //FIX here!
+      //(*node[v4].elm)[ node[v4].nelms ][0] = i;
 
    // // Compute the cell center and cell volume.
       //tri_or_quad : if (elm(i).nvtx==3) then
@@ -619,7 +622,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
          xc = elm[i].x;
          yc = elm[i].y;
-         if (tri_area(x1,x2,xc,y1,y2,yc)<zero) {
+         if (tri_area(x1,x2,xc,y1,y2,yc)<=zero) {
             cout << " Centroid outside the quad element 12c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1  << endl;
             cout << "  (x2,y2)=" << x2 << y2  << endl;
@@ -629,7 +632,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             //stop
          }
 
-         if (tri_area(x2,x3,xc,y2,y3,yc)<zero) {
+         if (tri_area(x2,x3,xc,y2,y3,yc)<=zero) {
             cout << " Centroid outside the quad element 23c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1  << endl;
             cout << "  (x2,y2)=" << x2 << y2  << endl;
@@ -639,7 +642,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             //stop
          }
 
-         if (tri_area(x3,x4,xc,y3,y4,yc)<zero) {
+         if (tri_area(x3,x4,xc,y3,y4,yc)<=zero) {
             cout << " Centroid outside the quad element 34c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1 << endl;
             cout << "  (x2,y2)=" << x2 << y2 << endl;
@@ -649,7 +652,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             //stop
          }
 
-         if (tri_area(x4,x1,xc,y4,y1,yc)<zero) {
+         if (tri_area(x4,x1,xc,y4,y1,yc)<=zero) {
             cout << " Centroid outside the quad element 41c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1  << endl;
             cout << "  (x2,y2)=" << x2 << y2  << endl;
@@ -661,8 +664,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    //  Distribution of element number to the 4th node of the quadrilateral
       node[v4].nelms = node[v4].nelms + 1;
-      node[v4].elm = new Array2D<int>(node[v4].nelms, 0);
-      (*node[v4].elm)[node[v4].nelms][0] = i;
+      node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
+      (*node[v4].elm)[ node[v4].nelms ][0] = i;
 
       }//    endif tri_or_quad
 
@@ -805,7 +808,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    }
 
 // Begin constructing the element-neighbor data
-
+   cout << "Begin constructing the element-neighbor data \n" << endl;
    //elements2 : do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
 
@@ -819,40 +822,56 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       //            /        |
       //           o---------o
       //
-         //TLM warning:  fixed step out of bounds 
-         if (k  < elm[i].nvtx)  vL = (*elm[i].vtx)(k); //k+1 - 1
-         if (k == elm[i].nvtx) vL = (*elm[i].vtx)(0); //1-1
+         //TLM warning:  fixed step out of bounds ... badly
+         if (k  < elm[i].nvtx-1) vL = (*elm[i].vtx)(k+1); //k+1 - 1.. nope, K goes from 0
+         if (k == elm[i].nvtx-1) vL = (*elm[i].vtx)(0); //1-1
          vR = (*elm[i].vtx)(k);
+
       //   Loop over the surrounding elements of the node vR,
       //   and find the element neighbor from them.
          found = false;
       //elms_around_vR : do j = 1, node(vR).nelms;
          for (int j = 0; j < node[vR].nelms; j++) {
             jelm = (*node[vR].elm)(j); 
-         //edge_matching : do ii = 1, elm(jelm).nvtx;
-         // I just remembered that 
-         //  the "2D" array works just as well as 1D
-         for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
-                           v1 = (*elm[jelm].vtx)(ii);
-            if (ii  > 1) { v2 = (*elm[jelm].vtx)(ii-1); }
-            if (ii == 1) { v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); } //TLM fix: array bounds overrun fixed here
+            // cout << vR << " " << j << "   " << (*node[vR].elm)(j) << endl;
+            // cout << j << "   " << jelm << endl;
 
-            if (v1==vR and v2==vL) {
-               found = true;
-               im = ii+1;
-               if (im > elm[jelm].nvtx) { im = im - elm[jelm].nvtx; }
-               break; //exit edge_matching
-            } //endif
-         } //end do edge_matching
-     //if (found) exit elms_around_vR
-     if (found) {break;}
+            //edge_matching : do ii = 1, elm(jelm).nvtx;
+            for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
+                              v1 = (*elm[jelm].vtx)(ii);
+               //cout << ii << endl;
+               if (ii  > 0) { 
+                  v2 = (*elm[jelm].vtx)(ii-1); 
+               }
+               else if (ii == 0) { 
+                  v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); 
+               } //TLM fix: array bounds overrun fixed here
+               // else{
+               //    //cout << " failed to meet conditions" << endl;
+               // }
+               if (v1==vR and v2==vL) {
+                  found = true;
+                  //cout << "found v1==VR, v2==VL " << vR << "   " << vL << endl;
+                  im = ii+1;
+                  if (im > (elm[jelm].nvtx-1)) { 
+                     im = im - (elm[jelm].nvtx-0); 
+                  }
+                  break; //exit edge_matching  |
+               } //endif                       V
+               else {
+                  //cout << "not found " << v1 << " != " << vR << "   " << v2 << " != " << vL << endl;
+               }
+            } //end do     edge_matching   <---V
+
+      //if (found) exit elms_around_vR
+      if (found) {break;}
 
       } //end do elms_around_vR
 
       // Q: why is this k+2 when we already loop all the way to nvtx?
       in = k + 2; 
-      if (in > elm[i].nvtx-1) { in = in - elm[i].nvtx; } // A: simple fix here: in > elm[i].nvtx had to be ammended
-
+      if (in > elm[i].nvtx-1) { in = in - elm[i].nvtx-0; } // A: simple fix here: in > elm[i].nvtx had to be ammended and not [0,1,2](3) => 2 len=3
+      // i.e. if n > 2, then c = 3; so subtract 3 (i.e. nvtx) to get back to zero
       if (found) {
          (*elm[   i].nghbr)(in) = jelm;
          (*elm[jelm].nghbr)(im) = i;
@@ -865,6 +884,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }//    end do elm_vertex
 
    }//   end do elements2
+
+cout << "DONE constructing the element-neighbor data " << endl;
 
 //--------------------------------------------------------------------------------
 // Edge-data for node-centered (edge-based) scheme.
@@ -1225,7 +1246,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //
 // Quadratic approximation:
 // See http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2015v281pp518-555_preprint.pdf
-// for details on the quadratic approximation for computing more accurate normals.
+// for details on the bnode(quadratic approximation for computing more accurate normals.
 // 
 
 //   boundary_type0 : do i = 1, nbound
@@ -1234,19 +1255,19 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       for (size_t j = 0; j < bound[i].nbnodes; j++) {
 
          if (j==0) {
-            v1 = (*bound[i].bnode)(j  );
-            v2 = (*bound[i].bnode)(j+1);
-            v3 = (*bound[i].bnode)(j+2);
+            v1 = (*bound[i].bnode)[j  ][0];
+            v2 = (*bound[i].bnode)[j+1][0];
+            v3 = (*bound[i].bnode)[j+2][0];
          }
          else if (j==bound[i].nbnodes-1) {
-            v1 = (*bound[i].bnode)(j-2);
-            v2 = (*bound[i].bnode)(j-1);
-            v3 = (*bound[i].bnode)(j  );
+            v1 = (*bound[i].bnode)[j-2][0];
+            v2 = (*bound[i].bnode)[j-1][0];
+            v3 = (*bound[i].bnode)[j  ][0];
          }
          else {
-            v1 = (*bound[i].bnode)(j-1);
-            v2 = (*bound[i].bnode)(j);
-            v3 = (*bound[i].bnode)(j+1);
+            v1 = (*bound[i].bnode)[j-1][0];
+            v2 = (*bound[i].bnode)[j][0];
+            v3 = (*bound[i].bnode)[j+1][0];
          }
 
          x1 = node[v1].x;
@@ -1262,7 +1283,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
 //    Skip the last one if the boundary segment is a closed boundary 
 //    in which case the last node is the same as the first one.
-      if (j==bound[i].nbnodes and (*bound[i].bnode)(j)==(*bound[i].bnode)(0) ) {
+      //if (j==bound[i].nbnodes and (*bound[i].bnode)(j)==(*bound[i].bnode)(0) ) {
+      if (j==bound[i].nbnodes-1 and (*bound[i].bnode)[j][0]==(*bound[i].bnode)[0][0] ) { //TLM TODO FIX? better?
          (*bound[i].bn)(j)  = (*bound[i].bn)(0);
          (*bound[i].bnx)(j) = (*bound[i].bnx)(0);
          (*bound[i].bny)(j) = (*bound[i].bny)(0);
@@ -1387,10 +1409,10 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-         x1 = node[ (*bound[i].bnode)(j  ) ].x;
-         y1 = node[ (*bound[i].bnode)(j  ) ].y;
-         x2 = node[ (*bound[i].bnode)(j+1) ].x;
-         y2 = node[ (*bound[i].bnode)(j+1) ].y;
+         x1 = node[ (*bound[i].bnode)[j  ][0] ].x;
+         y1 = node[ (*bound[i].bnode)[j  ][0] ].y;
+         x2 = node[ (*bound[i].bnode)[j+1][0] ].x;
+         y2 = node[ (*bound[i].bnode)[j+1][0] ].y;
 
          (*bound[i].bfn)(j,0)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j,0) = -(y1-y2) / (*bound[i].bfn)(j);
@@ -1403,10 +1425,10 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-         x1 = node[(*bound[i].bnode)(j  ) ].x;
-         y1 = node[(*bound[i].bnode)(j  ) ].y;
-         x2 = node[(*bound[i].bnode)(j+1) ].x;
-         y2 = node[(*bound[i].bnode)(j+1) ].y;
+         x1 = node[(*bound[i].bnode)[j  ][0] ].x;
+         y1 = node[(*bound[i].bnode)[j  ][0] ].y;
+         x2 = node[(*bound[i].bnode)[j+1][0] ].x;
+         y2 = node[(*bound[i].bnode)[j+1][0] ].y;
 
          (*bound[i].bfn)(j)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j) = -(y1-y2) / (*bound[i].bfn)(j);
@@ -1419,8 +1441,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-         n1 = (*bound[i].bnode)(j  );  //Left node
-         n2 = (*bound[i].bnode)(j+1);  //Right node
+         n1 = (*bound[i].bnode)[j  ][0];  //Left node
+         n2 = (*bound[i].bnode)[j+1][0];  //Right node
 
 
          for (size_t k = 0; k < node[n2].nnghbrs; k++) {
@@ -1459,11 +1481,12 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //   do i = 1, nbound
 //    do j = 1, bound[i].nbfaces
    for (size_t i = 0; i < nbound; i++) {
-      for (size_t j = 0; j < bound[i].nbfaces; j++) {
+      //for (size_t j = 0; j < bound[i].nbfaces; j++) {
+      for (size_t j = 0; j < 2; j++) {
 
          //   bface is defined by the nodes v1 and v2.
-         v1 = (*bound[i].bnode)(j  );
-         v2 = (*bound[i].bnode)(j+1);
+         v1 = (*bound[i].bnode)[j][0] ;
+         v2 = (*bound[i].bnode)[j][0] ;
 
          found = false;
 
@@ -1472,28 +1495,36 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
          //do k = 1, node[v1).nelms
          for (size_t k = 0; k < node[v1].nelms; k ++) {
-            ielm = (*node[v1].elm)(k);
+            ielm = (*node[v1].elm)[k][0];
             //do ii = 1, elm[ielm].nvtx;
             for (size_t ii = 0; ii < elm[ielm].nvtx; ii++) {
                in = ii;
                im = ii+1;
-               if (im >= elm[ielm].nvtx ) { im = im - (elm[ielm].nvtx); }//return to 0
+               if (im == elm[ielm].nvtx ) { im = im - (elm[ielm].nvtx); }//return to 0? (cannot use im = 0; }//)
+              
+               //if (im == elm[ielm].nvtx ) { im = im - (elm[ielm].nvtx); }//return to 0? (cannot use im = 0; }//)
+               
+               if (im > elm[ielm].nvtx ) { cout << "error: im is off the map" << endl;; }//return to 0
                vt1 = (*elm[ielm].vtx)(in);
                vt2 = (*elm[ielm].vtx)(im);
+               cout << "    " << ielm << "    " << in << "    " << im << endl;
                if (vt1 == v1 and vt2 == v2) {
+               cout << " " << ielm << " " << in << " " << im << endl;
                   found = true;
-                  break; //exit
+                  break; //continue; //exit
                }
+               if (found) {break;} //exit  //extra break needed to account for exit behavior!
             } //end do
             if (found) {break;} //exit
          }//end do
 
          if (found) {
+            cout << " GOOD: Boundary-adjacent element found" << endl;
             (*bound[i].belm)(j) = ielm;
          }
          else {
             cout << " Boundary-adjacent element not found. Error..." << endl;
-            std::exit(0);//stop
+            //std::exit(0);//stop
          }
 
 
