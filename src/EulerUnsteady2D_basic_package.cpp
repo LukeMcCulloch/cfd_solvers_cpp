@@ -323,6 +323,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          (*elm[i].vtx)(0) = x;
          (*elm[i].vtx)(1) = y;
          (*elm[i].vtx)(2) = z;
+         if (i<20) cout << "\nx, y, z = " << x <<"  " << y << "  " << z;
       }
    }
    // // Quads: assumed that the vertices are ordered counterclockwise
@@ -346,10 +347,10 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x1,x2,x3,x4;
          in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated ...ints
-         (*elm[ntria+i].vtx)(0,0) = x1;
-         (*elm[ntria+i].vtx)(1,0) = x2;
-         (*elm[ntria+i].vtx)(2,0) = x3;
-         (*elm[ntria+i].vtx)(3,0) = x4;
+         (*elm[ntria+i-1].vtx)(0,0) = x1;
+         (*elm[ntria+i-1].vtx)(1,0) = x2;
+         (*elm[ntria+i-1].vtx)(2,0) = x3;
+         (*elm[ntria+i-1].vtx)(3,0) = x4;
       }
    }
 
@@ -1503,13 +1504,13 @@ cout << "DONE constructing the element-neighbor data " << endl;
                im = ii+1;
                if (im > elm[ielm].nvtx-1 ) { im = im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
               
-               vt1 = (*elm[ielm].vtx)(in);
-               vt2 = (*elm[ielm].vtx)(im);
-               //cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
+               vt1 = (*elm[ielm].vtx)(in); //TLM these are shit
+               vt2 = (*elm[ielm].vtx)(im); //TLM these are shit
+               cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
                cout << "    " << ielm << "    " << im << "    " << in << endl;
                if (vt1 == v1 and vt2 == v2) {
                   found = true;
-                  cout << "found " << ielm << " " << in << " " << im << endl;
+                  cout << "found! " << ielm << " " << in << " " << im << endl;
                   break; //continue; //exit
                }
                if (found) {break;} //exit  //extra break needed to account for exit behavior!
