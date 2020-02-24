@@ -829,9 +829,13 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          }
 
       //  Distribution of element number to the 4th node of the quadrilateral
-         node[v4].nelms = node[v4].nelms + 1;
-         node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
-         (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
+         // node[v4].nelms = node[v4].nelms + 1;
+         // node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
+         // (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
+
+         // easier way
+         (*node[v4].elm)((*node[v4].elm).tracked_index, 0) = i;
+         (*node[v4].elm).tracked_index +=1;
 
          // node[v4].elm = new Array2D<int>(node[v4].nelms+1, 1);
          // (*node[v4].elm)( node[v4].nelms , 0) = i;
@@ -1774,16 +1778,16 @@ A: no, those were statically allocated, not pointers to
 //
 
 // Check the number of neighbor nodes (must have at least 2 neighbors)
-  cout << " --- Node neighbor data:" << endl;
+   cout << " --- Node neighbor data:" << endl;
 
-//   ave_nghbr = node[1).nnghbrs
-//   min_nghbr = node[1).nnghbrs
-//   max_nghbr = node[1).nnghbrs
-//        imin = 1
-//        imax = 1
-//    if (node[1).nnghbrs==2) {
-//     write(*,*) "--- 2 neighbors for the node = ", 1
-//    }
+   ave_nghbr = node[1].nnghbrs;
+   min_nghbr = node[1].nnghbrs;
+   max_nghbr = node[1].nnghbrs;
+      imin = 1;
+      imax = 1;
+   if (node[1].nnghbrs==2) {
+      cout << "--- 2 neighbors for the node = " << 1 << endl;
+   }
 
 //   do i = 2, nnodes
 //    ave_nghbr = ave_nghbr + node[i].nnghbrs
