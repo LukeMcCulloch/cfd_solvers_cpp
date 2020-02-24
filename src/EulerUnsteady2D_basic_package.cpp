@@ -1915,134 +1915,164 @@ cout << "Generating CC scheme data......" << endl;
       }//end do
    }//   end do elements5
 
-// // Loop over faces
-// // Construct directed area vector.
+// Loop over faces
+// Construct directed area vector.
 
-//   faces : do i = 1, nfaces
+   //faces : do i = 1, nfaces
+   for (size_t i = 0; i < nfaces; i++) {
 
-//    n1 = face(i).n1
-//    n2 = face(i).n2
-//    e1 = face(i).e1
-//    e2 = face(i).e2
+      n1 = face[i].n1;
+      n2 = face[i].n2;
+      e1 = face[i].e1;
+      e2 = face[i].e2;
 
-// // Face vector
-//   face(i).dav(1) = -( node[n2].y - node[n1].y )
-//   face(i).dav(2) =    node[n2].x - node[n1].x
-//   face(i).da     = sqrt( face(i).dav(1)**2 + face(i).dav(2)**2 )
-//   face(i).dav    = face(i).dav / face(i).da
+      // Face vector
+      face[i].dav(0) = -( node[n2].y - node[n1].y );
+      face[i].dav(1) =    node[n2].x - node[n1].x;
+      face[i].da     = sqrt( face[i].dav(0)*face[i].dav(0) +
+                            face[i].dav(1)*face[i].dav(1) );
+      face[i].dav    = face[i].dav / face[i].da;
 
-//   end do faces
+   } //end do faces
 
-// // Construct vertex-neighbor data for cell-centered scheme.
-// //
-// // For each element, i, collect all elements sharing the nodes
-// // of the element, i, including face-neighors.
-// //
-// //      ___________
-// //     |     |     |
-// //     |  o  |  o  |
-// //     |_____|_____|
-// //    /\    / \    \
-// //   / o\ o/ i \  o \
-// //  /____\/_____\____\
-// //  \    /      /\    \
-// //   \o /  o   / o\ o  \
-// //    \/______/____\____\
-// //
-// //          i: Element of interest
-// //          o: Vertex neighbors (k = 1,2,...,9)
+// Construct vertex-neighbor data for cell-centered scheme.
+//
+// For each element, i, collect all elements sharing the nodes
+// of the element, i, including face-neighors.
+//
+//      ___________
+//     |     |     |
+//     |  o  |  o  |
+//     |_____|_____|
+//    /\    / \    \
+//   / o\ o/ i \  o \
+//  /____\/_____\____\
+//  \    /      /\    \
+//   \o /  o   / o\ o  \
+//    \/______/____\____\
+//
+//          i: Element of interest
+//          o: Vertex neighbors (k = 1,2,...,9)
 
-//   write(*,*) " --- Vertex-neighbor data:"
+   cout << " --- Vertex-neighbor data:" << endl;
 
-//   do i = 1, nelms
-//    elm(i).nvnghbrs = 1
-//    call my_alloc_int_ptr(elm(i).vnghbr, 1)
-//   end do
+   //do i = 1, nelms
+   for (size_t i = 0; i < nelms; i++) {
+      elm[i].nvnghbrs = 1;
+      //call my_alloc_int_ptr(elm(i).vnghbr, 1)
+      elm[i].vnghbr = new Array2D<int>(1,1);
+   }
 
-//   ave_nghbr = 0
-//   min_nghbr = 10000
-//   max_nghbr =-10000
-//        imin = 1
-//        imax = 1
+   ave_nghbr = 0;
+   min_nghbr = 10000;
+   max_nghbr =-10000;
+         imin = 1;
+         imax = 1;
 
-// // Initialization
-//   elements6 : do i = 1, nelms
-//    elm(i).nvnghbrs = 0
-//   end do elements6
+   // Initialization
+   //elements6 : do i = 1, nelms
+   for (size_t i =0; i< nelms; i++) {
+      elm[i].nvnghbrs = 0;
+   }//end do elements6
 
-// // Collect vertex-neighbors
-//   elements7 : do i = 1, nelms
-
-// // (1)Add face-neighbors
-//    do k = 1, elm(i).nnghbrs
-//     if ( elm(i).nghbr(k) > 0 ) {
-//      elm(i).nvnghbrs = elm(i).nvnghbrs + 1
-//      call my_alloc_int_ptr(elm(i).vnghbr, elm(i).nvnghbrs)
-//      elm(i).vnghbr(elm(i).nvnghbrs) = elm(i).nghbr(k)
-//     }
-//    end do
-
-// // (2)Add vertex-neighbors
-//    do k = 1, elm(i).nvtx
-//     v1 = elm(i).vtx(k)
-
-//     velms : do j = 1, node[v1).nelms
-//      e1 = node[v1).elm(j)
-//      if (e1 == i) cycle velms
-
-// //    Check if the element is already added.
-//        found = .false.
-//      do ii = 1, elm(i).nvnghbrs
-//       if ( e1 == elm(i).vnghbr(ii) ) {
-//        found = .true.
-//        exit
-//       }
-//      end do
-
-// //    Add the element, e1, if not added yet.
-//      if (.not.found) {
-//       elm(i).nvnghbrs = elm(i).nvnghbrs + 1
-//       call my_alloc_int_ptr(elm(i).vnghbr, elm(i).nvnghbrs)
-//       elm(i).vnghbr(elm(i).nvnghbrs) = e1
-//      }
-//     end do velms
-
-//    end do
-
-//    ave_nghbr = ave_nghbr + elm(i).nvnghbrs
-//    if (elm(i).nvnghbrs < min_nghbr) imin = i
-//    if (elm(i).nvnghbrs > max_nghbr) imax = i
-//    min_nghbr = min(min_nghbr, elm(i).nvnghbrs)
-//    max_nghbr = max(max_nghbr, elm(i).nvnghbrs)
-//    if (elm(i).nvnghbrs < 3) {
-//     write(*,*) "--- Not enough neighbors: elm = ", i, &
-//                "elm(i).nvnghbrs=",elm(i).nvnghbrs
-//    }
-
-//   end do elements7
-
-//   write(*,*) "      ave_nghbr = ", ave_nghbr/nelms
-//   write(*,*) "      min_nghbr = ", min_nghbr, " elm = ", imin
-//   write(*,*) "      max_nghbr = ", max_nghbr, " elm = ", imax
-//   write(*,*)
+// Collect vertex-neighbors
+   //elements7 : do i = 1, nelms
+   for (size_t i = 0; i < nelms; i++) {
 
 
-//   do i = 1, nelms
-//    elm(i).bmark = 0
-//   end do
+   // (1)Add face-neighbors
+      //do k = 1, elm(i).nnghbrs
+      for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+         if ( (*elm[i].nghbr)(k) > 0 ) {
+            elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
 
-//   bc_loop : do i = 1, nbound
-//    if (trim(bound[i].bc_type) == "dirichlet") {
-//     do j = 1, bound[i].nbfaces
-//      elm( bound[i].belm(j) ).bmark = 1
-//     end do
-//    }
-//   end do bc_loop
+            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
+         }
+      }
+      // TLM loops to avoid realloc:
+      // for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+      //    if ( (*elm[i].nghbr)(k) > 0 ) {
+      //       elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+      //    }
+      // }
+      // for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+      //    if ( (*elm[i].nghbr)(k) > 0 ) {
+      //       (*elm[i].vnghbr)(elm[i].nvnghbrs) = (*elm[i].nghbr)(k);
+      //    }
+      // }
+
+
+
+
+// (2)Add vertex-neighbors
+   //do k = 1, elm[i].nvtx
+   for (size_t k = 0; k < elm[i].nvtx; k++) {
+      v1 = (*elm[i].vtx)(k);
+
+      //velms : do j = 1, node[v1).nelms
+      for (size_t j =0; j < node[v1].nelms; j++) {
+         e1 = (*node[v1].elm)(j);
+         if (e1 == i) continue; //velms;
+
+   //    Check if the element is already added.
+         found = false;
+         //do ii = 1, elm[i].nvnghbrs
+         for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
+            if ( e1 == (*elm[i].vnghbr)(ii) ) {
+               found = true;
+               break;
+            }
+         }
+
+//    Add the element, e1, if not added yet.
+         if (not found) {
+            elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
+            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
+         }
+      }//end do velms
+
+   }//end do
+
+   ave_nghbr = ave_nghbr + elm[i].nvnghbrs;
+   if (elm[i].nvnghbrs < min_nghbr) imin = i;
+   if (elm[i].nvnghbrs > max_nghbr) imax = i;
+   min_nghbr = std::min(min_nghbr, elm[i].nvnghbrs);
+   max_nghbr = std::max(max_nghbr, elm[i].nvnghbrs);
+   if (elm[i].nvnghbrs < 3) {
+      cout << "--- Not enough neighbors: elm = " << i << 
+               "elm[i].nvnghbrs= " << elm[i].nvnghbrs << endl;
+   }
+
+   }//end do elements7
+
+   cout << "      ave_nghbr = " << ave_nghbr/nelms << endl;
+   cout << "      min_nghbr = " << min_nghbr << " elm = " << imin << endl;
+   cout << "      max_nghbr = " << max_nghbr << " elm = " << imax << endl;
+   cout << " "  << endl;
+
+
+   //do i = 1, nelms
+   for ( int i = 0; i < nelms; ++i ) {
+      elm[i].bmark = 0;
+   }
+
+   //bc_loop : do i = 1, nbound
+   for ( int i = 0; i < nbound; ++i ) {
+      if ( bound[i].bc_type == "dirichlet") {
+         //do j = 1, bound[i].nbfaces
+         for (size_t i = 0; i < bound[i].nbfaces; i++) {
+            elm[ (*bound[i].belm)(j) ].bmark = 1;
+         }//end do
+      }
+   }// end do bc_loop
 
 // //--------------------------------------------------------------------------------
 
-   return;
-};
+}
 //  end subroutine construct_grid_data
 
 //********************************************************************************
