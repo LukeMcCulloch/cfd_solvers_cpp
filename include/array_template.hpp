@@ -94,6 +94,7 @@ class Array2D{
         // set up data size of matrix
         int nrows, ncols;
         int storage_size;
+        size_t tracked_index;
 
         // malloc host memory
         T* array;
@@ -103,6 +104,7 @@ class Array2D{
                         nrows(numrows), ncols(numcols){
             //cout << "building \n" << endl;
             //buildWithParameters(numrows, numcols);
+            tracked_index = 0;
             build();
             //cout << "built \n" << endl;
             //initialize();
@@ -114,8 +116,15 @@ class Array2D{
         //copy constructor 
         Array2D(const Array2D& A);
 
+
         // destructor
         ~Array2D ();
+
+
+        // resize! constructor
+        Array2D(const Array2D& A, int nrows, int ncols);
+
+            
 
         //methods:
         void build();
@@ -219,6 +228,8 @@ Array2D<T>::Array2D(const Array2D& other)
     storage_size = nrows*ncols;
     nBytes = storage_size * sizeof(T);
 
+    //cout << "copy constructor" << endl;
+
     array = new T[storage_size];
 
     //printf("\narray copy constructor\n");
@@ -228,6 +239,22 @@ Array2D<T>::Array2D(const Array2D& other)
     }
 }
 
+
+// resize copy constructor:
+template <class T>
+Array2D<T>::Array2D(const Array2D& other, int nrows, int ncols)
+    : nrows(other.nrows+nrows), ncols(other.ncols+ncols){
+    storage_size = nrows*ncols;
+    nBytes = storage_size * sizeof(T);
+
+    array = new T[storage_size];
+
+    //printf("\narray copy constructor\n");
+    int i = 0;
+    for(i = 0; i < other.storage_size; i++) {
+       array[i] = other.array[i];
+    }
+}
 
 
 template <class T>
