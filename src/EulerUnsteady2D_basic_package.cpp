@@ -1806,36 +1806,42 @@ A: no, those were statically allocated, not pointers to
   cout << "      max_nghbr = " << max_nghbr << " at node " << imax << endl;
   cout << "" << endl;
 
-// //--------------------------------------------------------------------------------
-// // Cell centered scheme data
-// //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+// Cell centered scheme data
+//--------------------------------------------------------------------------------
 
-//   write(*,*) "Generating CC scheme data......"
+cout << "Generating CC scheme data......" << endl;
 
-//   do i = 1, nelms   
-//    allocate(elm(i).edge( elm(i).nnghbrs ) )
-//   end do
+   //do i = 1, nelms  
+   for (size_t i = 0; i < nelms; i++) { 
+      //allocate(elm(i).edge( elm(i).nnghbrs ) )
+      elm[i].edge = new Array2D<int>[ elm[i].nnghbrs ];
+   }
 
-//   edges3 : do i = 1, nedges
+   //edges3 : do i = 1, nedges
+   for (size_t i = 0; i < nedges; i++) {
 
-//    e1 = edge[i].e1
-//    e2 = edge[i].e2
 
-// // Left element
-//   if (e1 > 0) {
-//    do k = 1, elm[e1].nnghbrs
-//     if (elm[e1].nghbr(k)==e2) elm[e1].edge(k) = i
-//    end do
-//   }
+      e1 = edge[i].e1;
+      e2 = edge[i].e2;
 
-// // Right element
-//   if (e2 > 0) {
-//    do k = 1, elm[e2].nnghbrs
-//     if (elm[e2].nghbr(k)==e1) elm[e2].edge(k) = i
-//    end do
-//   }
+      // Left element
+      if (e1 > 0) {
+         //do k = 1, elm[e1].nnghbrs;
+         for (size_t k = 0; k < elm[e1].nnghbrs; k++) {
+            if ( (*elm[e1].nghbr)(k)==e2) (*elm[e1].edge)(k) = i;
+         }
+      }
 
-//   end do edges3
+      // Right element
+      if (e2 > 0) {
+         //do k = 1, elm[e2].nnghbrs;
+         for (size_t k = 0; k < elm[e2].nnghbrs; k++) {
+            if ( (*elm[e2].nghbr)(k)==e1)  (*elm[e2].edge)(k) = i;
+         }
+      }
+
+   }//end do edges3
 
 // // Face-data for cell-centered (edge-based) scheme.
 // //
