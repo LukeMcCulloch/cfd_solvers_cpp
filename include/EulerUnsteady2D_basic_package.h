@@ -383,6 +383,7 @@ public:
 // Note: Each face has the following data.
 //----------------------------------------------------------
   class face_type{
+  public:
     // to be constructed in the code (NB: boundary faces are excluded.)
     int n1, n2;    //associated nodes
     int e1, e2;    //associated elements

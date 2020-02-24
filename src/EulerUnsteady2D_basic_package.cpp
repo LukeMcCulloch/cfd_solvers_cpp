@@ -1874,42 +1874,46 @@ cout << "Generating CC scheme data......" << endl;
          if (jelm > i) {
             nfaces = nfaces + 1;
          }
-      }//end do
+      }
    }//end do elements4
 
-//   allocate(face(nfaces))
+   //   allocate(face(nfaces))
+   face = new face_type[nfaces];
 
-//   nfaces = 0
+   nfaces = 0;
 
 //   elements5 : do i = 1, nelms
-//    do k = 1, elm(i).nnghbrs
-//    jelm = elm(i).nghbr(k)
+   for ( size_t i = 0; i < nelms; i++) {
+      //do k = 1, elm(i).nnghbrs
+      for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+         jelm = (*elm[i].nghbr)(k);
 
-//     if (jelm > i) {
+         if (jelm > i) {
 
-//      nfaces = nfaces + 1
+            nfaces = nfaces + 1;
 
-//      face(nfaces).e1 = i
-//      face(nfaces).e2 = jelm
+            face[nfaces].e1 = i;
+            face[nfaces].e2 = jelm;
 
-//      iedge = elm(i).edge(k)
-//      v1 = edge(iedge).n1
-//      v2 = edge(iedge).n2
+            iedge = (*elm[i].edge)(k);
+            v1 = edge[iedge].n1;
+            v2 = edge[iedge].n2;
 
-//      if (edge(iedge).e1 == jelm) {
-//       face(nfaces).n1 = v1
-//       face(nfaces).n2 = v2
-//      else
-//       face(nfaces).n1 = v2
-//       face(nfaces).n2 = v1
-//      }
-   
-//     elseif (jelm == 0) {
-// //    Skip boundary faces.
-//     }
+            if (edge[iedge].e1 == jelm) {
+               face[nfaces].n1 = v1;
+               face[nfaces].n2 = v2;
+            }
+            else {
+               face[nfaces].n1 = v2;
+               face[nfaces].n2 = v1;
+            }
+         }
+         else if (jelm == 0) {
+      //    Skip boundary faces.
+         }
 
-//    end do
-//   end do elements5
+      }//end do
+   }//   end do elements5
 
 // // Loop over faces
 // // Construct directed area vector.
