@@ -287,7 +287,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       // node[i].res   = new Array2D<real>(nq,1);
 
       //node[i].nelms = 0;
-      //if (i< 200) std::cout  << i << "  " << node[i].x << " " << node[i].y << std::endl;
+      if (i< 200) std::cout  << i << "  " << node[i].x << " " << node[i].y << std::endl;
 
    }
    //cout << "done reading nodal coords" << endl;
@@ -394,7 +394,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       std::getline(infile, line);
       std::istringstream in(line);
       in >> bound[i].nbnodes;
-      cout << "Got in bnodes = " << bound[i].nbnodes << endl;
+      //cout << "Got in bnodes = " << bound[i].nbnodes << endl;
       bound[i].bnode = new Array2D<int>(bound[i].nbnodes , 1);
    }
 
@@ -409,14 +409,14 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          in >> init;
          //(*bound[i].bnode)[j][0] = init;
          //TLM bnode issue here?
-         (*bound[i].bnode)(j,0) = init;
+         (*bound[i].bnode)(j,0) = init-1;
          
          
-         //cout << i << " " << j << endl;
+         cout << i << " " << j << " " << (*bound[i].bnode)(j,0)  << endl;
 
-         if ( j>bound[i].nbnodes-21 ) {
-            cout << (*bound[i].bnode)(j,0) << endl;
-         }
+         // if ( j>bound[i].nbnodes-21 ) {
+         //    cout << (*bound[i].bnode)(j,0) << endl;
+         // }
 
          //cout << (*bound[i].bnode)(j,0) << "   " << init << endl;
          // testing array access:
@@ -1451,7 +1451,7 @@ A: no, those were statically allocated, not pointers to
 
    for (size_t i = 0; i < nbound; i++) {
       bound[i].nbfaces = bound[i].nbnodes-1;
-      //cout << "nbfaces = " << bound[i].nbfaces << endl;
+      cout << "nbfaces = " << bound[i].nbfaces << endl;
 
       bound[i].bfnx = new Array2D<real>( bound[i].nbfaces , 1 );
       bound[i].bfny = new Array2D<real>( bound[i].nbfaces , 1 );
@@ -1467,15 +1467,25 @@ A: no, those were statically allocated, not pointers to
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-         x1 = node[ (*bound[i].bnode)[j  ][0] ].x;
-         y1 = node[ (*bound[i].bnode)[j  ][0] ].y;
-         x2 = node[ (*bound[i].bnode)[j+1][0] ].x;
-         y2 = node[ (*bound[i].bnode)[j+1][0] ].y;
+         x1 = node[ (*bound[i].bnode)(j  ,0) ].x;
+         y1 = node[ (*bound[i].bnode)(j  ,0) ].y;
+         x2 = node[ (*bound[i].bnode)(j+1,0) ].x;
+         y2 = node[ (*bound[i].bnode)(j+1,0) ].y;
 
-         //if (j==bound[i].nbfaces-1) {
-            cout << "weird x2, y2 = " << x2 << "  "  << y2 << endl;
+
+         if (j==0) {
+            cout << "weird i, j  = " << i << "  "  << j << endl;
+            cout << "weird x1, y1 = " << x1 << "  "  << y1 << " x2, y2 = " << x2 << "  "  << y2 << endl;
             cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
-         //}
+            cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
+         }
+
+         if (j==bound[i].nbfaces-1) {
+            cout << "weird i, j  = " << i << "  "  << j << endl;
+            cout << "weird x1, y1 = " << x1 << "  "  << y1 << " x2, y2 = " << x2 << "  "  << y2 << endl;
+            cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
+            cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
+         }
 
          (*bound[i].bfn)(j,0)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j,0) = -(y1-y2) / (*bound[i].bfn)(j);
@@ -1493,10 +1503,11 @@ A: no, those were statically allocated, not pointers to
          x2 = node[(*bound[i].bnode)[j+1][0] ].x;
          y2 = node[(*bound[i].bnode)[j+1][0] ].y;
 
-         if (j==bound[i].nbfaces-1){ 
-            cout << "weird x2, y2 = " << x2 << "  " << y2 << endl;
-            cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
-         }
+         // if (j==bound[i].nbfaces-1){ 
+         //    cout << "weird i, j  = " << i << "  "  << j << endl;
+         //    cout << "weird x2, y2 = " << x2 << "  " << y2 << endl;
+         //    cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
+         // }
 
          (*bound[i].bfn)(j)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j) = -(y1-y2) / (*bound[i].bfn)(j);
