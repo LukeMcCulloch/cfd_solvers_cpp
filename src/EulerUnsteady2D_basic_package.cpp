@@ -287,7 +287,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       // node[i].res   = new Array2D<real>(nq,1);
 
       //node[i].nelms = 0;
-      if (i< 200) std::cout  << i << "  " << node[i].x << " " << node[i].y << std::endl;
+      //if (i< 200) std::cout  << i << "  " << node[i].x << " " << node[i].y << std::endl;
 
    }
    //cout << "done reading nodal coords" << endl;
@@ -320,19 +320,19 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x, y, z;
          in >> x >> y >> z;       //now read the whitespace-separated ints
+         // Fix indices for 0 indexed code!
          (*elm[i].vtx)(0) = x-1;
          (*elm[i].vtx)(1) = y-1;
          (*elm[i].vtx)(2) = z-1;
          //cout << (*elm[i].vtx).ncols << endl;
-         //if (i<20) cout << "\nInput = " << x <<"  " << y << "  " << z;
-         if (i<20) cout << "\nInput = " << (*elm[i].vtx)(0) <<
-                                         "  " << (*elm[i].vtx)(1) << 
-                                         "  " << (*elm[i].vtx)(2) ;
-         if (i>ntria-20) cout << "\nInput = " << (*elm[i].vtx)(0) <<
-                                         "  " << (*elm[i].vtx)(1) << 
-                                         "  " << (*elm[i].vtx)(2) ;
-         //if (i>ntria-20) cout << "\nInput = " << (*elm[i].vtx)(0,0) <<"  " << (*elm[i].vtx)(1,0) << "  " << (*elm[i].vtx)(2,0);
-         //if (i>ntria-20) cout << "\nInput = " << (*elm[i].vtx)(0) <<"  " << (*elm[i].vtx)(1) << "  " << (*elm[i].vtx)(2);
+         
+         // if (i<20) cout << "\nInput = " << (*elm[i].vtx)(0) <<
+         //                                 "  " << (*elm[i].vtx)(1) << 
+         //                                 "  " << (*elm[i].vtx)(2) ;
+         // if (i>ntria-20) cout << "\nInput = " << (*elm[i].vtx)(0) <<
+         //                                 "  " << (*elm[i].vtx)(1) << 
+         //                                 "  " << (*elm[i].vtx)(2) ;
+               
       }
    }
    // // Quads: assumed that the vertices are ordered counterclockwise
@@ -356,10 +356,11 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x1,x2,x3,x4;
          in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated ...ints
-         (*elm[ntria+i-1].vtx)(0) = x1;
-         (*elm[ntria+i-1].vtx)(1) = x2;
-         (*elm[ntria+i-1].vtx)(2) = x3;
-         (*elm[ntria+i-1].vtx)(3) = x4;
+         // Fix indices for 0 indexed code!
+         (*elm[ntria+i-1].vtx)(0) = x1-1;
+         (*elm[ntria+i-1].vtx)(1) = x2-1;
+         (*elm[ntria+i-1].vtx)(2) = x3-1;
+         (*elm[ntria+i-1].vtx)(3) = x4-1;
          // if (i<20) cout << "\nx, y, z = " << x1 <<"  " << x2 << "  " << x3 << x4;
          // if (i<20) cout << "\nelm x, elm y, elm z = " << (*elm[i].vtx)(0,0) <<"  " << (*elm[i].vtx)(1,0) << "  " << (*elm[i].vtx)(2,0)<< "  " << (*elm[i].vtx)(3,0);
          // if (i<20) cout << "\nelm x, elm y, elm z = " << (*elm[i].vtx)(0) <<"  " << (*elm[i].vtx)(1) << "  " << (*elm[i].vtx)(2) << "  " << (*elm[i].vtx)(3);
@@ -408,11 +409,12 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          int init;
          in >> init;
          //(*bound[i].bnode)[j][0] = init;
-         //TLM bnode issue here?
+         //TLM bnode issue : we are reading in indices that 
+         //  were starting from 1, but our code starts form 0!
          (*bound[i].bnode)(j,0) = init-1;
          
          
-         cout << i << " " << j << " " << (*bound[i].bnode)(j,0)  << endl;
+         //cout << i << " " << j << " " << (*bound[i].bnode)(j,0)  << endl;
 
          // if ( j>bound[i].nbnodes-21 ) {
          //    cout << (*bound[i].bnode)(j,0) << endl;
@@ -608,28 +610,33 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       * DESIGN CHOICE HERE -- use std<vector?> or similar?
       * I don't think we need a true dynamic (i.e. resizable) array
       */
-      node[v1].elm = new Array2D<int>(node[v1].nelms+1, 1);
-      (*node[v1].elm)[node[v1].nelms][0] = i;
       node[v1].nelms = node[v1].nelms + 1;
-      if (i<20) cout << "index to node: " << v1 << " " <<  
-                        (*node[v1].elm)[node[v1].nelms-1][0] << endl;
+      node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
+      (*node[v1].elm)(node[v1].nelms-1, 0) = i;
+      // if ( 80190 < i < 80210) cout << "index to node: " << v1 << " " <<  
+      //                   (*node[v1].elm)[node[v1].nelms-1][0] << endl;
 
-      // node[v2].nelms = node[v2].nelms + 1;
-      // node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      // (*node[v2].elm)[node[v2].nelms-1][0] = i;
+      if (i == 80200) {
+         cout << "----------------------------------" << endl;
+         cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
+         cout << "----------------------------------" << endl;
+      }
 
-      // node[v3].nelms = node[v3].nelms + 1;
-      // node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      // (*node[v3].elm)[node[v3].nelms-1][0] = i;
-
-      node[v2].elm = new Array2D<int>(node[v2].nelms+1, 1);
-      (*node[v2].elm)[node[v2].nelms][0] = i;
       node[v2].nelms = node[v2].nelms + 1;
+      node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
+      (*node[v2].elm)[node[v2].nelms-1][0] = i;
 
-      node[v3].elm = new Array2D<int>(node[v3].nelms+1, 1);
-      (*node[v3].elm)[node[v3].nelms][0] = i;
       node[v3].nelms = node[v3].nelms + 1;
+      node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+      (*node[v3].elm)[node[v3].nelms-1][0] = i;
 
+      // node[v2].elm = new Array2D<int>(node[v2].nelms+1, 1);
+      // (*node[v2].elm)[node[v2].nelms][0] = i;
+      // node[v2].nelms = node[v2].nelms + 1;
+
+      // node[v3].elm = new Array2D<int>(node[v3].nelms+1, 1);
+      // (*node[v3].elm)[node[v3].nelms][0] = i;
+      // node[v3].nelms = node[v3].nelms + 1;
 
       //FIX here!
       //(*node[v4].elm)[ node[v4].nelms ][0] = i;
@@ -711,7 +718,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       // (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
 
       node[v4].elm = new Array2D<int>(node[v4].nelms+1, 1);
-      (*node[v4].elm)[ node[v4].nelms ][0] = i;
+      (*node[v4].elm)( node[v4].nelms , 0) = i;
       node[v4].nelms = node[v4].nelms + 1;
 
       }//    endif tri_or_quad
@@ -1474,17 +1481,19 @@ A: no, those were statically allocated, not pointers to
 
 
          if (j==0) {
-            cout << "weird i, j  = " << i << "  "  << j << endl;
-            cout << "weird x1, y1 = " << x1 << "  "  << y1 << " x2, y2 = " << x2 << "  "  << y2 << endl;
-            cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
-            cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
+            // good now
+            // cout << "weird i, j  = " << i << "  "  << j << endl;
+            // cout << "weird x1, y1 = " << x1 << "  "  << y1 << " x2, y2 = " << x2 << "  "  << y2 << endl;
+            // cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
+            // cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
          }
 
          if (j==bound[i].nbfaces-1) {
-            cout << "weird i, j  = " << i << "  "  << j << endl;
-            cout << "weird x1, y1 = " << x1 << "  "  << y1 << " x2, y2 = " << x2 << "  "  << y2 << endl;
-            cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
-            cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
+            // good now
+            // cout << "weird i, j  = " << i << "  "  << j << endl;
+            // cout << "weird x1, y1 = " << x1 << "  "  << y1 << " x2, y2 = " << x2 << "  "  << y2 << endl;
+            // cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
+            // cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
          }
 
          (*bound[i].bfn)(j,0)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
@@ -1561,7 +1570,7 @@ A: no, those were statically allocated, not pointers to
 //    do j = 1, bound[i].nbfaces
    for (size_t i = 0; i < nbound; i++) {
       //for (size_t j = 0; j < bound[i].nbfaces; j++) {
-      for (size_t j = 0; j < 2; j++) {
+      for (size_t j = 0; j < 1; j++) {
 
          //   bface is defined by the nodes v1 and v2.
          v1 = (*bound[i].bnode)(j) ;
@@ -1574,40 +1583,45 @@ A: no, those were statically allocated, not pointers to
 
          //do k = 1, node[v1).nelms
          for (size_t k = 0; k < node[v1].nelms; k ++) {
-            ielm = (*node[v1].elm)(k); //[k][0];
+            ielm = (*node[v1].elm)(k, 0); //[k][0];
+            cout << "v1, k, ielm  " << v1 << "    " << k << "    " << ielm << endl;
             //do ii = 1, elm[ielm].nvtx;
             for (size_t ii = 0; ii < elm[ielm].nvtx; ii++) {
 
 
                in = ii;
-               // im = ii+1;
-               // if (im > elm[ielm].nvtx-1 ) { im = im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
+               im = ii+1;
+               if (im > elm[ielm].nvtx-1 ) { im = 0;}//im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
               
-               // vt1 = (*elm[ielm].vtx)(in); //TLM these are bad
-               // vt2 = (*elm[ielm].vtx)(im); //TLM these are bad
+               vt1 = (*elm[ielm].vtx)(in); //(in); //TLM these are bad
+               vt2 = (*elm[ielm].vtx)(im); //TLM these are bad
 
 
-               vt1 = (*elm[jelm].vtx)(ii);
-               //cout << ii << endl;
-               if (ii  > 0) { 
-                  vt2 = (*elm[jelm].vtx)(ii-1); 
-               }
-               else if (ii == 0) { 
-                  vt2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); 
-               } //TLM fix: array bounds overrun fixed here
+               // vt1 = (*elm[ielm].vtx)(ii);
+               // //cout << ii << endl;
+               // if (ii  < elm[ielm].nvtx-1) { 
+               //    vt2 = (*elm[ielm].vtx)(ii+1); 
+               // }
+               // else { 
+               //    vt2 = (*elm[ielm].vtx)(0); 
+               // } //TLM fix: array bounds overrun fixed here
                
 
 
-               //if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
-               //if (j < 2) cout << "    " << ielm << "    " << im << "    " << in << endl;
+               if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
+               if (j < 2) cout << "    " << ielm << "    " << im << "    " << in << endl;
                if (vt1 == v1 and vt2 == v2) {
                   found = true;
-                  //if (j < 2) cout << "found! " << ielm << endl;//" " << in << " " << im << endl;
-                  //if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
+                  if (j < 2) cout << "found! " << endl;;//" " << in << " " << im << endl;
+                  if (j < 2) cout << "    " << ielm << "    " << im << "    " << in << endl;
+                  // if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
+                  cout << "break 1" << endl;
                   break; //continue; //exit
                }
-               if (found) {break;} //exit  //extra break needed to account for exit behavior!
+               // cout << "break 2" << endl;
+               // if (found) {break;} //exit  //extra break needed to account for exit behavior!
             } //end do
+            cout << "break 3" << endl;
             if (found) {break;} //exit
          }//end do
 
