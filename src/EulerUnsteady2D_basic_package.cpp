@@ -1812,10 +1812,10 @@ A: no, those were statically allocated, not pointers to
 
 cout << "Generating CC scheme data......" << endl;
 
-   //do i = 1, nelms  
+   //do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) { 
       //allocate(elm(i).edge( elm(i).nnghbrs ) )
-      elm[i].edge = new Array2D<int>[ elm[i].nnghbrs ];
+      elm[i].edge = new Array2D<int>( elm[i].nnghbrs , 1 );
    }
 
    //edges3 : do i = 1, nedges
@@ -1843,37 +1843,39 @@ cout << "Generating CC scheme data......" << endl;
 
    }//end do edges3
 
-// // Face-data for cell-centered (edge-based) scheme.
-// //
-// // Loop over elements 4
-// // Construct face data:
-// // face is an edge across elements pointing
-// // element e1 to element e2 (e2 > e1):
-// //
-// //       e2
-// //        \    
-// //         \ face: e1 -> e2 
-// //          \
-// //  n1 o--------------o n2 <-- face
-// //            \
-// //             \          n1, n2: end nodes of the face
-// //              \         e1: element 1
-// //              e1        e2: element 2  (e2 > e1)
-// //
-// // Note: Face data is dual to the edge data.
-// //       It can be trivially constructed from the edge data, but
-// //       here the face data is constructed by using the element
-// //       neighbor data just for an educational purpose.
+// Face-data for cell-centered (edge-based) scheme.
+//
+// Loop over elements 4
+// Construct face data:
+// face is an edge across elements pointing
+// element e1 to element e2 (e2 > e1):
+//
+//       e2
+//        \    
+//         \ face: e1 -> e2 
+//          \
+//  n1 o--------------o n2 <-- face
+//            \
+//             \          n1, n2: end nodes of the face
+//              \         e1: element 1
+//              e1        e2: element 2  (e2 > e1)
+//
+// Note: Face data is dual to the edge data.
+//       It can be trivially constructed from the edge data, but
+//       here the face data is constructed by using the element
+//       neighbor data just for an educational purpose.
 
-//   nfaces = 0
-//   elements4 : do i = 1, nelms
-//    do k = 1, elm(i).nnghbrs
-//    jelm = elm(i).nghbr(k)
-//     if (jelm > i) {
-//      nfaces = nfaces + 1
-//     }
-//    end do
-//   end do elements4
+   nfaces = 0;
+   //elements4 : do i = 1, nelms
+   for (size_t i = 0; i < nelms; i++) {
+      //do k = 1, elm(i).nnghbrs
+      for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+         jelm = (*elm[i].nghbr)(k);
+         if (jelm > i) {
+            nfaces = nfaces + 1;
+         }
+      }//end do
+   }//end do elements4
 
 //   allocate(face(nfaces))
 
