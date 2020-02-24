@@ -1789,21 +1789,22 @@ A: no, those were statically allocated, not pointers to
       cout << "--- 2 neighbors for the node = " << 1 << endl;
    }
 
-//   do i = 2, nnodes
-//    ave_nghbr = ave_nghbr + node[i].nnghbrs
-//    if (node[i].nnghbrs < min_nghbr) imin = i
-//    if (node[i].nnghbrs > max_nghbr) imax = i
-//    min_nghbr = min(min_nghbr, node[i].nnghbrs)
-//    max_nghbr = max(max_nghbr, node[i].nnghbrs)
-//    if (node[i].nnghbrs==2) {
-//     write(*,*) "--- 2 neighbors for the node = ", i
-//    }
-//   end do
+  //do i = 2, nnodes
+   for (size_t i = 1; i < nnodes; i++) {
+      ave_nghbr = ave_nghbr + node[i].nnghbrs;
+      if (node[i].nnghbrs < min_nghbr) imin = i;
+      if (node[i].nnghbrs > max_nghbr) imax = i;
+      min_nghbr = std::min(min_nghbr, node[i].nnghbrs);
+      max_nghbr = std::max(max_nghbr, node[i].nnghbrs);
+      if (node[i].nnghbrs==2) {
+         cout <<  "--- 2 neighbors for the node = " << i << endl;
+      }
+   }
 
-//   write(*,*) "      ave_nghbr = ", ave_nghbr/nnodes
-//   write(*,*) "      min_nghbr = ", min_nghbr, " at node ", imin
-//   write(*,*) "      max_nghbr = ", max_nghbr, " at node ", imax
-//   write(*,*)
+  cout << "      ave_nghbr = " << ave_nghbr/nnodes << endl;
+  cout << "      min_nghbr = " << min_nghbr << " at node " << imin << endl;
+  cout << "      max_nghbr = " << max_nghbr << " at node " << imax << endl;
+  cout << "" << endl;
 
 // //--------------------------------------------------------------------------------
 // // Cell centered scheme data
