@@ -287,7 +287,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       // node[i].res   = new Array2D<real>(nq,1);
 
       //node[i].nelms = 0;
-      //std::cout << "i = " << i << " of " << nnodes-1 << std::endl;
+      //if (i< 200) std::cout  << i << "  " << node[i].x << " " << node[i].y << std::endl;
 
    }
    //cout << "done reading nodal coords" << endl;
@@ -320,10 +320,19 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x, y, z;
          in >> x >> y >> z;       //now read the whitespace-separated ints
-         (*elm[i].vtx)(0) = x;
-         (*elm[i].vtx)(1) = y;
-         (*elm[i].vtx)(2) = z;
-         if (i<20) cout << "\nx, y, z = " << x <<"  " << y << "  " << z;
+         (*elm[i].vtx)(0) = x-1;
+         (*elm[i].vtx)(1) = y-1;
+         (*elm[i].vtx)(2) = z-1;
+         //cout << (*elm[i].vtx).ncols << endl;
+         //if (i<20) cout << "\nInput = " << x <<"  " << y << "  " << z;
+         if (i<20) cout << "\nInput = " << (*elm[i].vtx)(0) <<
+                                         "  " << (*elm[i].vtx)(1) << 
+                                         "  " << (*elm[i].vtx)(2) ;
+         if (i>ntria-20) cout << "\nInput = " << (*elm[i].vtx)(0) <<
+                                         "  " << (*elm[i].vtx)(1) << 
+                                         "  " << (*elm[i].vtx)(2) ;
+         //if (i>ntria-20) cout << "\nInput = " << (*elm[i].vtx)(0,0) <<"  " << (*elm[i].vtx)(1,0) << "  " << (*elm[i].vtx)(2,0);
+         //if (i>ntria-20) cout << "\nInput = " << (*elm[i].vtx)(0) <<"  " << (*elm[i].vtx)(1) << "  " << (*elm[i].vtx)(2);
       }
    }
    // // Quads: assumed that the vertices are ordered counterclockwise
@@ -347,11 +356,17 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x1,x2,x3,x4;
          in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated ...ints
-         (*elm[ntria+i-1].vtx)(0,0) = x1;
-         (*elm[ntria+i-1].vtx)(1,0) = x2;
-         (*elm[ntria+i-1].vtx)(2,0) = x3;
-         (*elm[ntria+i-1].vtx)(3,0) = x4;
+         (*elm[ntria+i-1].vtx)(0) = x1;
+         (*elm[ntria+i-1].vtx)(1) = x2;
+         (*elm[ntria+i-1].vtx)(2) = x3;
+         (*elm[ntria+i-1].vtx)(3) = x4;
+         // if (i<20) cout << "\nx, y, z = " << x1 <<"  " << x2 << "  " << x3 << x4;
+         // if (i<20) cout << "\nelm x, elm y, elm z = " << (*elm[i].vtx)(0,0) <<"  " << (*elm[i].vtx)(1,0) << "  " << (*elm[i].vtx)(2,0)<< "  " << (*elm[i].vtx)(3,0);
+         // if (i<20) cout << "\nelm x, elm y, elm z = " << (*elm[i].vtx)(0) <<"  " << (*elm[i].vtx)(1) << "  " << (*elm[i].vtx)(2) << "  " << (*elm[i].vtx)(3);
       }
+   }
+   else{
+      cout << "\nNo Quads in this Mesh\n" << endl;
    }
 
    //  Write out the grid data.
@@ -370,7 +385,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::istringstream in(line);
    in >> nbound;
    bound = new bgrid_type[nbound];
-   cout << " nbound = " << nbound << endl;
+   cout << "\n nbound = " << nbound << "\n" <<endl;
 
 
    // // READ: Number of Boundary nodes (including the starting one at the end if
@@ -379,25 +394,37 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
       std::getline(infile, line);
       std::istringstream in(line);
       in >> bound[i].nbnodes;
+      cout << "Got in bnodes = " << bound[i].nbnodes << endl;
       bound[i].bnode = new Array2D<int>(bound[i].nbnodes , 1);
    }
 
    // // READ: Read boundary nodes
+   cout << "Reading boundary nodes" << endl;
+   std::getline(infile, line); //TLM: need to skip line here
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbnodes; j++) {
          std::getline(infile, line);
          std::istringstream in(line);
          int init;
          in >> init;
-         (*bound[i].bnode)[j][0] = init;
+         //(*bound[i].bnode)[j][0] = init;
          //TLM bnode issue here?
-         //(*bound[i].bnode)(j,0) = init;
+         (*bound[i].bnode)(j,0) = init;
+         
+         
+         //cout << i << " " << j << endl;
 
+         if ( j>bound[i].nbnodes-21 ) {
+            cout << (*bound[i].bnode)(j,0) << endl;
+         }
+
+         //cout << (*bound[i].bnode)(j,0) << "   " << init << endl;
          // testing array access:
          //int some = (*bound[i].bnode)[j][0];
          //cout << "get some " << some << endl;
       }
    }
+   cout << "Done Reading boundary nodes" << endl;
 
    //  Print the boundary grid data.
    std::cout << " Boundary nodes:" << std::endl;
@@ -421,7 +448,6 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    std::cout << "" << std::endl;
 
    // // Open the input file.
-   //std::ofstream outfile;
    std::ifstream outfile;
    outfile.open (datafile_bcmap_in);
 
@@ -527,6 +553,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       node[i].nelms = 0;
    } 
    nedges = 0;
+   cout << "\nnnodes = " << nnodes << endl;
+   cout << "nelms = " << nnodes << "\n" << endl;
 
 //--------------------------------------------------------------------------------
 // Loop over elements and construct the fololowing data.
@@ -574,36 +602,49 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       y2 = node[v2].y;
       y3 = node[v3].y;
 
-   // // Distribute the element index to nodes.
+   // Distribute the element index to nodes.
 
       /*
       * DESIGN CHOICE HERE -- use std<vector?> or similar?
       * I don't think we need a true dynamic (i.e. resizable) array
       */
+      node[v1].elm = new Array2D<int>(node[v1].nelms+1, 1);
+      (*node[v1].elm)[node[v1].nelms][0] = i;
       node[v1].nelms = node[v1].nelms + 1;
-      node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      (*node[v1].elm)[node[v1].nelms-1][0] = i;
+      if (i<20) cout << "index to node: " << v1 << " " <<  
+                        (*node[v1].elm)[node[v1].nelms-1][0] << endl;
 
+      // node[v2].nelms = node[v2].nelms + 1;
+      // node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
+      // (*node[v2].elm)[node[v2].nelms-1][0] = i;
+
+      // node[v3].nelms = node[v3].nelms + 1;
+      // node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+      // (*node[v3].elm)[node[v3].nelms-1][0] = i;
+
+      node[v2].elm = new Array2D<int>(node[v2].nelms+1, 1);
+      (*node[v2].elm)[node[v2].nelms][0] = i;
       node[v2].nelms = node[v2].nelms + 1;
-      node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      (*node[v2].elm)[node[v2].nelms-1][0] = i;
 
+      node[v3].elm = new Array2D<int>(node[v3].nelms+1, 1);
+      (*node[v3].elm)[node[v3].nelms][0] = i;
       node[v3].nelms = node[v3].nelms + 1;
-      node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      (*node[v3].elm)[node[v3].nelms-1][0] = i;
+
 
       //FIX here!
       //(*node[v4].elm)[ node[v4].nelms ][0] = i;
 
-   // // Compute the cell center and cell volume.
+      // Compute the cell center and cell volume.
       //tri_or_quad : if (elm(i).nvtx==3) then
       if (elm[i].nvtx==3) {
 
-   //   Triangle centroid and volume
+      // Triangle centroid and volume
       elm[i].x   = third*(x1+x2+x3);
       elm[i].y   = third*(y1+y2+y3);
       elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
+
       }
+
       else if (elm[i].nvtx==4) {
 
    //   this is a quad. Get the 4th vertex.
@@ -665,9 +706,13 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          }
 
    //  Distribution of element number to the 4th node of the quadrilateral
+      // node[v4].nelms = node[v4].nelms + 1;
+      // node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
+      // (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
+
+      node[v4].elm = new Array2D<int>(node[v4].nelms+1, 1);
+      (*node[v4].elm)[ node[v4].nelms ][0] = i;
       node[v4].nelms = node[v4].nelms + 1;
-      node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
-      (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
 
       }//    endif tri_or_quad
 
@@ -682,7 +727,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //   elementsv : do i = 1, nelms
    for ( int i = 0; i < nelms; ++i ) {
       
-
+//TLM here 2/23/2020 6::11
       v1 = (*elm[i].vtx)(0);
       v2 = (*elm[i].vtx)(1);
       v3 = (*elm[i].vtx)(2);
@@ -815,7 +860,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    for (size_t i = 0; i < nelms; i++) {
 
       //elm_vertex : do k = 1, elm(i).nvtx
-      for (int k = 0; k < elm[i].nvtx; k++) {
+      for (size_t k = 0; k < elm[i].nvtx; k++) {
       //   Get the face of the element i:
       //
       //             vL      vR
@@ -824,7 +869,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       //            /        |
       //           o---------o
       //
-         //TLM warning:  fixed step out of bounds ... badly
+         //TLM warning:  fixed step out of bounds
          if (k  < elm[i].nvtx-1) vL = (*elm[i].vtx)(k+1); //k+1 - 1.. nope, K goes from 0
          if (k == elm[i].nvtx-1) vL = (*elm[i].vtx)(0); //1-1
          vR = (*elm[i].vtx)(k);
@@ -834,13 +879,18 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          found = false;
       //elms_around_vR : do j = 1, node(vR).nelms;
          for (int j = 0; j < node[vR].nelms; j++) {
-            jelm = (*node[vR].elm)(j); 
+            jelm = (*node[vR].elm)(j);
+            
+            //tlm issue seen here:
+            //cout << "jelm = " << jelm << endl;
+            
             // cout << vR << " " << j << "   " << (*node[vR].elm)(j) << endl;
-            // cout << j << "   " << jelm << endl;
+            //if (i < 20) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
 
             //edge_matching : do ii = 1, elm(jelm).nvtx;
             for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
-                              v1 = (*elm[jelm].vtx)(ii);
+               
+               v1 = (*elm[jelm].vtx)(ii);
                //cout << ii << endl;
                if (ii  > 0) { 
                   v2 = (*elm[jelm].vtx)(ii-1); 
@@ -848,21 +898,19 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
                else if (ii == 0) { 
                   v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); 
                } //TLM fix: array bounds overrun fixed here
-               // else{
-               //    //cout << " failed to meet conditions" << endl;
-               // }
+               
                if (v1==vR and v2==vL) {
                   found = true;
-                  //cout << "found v1==VR, v2==VL " << vR << "   " << vL << endl;
+                  //if (k < 2) cout << " v = " << vR << "  " << v1 << "  " << vL << "  " << v2 << endl;
+               
+                  //cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   im = ii+1;
                   if (im > (elm[jelm].nvtx-1)) { 
                      im = im - (elm[jelm].nvtx-0); 
                   }
                   break; //exit edge_matching  |
-               } //endif                       V
-               else {
-                  //cout << "not found " << v1 << " != " << vR << "   " << v2 << " != " << vL << endl;
-               }
+               } //endif       
+
             } //end do     edge_matching   <---V
 
       //if (found) exit elms_around_vR
@@ -1087,6 +1135,14 @@ cout << "DONE constructing the element-neighbor data " << endl;
       
       edge[i].dav = zero;
 
+/*
+Q, should below be
+
+(*edge[i].dav)(0) 
+
+
+A: no, those were statically allocated, not pointers to
+*/
       // Contribution from the left element
       if (e1 > 0) {
          xc = elm[e1].x;
@@ -1416,6 +1472,11 @@ cout << "DONE constructing the element-neighbor data " << endl;
          x2 = node[ (*bound[i].bnode)[j+1][0] ].x;
          y2 = node[ (*bound[i].bnode)[j+1][0] ].y;
 
+         //if (j==bound[i].nbfaces-1) {
+            cout << "weird x2, y2 = " << x2 << "  "  << y2 << endl;
+            cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
+         //}
+
          (*bound[i].bfn)(j,0)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j,0) = -(y1-y2) / (*bound[i].bfn)(j);
          (*bound[i].bfny)(j) =  (x1-x2) / (*bound[i].bfn)(j);
@@ -1431,6 +1492,11 @@ cout << "DONE constructing the element-neighbor data " << endl;
          y1 = node[(*bound[i].bnode)[j  ][0] ].y;
          x2 = node[(*bound[i].bnode)[j+1][0] ].x;
          y2 = node[(*bound[i].bnode)[j+1][0] ].y;
+
+         if (j==bound[i].nbfaces-1){ 
+            cout << "weird x2, y2 = " << x2 << "  " << y2 << endl;
+            cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
+         }
 
          (*bound[i].bfn)(j)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j) = -(y1-y2) / (*bound[i].bfn)(j);
@@ -1487,8 +1553,8 @@ cout << "DONE constructing the element-neighbor data " << endl;
       for (size_t j = 0; j < 2; j++) {
 
          //   bface is defined by the nodes v1 and v2.
-         v1 = (*bound[i].bnode)[j][0] ;
-         v2 = (*bound[i].bnode)[j+1][0] ;
+         v1 = (*bound[i].bnode)(j) ;
+         v2 = (*bound[i].bnode)(j+1);
 
          found = false;
 
@@ -1500,17 +1566,33 @@ cout << "DONE constructing the element-neighbor data " << endl;
             ielm = (*node[v1].elm)(k); //[k][0];
             //do ii = 1, elm[ielm].nvtx;
             for (size_t ii = 0; ii < elm[ielm].nvtx; ii++) {
+
+
                in = ii;
-               im = ii+1;
-               if (im > elm[ielm].nvtx-1 ) { im = im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
+               // im = ii+1;
+               // if (im > elm[ielm].nvtx-1 ) { im = im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
               
-               vt1 = (*elm[ielm].vtx)(in); //TLM these are shit
-               vt2 = (*elm[ielm].vtx)(im); //TLM these are shit
-               cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
-               cout << "    " << ielm << "    " << im << "    " << in << endl;
+               // vt1 = (*elm[ielm].vtx)(in); //TLM these are bad
+               // vt2 = (*elm[ielm].vtx)(im); //TLM these are bad
+
+
+               vt1 = (*elm[jelm].vtx)(ii);
+               //cout << ii << endl;
+               if (ii  > 0) { 
+                  vt2 = (*elm[jelm].vtx)(ii-1); 
+               }
+               else if (ii == 0) { 
+                  vt2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); 
+               } //TLM fix: array bounds overrun fixed here
+               
+
+
+               //if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
+               //if (j < 2) cout << "    " << ielm << "    " << im << "    " << in << endl;
                if (vt1 == v1 and vt2 == v2) {
                   found = true;
-                  cout << "found! " << ielm << " " << in << " " << im << endl;
+                  //if (j < 2) cout << "found! " << ielm << endl;//" " << in << " " << im << endl;
+                  //if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
                   break; //continue; //exit
                }
                if (found) {break;} //exit  //extra break needed to account for exit behavior!
