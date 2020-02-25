@@ -2003,8 +2003,12 @@ cout << "Generating CC scheme data......" << endl;
    //do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
       elm[i].nvnghbrs = 1;
-      //call my_alloc_int_ptr(elm(i).vnghbr, 1)
-      elm[i].vnghbr = new Array2D<int>(1,1);
+      //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
+      //Array2D<int> save4 = (*elm[i].vnghbr);
+      elm[i].vnghbr = new Array2D<int>( elm[i].vnghbr,1);
+      // for (size_t ra; ra < save4.storage_size; ra++) {
+      //    (*elm[i].vnghbr).array[ra] = save4.array[ra];
+      // }
    }
 
    ave_nghbr = 0;
@@ -2030,9 +2034,12 @@ cout << "Generating CC scheme data......" << endl;
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
          if ( (*elm[i].nghbr)(k) > 0 ) {
             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-            
+            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs) //TLM TODO: redo with reallocation
+            Array2D<int> save5 = (*elm[i].vnghbr);
             elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+            for (size_t ra; ra < save5.storage_size; ra++) {
+               (*elm[i].vnghbr).array[ra] = save5.array[ra];
+            }
             (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
          }
       }
@@ -2062,8 +2069,12 @@ cout << "Generating CC scheme data......" << endl;
    //       Add the element, e1, if not added yet.
             if (not found) {
                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-               //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+               //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs) //TLM TODO: redo with reallocation
+               Array2D<int> save6 = (*elm[i].vnghbr);
                elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
+               for (size_t ra; ra < save6.storage_size; ra++) {
+                  (*elm[i].vnghbr).array[ra] = save6.array[ra];
+               }
                (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
             }
          }//velms loop
