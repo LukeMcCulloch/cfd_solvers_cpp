@@ -95,6 +95,7 @@ class Array2D{
         int nrows, ncols;
         int storage_size;
         int tracked_index;
+        bool allocated;
 
         // malloc host memory
         T* array;
@@ -106,6 +107,7 @@ class Array2D{
             //buildWithParameters(numrows, numcols);
             tracked_index = 0;
             build();
+            allocated = true;
             //cout << "built \n" << endl;
             //initialize();
             //cout << "initialized \n" << endl;
@@ -305,6 +307,20 @@ Array2D<T> Array2D<T>::operator=(const T a) {
 
 
 
+
+template <typename T>
+void print (T const& c){
+
+    int ncol = c.getncols();
+    int nrow = c.getnrows();
+    for (int i=0; i<nrow; ++i) {
+        std::cout << '\n';
+        for (int j=0; j<ncol; ++j) {
+            std::cout << c(i,j) << ' ';
+        }
+    }
+    std::cout << "\nDone \n" << std::endl;
+}
 
 
 /**/  //TODO, use this: 

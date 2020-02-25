@@ -69,6 +69,9 @@
 // mesh-y math-y functions
 #include "../include/MathGeometry.h" 
 
+//======================================
+// string trimfunctions
+#include "../include/StringOps.h" 
 
 using std::cout;
 using std::endl;
@@ -320,7 +323,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x, y, z;
          in >> x >> y >> z;       //now read the whitespace-separated ints
-         // Fix indices for 0 indexed code!
+         // Fix indices for 0 indexed code//
          (*elm[i].vtx)(0) = x-1;
          (*elm[i].vtx)(1) = y-1;
          (*elm[i].vtx)(2) = z-1;
@@ -356,7 +359,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x1,x2,x3,x4;
          in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated ...ints
-         // Fix indices for 0 indexed code!
+         // Fix indices for 0 indexed code//
          (*elm[ntria+i-1].vtx)(0) = x1-1;
          (*elm[ntria+i-1].vtx)(1) = x2-1;
          (*elm[ntria+i-1].vtx)(2) = x3-1;
@@ -410,7 +413,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
          in >> init;
          //(*bound[i].bnode)[j][0] = init;
          //TLM bnode issue : we are reading in indices that 
-         //  were starting from 1, but our code starts form 0!
+         //  were starting from 1, but our code starts form 0//
          (*bound[i].bnode)(j,0) = init-1;
          
          
@@ -591,22 +594,35 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
 //   elements : do i = 1, nelms
 
-   for ( int i = 0; i < nelms; ++i ) {
-      v1 = (*elm[i].vtx)(0,0);
-      v2 = (*elm[i].vtx)(1,0);
-      v3 = (*elm[i].vtx)(2,0);
-      node[v1].nelms = node[v1].nelms + 1;
-      node[v2].nelms = node[v2].nelms + 1;
-      node[v3].nelms = node[v3].nelms + 1;
+   // for ( int i = 0; i < nelms; ++i ) {
+   //    v1 = (*elm[i].vtx)(0,0);
+   //    v2 = (*elm[i].vtx)(1,0);
+   //    v3 = (*elm[i].vtx)(2,0);
+   //    node[v1].nelms = node[v1].nelms + 1;
+   //    node[v2].nelms = node[v2].nelms + 1;
+   //    node[v3].nelms = node[v3].nelms + 1;
 
-   }
+   // }
+   // for ( int i = 0; i < nelms; ++i ) {
+   //    v1 = (*elm[i].vtx)(0,0);
+   //    v2 = (*elm[i].vtx)(1,0);
+   //    v3 = (*elm[i].vtx)(2,0);
+   //    node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
+   //    node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
+   //    node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+   // }
+
+   //dummy allocations:
+   // node[v1].elm = new Array2D<int>(1, 1);
+   // node[v2].elm = new Array2D<int>(1, 1);
+   // node[v3].elm = new Array2D<int>(1, 1);
    for ( int i = 0; i < nelms; ++i ) {
       v1 = (*elm[i].vtx)(0,0);
       v2 = (*elm[i].vtx)(1,0);
       v3 = (*elm[i].vtx)(2,0);
-      node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+      node[v1].elm = new Array2D<int>(1, 1);
+      node[v2].elm = new Array2D<int>(1, 1);
+      node[v3].elm = new Array2D<int>(1, 1);
    }
 
    for ( int i = 0; i < nelms; ++i ) {
@@ -626,33 +642,33 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    // Distribute the element index to nodes.
 
       /*
-      * DESIGN CHOICE HERE -- use std<vector?> or similar?
-      * I don't think we need a true dynamic (i.e. resizable) array
+      * DESIGN CHOICE HERE -- use std<vector> or similar?
+      * should use containers
       */
 
-      // node[v1].nelms = node[v1].nelms + 1;
-      //attempt copy constructor //Array2D<int> save1( (*node[v1].elm) );
-      // node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      // (*node[v1].elm)(node[v1].nelms-1, 0) = i;
 
-      (*node[v1].elm)((*node[v1].elm).tracked_index, 0) = i;
-      (*node[v1].elm).tracked_index +=1;
+      // easy way:
+      // (*node[v1].elm)((*node[v1].elm).tracked_index, 0) = i;
+      // (*node[v1].elm).tracked_index += 1;
 
-      // node[v1].nelms = node[v1].nelms + 1;
-      // //Array2D<int> save1 = Array2D<int>(node[v1].nelms, 1);
-      // // invoke the copy constructor:
-      // Array2D<int> save1( (*node[v1].elm) );
-      // //save1.print();
-      // //delete [] node[v1].elm;
-      // node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      // for (size_t ra = 0; ra < save1.storage_size; ra++){
-      //    (*node[v1].elm)(ra) = save1(ra);
-      // }
-      // (*node[v1].elm)(node[v1].nelms-1, 0) = i;
-
+      // original attempt:
+      //node[v1].nelms = node[v1].nelms + 1;
+      //node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
       //(*node[v1].elm)(node[v1].nelms-1, 0) = i;
-      // if ( 80190 < i < 80210) cout << "index to node: " << v1 << " " <<  
-      //                   (*node[v1].elm)[node[v1].nelms-1][0] << endl;
+
+
+      // save and reallocate:
+      node[v1].nelms = node[v1].nelms + 1;
+      //cout << "save1 = " << endl;
+      Array2D<int> save1 =  *node[v1].elm; // copy constructor
+      //cout << "save1 is = " << endl;
+      //print(save1);
+      node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
+      for (size_t ra = 0; ra < save1.storage_size; ra++){
+         (*node[v1].elm).array[ra] = save1.array[ra];
+      }
+      (*node[v1].elm)(node[v1].nelms-1, 0) = i;
+
 
       if (i == 160400) {
          cout << "----------------------------------" << endl;
@@ -722,6 +738,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       // }
       // (*node[v3].elm)(node[v3].nelms-1 , 0) = i;
 
+
       // simplest, but ineffective:
       // node[v2].nelms = node[v2].nelms + 1;
       // node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
@@ -732,11 +749,39 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       // (*node[v3].elm)[node[v3].nelms-1][0] = i;
 
 
-      (*node[v2].elm)((*node[v2].elm).tracked_index, 0) = i;
-      (*node[v2].elm).tracked_index +=1;
 
-      (*node[v3].elm)((*node[v3].elm).tracked_index, 0) = i;
-      (*node[v3].elm).tracked_index +=1;
+
+      // working easy way:
+      // (*node[v2].elm)((*node[v2].elm).tracked_index, 0) = i;
+      // (*node[v2].elm).tracked_index +=1;
+
+      // (*node[v3].elm)((*node[v3].elm).tracked_index, 0) = i;
+      // (*node[v3].elm).tracked_index +=1;
+
+
+
+
+      // save and reallocate:
+      node[v2].nelms = node[v2].nelms + 1;
+      Array2D<int> save2 =  *node[v2].elm; // copy constructor
+      node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
+      for (size_t ra = 0; ra < save2.storage_size; ra++){
+         (*node[v2].elm).array[ra] = save2.array[ra];
+      }
+      (*node[v2].elm)(node[v2].nelms-1, 0) = i;
+      // end save and reallocate:
+
+
+
+      // // save and reallocate:
+      node[v3].nelms = node[v3].nelms + 1;
+      Array2D<int> save3 =  *node[v3].elm; // copy constructor
+      node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+      for (size_t ra = 0; ra < save3.storage_size; ra++){
+         (*node[v3].elm).array[ra] = save3.array[ra];
+      }
+      (*node[v3].elm)(node[v3].nelms-1, 0) = i;
+      // end save and reallocate:
 
 
          // for (size_t jw = 0; j < node[v1].nelms; jw++) {
@@ -754,7 +799,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       // (*node[v3].elm)[node[v3].nelms][0] = i;
       // node[v3].nelms = node[v3].nelms + 1;
 
-      //FIX here!
+      //FIX here//
       //(*node[v4].elm)[ node[v4].nelms ][0] = i;
 
       // Compute the cell center and cell volume.
@@ -1139,7 +1184,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
       edge[i].e1 = 0;
       edge[i].e2 = 0;
    }
-   nedges = -1; //TLM fence post fix!
+   nedges = -1; //TLM fence post fix//
 
 // Construct the edge data:
 //  two end nodes (n1, n2), and left and right elements (e1, e2)
@@ -1163,7 +1208,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].n2 = v2;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(2);
-            // assert(v1 != v2 && "v1 should not be equal to v2 -1");
+            // assert(v1 //= v2 && "v1 should not be equal to v2 -1");
          }
 
          if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
@@ -1172,7 +1217,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].n2 = v3;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(0);
-            // assert(v1 != v2 && "v1 should not be equal to v2 -2" );
+            // assert(v1 //= v2 && "v1 should not be equal to v2 -2" );
          }
 
          if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
@@ -1181,7 +1226,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].n2 = v1;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(1);
-            // assert(v1 != v2 && "v1 should not be equal to v2 -3");
+            // assert(v1 //= v2 && "v1 should not be equal to v2 -3");
          }
       }
    //  Quadrilateral element
@@ -1195,7 +1240,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].n2 = v2;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(2);
-            // assert(v1 != v2 && "v1 should not be equal to v2 -q1");
+            // assert(v1 //= v2 && "v1 should not be equal to v2 -q1");
          }
 
          if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
@@ -1204,7 +1249,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].n2 = v3;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(3);
-            // assert(v1 != v2 && "v1 should not be equal to v2 -q2");
+            // assert(v1 //= v2 && "v1 should not be equal to v2 -q2");
          }
 
          if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) ==0 ) {
@@ -1213,7 +1258,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].n2 = v4;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(0);
-            // assert(v1 != v2 && "v1 should not be equal to v2 -q3");
+            // assert(v1 //= v2 && "v1 should not be equal to v2 -q3");
          }
 
          if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
@@ -1222,7 +1267,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].n2 = v1;
             edge[nedges].e1 = i;
             edge[nedges].e2 = (*elm[i].nghbr)(1);
-            // assert(v1 != v2 && "v1 should not be equal to v2 -q4");
+            // assert(v1 //= v2 && "v1 should not be equal to v2 -q4");
          }
 
       }//    endif tri_quad2
@@ -1736,14 +1781,14 @@ A: no, those were statically allocated, not pointers to
                // if (j < 2) cout << "    " << ielm << "    " << im << "    " << in << endl;
                if (vt1 == v1 and vt2 == v2) {
                   found = true;
-                  //if (j < 2) cout << "found! " << endl;;//" " << in << " " << im << endl;
+                  //if (j < 2) cout << "found// " << endl;;//" " << in << " " << im << endl;
                   //if (j < 2) cout << "    " << ielm << "    " << im << "    " << in << endl;
                   // if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
                   //cout << "break 1" << endl;
                   break; //continue; //exit
                }
                // cout << "break 2" << endl;
-               //if (found) {break;} //exit  //extra break needed to account for exit behavior!
+               //if (found) {break;} //exit  //extra break needed to account for exit behavior//
             } //end do
             //cout << "break 3" << endl;
             if (found) {break;} //exit
@@ -1780,14 +1825,14 @@ A: no, those were statically allocated, not pointers to
 // Check the number of neighbor nodes (must have at least 2 neighbors)
    cout << " --- Node neighbor data:" << endl;
 
-   ave_nghbr = node[1].nnghbrs;
-   min_nghbr = node[1].nnghbrs;
-   max_nghbr = node[1].nnghbrs;
-      imin = 1;
-      imax = 1;
-   if (node[1].nnghbrs==2) {
-      cout << "--- 2 neighbors for the node = " << 1 << endl;
-   }
+   ave_nghbr = node[0].nnghbrs;
+   min_nghbr = node[0].nnghbrs;
+   max_nghbr = node[0].nnghbrs;
+      imin = 0;
+      imax = 0;
+   //if (node[1].nnghbrs==2) {
+      cout << "--- 2 neighbors for the node = " << 0 << endl;
+   //}
 
   //do i = 2, nnodes
    for (size_t i = 1; i < nnodes; i++) {
@@ -1975,6 +2020,100 @@ cout << "Generating CC scheme data......" << endl;
       elm[i].nvnghbrs = 0;
    }//elements6
 
+//--------------------------------------------------------------------------------
+// Collect vertex-neighbors
+//
+//  
+   //elements7 : do i = 1, nelms
+   for (size_t i = 0; i < nelms; i++) {
+   // (1)Add face-neighbors
+      //do k = 1, elm(i).nnghbrs
+      for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+         if ( (*elm[i].nghbr)(k) > 0 ) {
+            elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+            
+            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
+         }
+      }
+
+
+
+   // (2)Add vertex-neighbors
+      //do k = 1, elm[i].nvtx
+      for (size_t k = 0; k < elm[i].nvtx; k++) {
+         v1 = (*elm[i].vtx)(k);
+
+         //velms : do j = 1, node[v1).nelms
+         for (size_t j =0; j < node[v1].nelms; j++) {
+            e1 = (*node[v1].elm)(j);
+            if (e1 == i) continue; //velms;
+
+      //    Check if the element is already added.
+            found = false;
+            //do ii = 1, elm[i].nvnghbrs
+            for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
+               if ( e1 == (*elm[i].vnghbr)(ii) ) {
+                  found = true;
+                  break;
+               }
+            }
+
+   //       Add the element, e1, if not added yet.
+            if (not found) {
+               elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+               //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+               elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
+               (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
+            }
+         }//velms loop
+
+         }//end elm[i].nvtx loop
+
+      ave_nghbr = ave_nghbr + elm[i].nvnghbrs;
+      if (elm[i].nvnghbrs < min_nghbr) imin = i;
+      if (elm[i].nvnghbrs > max_nghbr) imax = i;
+      min_nghbr = std::min(min_nghbr, elm[i].nvnghbrs);
+      max_nghbr = std::max(max_nghbr, elm[i].nvnghbrs);
+      if (elm[i].nvnghbrs < 3) {
+         cout << "--- Not enough neighbors: elm = " << i << 
+                  "elm[i].nvnghbrs= " << elm[i].nvnghbrs << endl;
+      }
+
+   }// elements7 loop
+
+   cout << "      ave_nghbr = " << ave_nghbr/nelms << endl;
+   cout << "      min_nghbr = " << min_nghbr << " elm = " << imin << endl;
+   cout << "      max_nghbr = " << max_nghbr << " elm = " << imax << endl;
+   cout << " "  << endl;
+
+
+   //do i = 1, nelms
+   for ( int i = 0; i < nelms; ++i ) {
+      elm[i].bmark = 0;
+   }
+
+   //bc_loop : do i = 1, nbound
+   for ( int i = 0; i < nbound; ++i ) {
+      //cout << bound[i].bc_type << endl;
+      if ( trim( bound[i].bc_type ) == "dirichlet") {
+         cout << "Found dirichlet condition " << endl;
+         //do j = 1, bound[i].nbfaces
+         for (size_t i = 0; i < bound[i].nbfaces; i++) {
+            elm[ (*bound[i].belm)(j) ].bmark = 1;
+         }//end do
+      }
+
+      // if (  trim( bound[i].bc_type ) == "freestream") {
+      //    cout << "Found freestream condition " << endl;
+      // }
+   }// end do bc_loop
+
+//--------------------------------------------------------------------------------
+
+
+
 // //--------------------------------------------------------------------------------
 // // Collect vertex-neighbors
 // //
@@ -1986,12 +2125,30 @@ cout << "Generating CC scheme data......" << endl;
 //       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
 //          if ( (*elm[i].nghbr)(k) > 0 ) {
 //             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+
 //             //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-            
-//             elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-//             (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
+//             //elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+//             //(*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
 //          }
 //       }
+//    } // end elements 7 loop here
+
+//    for (size_t i = 0; i < nelms; i++) {
+//       //TLM loops to avoid realloc:
+//       if ( elm[i].nvnghbrs > 0 ) {
+//             elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+//          }
+//    } // end elements 7 loop here
+
+//    //elements7
+//    for (size_t i = 0; i < nelms; i++) {
+//       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+//          if ( (*elm[i].nghbr)(k) > 0 ) {
+//             (*elm[i].vnghbr)(elm[i].tracked_index) = (*elm[i].nghbr)(k);
+//             elm[i].tracked_index += 1;
+//          }
+//       }
+
 
 
 
@@ -2008,7 +2165,7 @@ cout << "Generating CC scheme data......" << endl;
 //       //    Check if the element is already added.
 //             found = false;
 //             //do ii = 1, elm[i].nvnghbrs
-//             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
+//             for (size_t ii = 0; ii < elm[i].tracked_index; ii++) {
 //                if ( e1 == (*elm[i].vnghbr)(ii) ) {
 //                   found = true;
 //                   break;
@@ -2017,23 +2174,23 @@ cout << "Generating CC scheme data......" << endl;
 
 //    //       Add the element, e1, if not added yet.
 //             if (not found) {
-//                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+//                elm[i].tracked_index = elm[i].tracked_index + 1;
 //                //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-//                elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
-//                (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
+//                elm[i].vnghbr = new Array2D<int>(elm[i].tracked_index, 1);
+//                (*elm[i].vnghbr)(elm[i].tracked_index-1) = e1;
 //             }
 //          }//velms loop
 
 //          }//end elm[i].nvtx loop
 
-//       ave_nghbr = ave_nghbr + elm[i].nvnghbrs;
-//       if (elm[i].nvnghbrs < min_nghbr) imin = i;
-//       if (elm[i].nvnghbrs > max_nghbr) imax = i;
-//       min_nghbr = std::min(min_nghbr, elm[i].nvnghbrs);
-//       max_nghbr = std::max(max_nghbr, elm[i].nvnghbrs);
-//       if (elm[i].nvnghbrs < 3) {
+//       ave_nghbr = ave_nghbr + elm[i].tracked_index;
+//       if (elm[i].tracked_index < min_nghbr) imin = i;
+//       if (elm[i].tracked_index > max_nghbr) imax = i;
+//       min_nghbr = std::min(min_nghbr, elm[i].tracked_index);
+//       max_nghbr = std::max(max_nghbr, elm[i].tracked_index);
+//       if (elm[i].tracked_index < 3) {
 //          cout << "--- Not enough neighbors: elm = " << i << 
-//                   "elm[i].nvnghbrs= " << elm[i].nvnghbrs << endl;
+//                   "elm[i].nvnghbrs= " << elm[i].tracked_index << endl;
 //       }
 
 //    }// elements7 loop
@@ -2063,114 +2220,143 @@ cout << "Generating CC scheme data......" << endl;
 
 
 
-//--------------------------------------------------------------------------------
-// Collect vertex-neighbors
-//
-//  
-   //elements7 : do i = 1, nelms
-   for (size_t i = 0; i < nelms; i++) {
-   // (1)Add face-neighbors
-      //do k = 1, elm(i).nnghbrs
-      for (size_t k = 0; k < elm[i].nnghbrs; k++) {
-         if ( (*elm[i].nghbr)(k) > 0 ) {
-            elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-
-            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-            //elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-            //(*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
-         }
-      }
-   } // end elements 7 loop here
-
-   for (size_t i = 0; i < nelms; i++) {
-      //TLM loops to avoid realloc:
-      if ( elm[i].nvnghbrs > 0 ) {
-            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-         }
-   } // end elements 7 loop here
-
-   //elements7
-   for (size_t i = 0; i < nelms; i++) {
-      for (size_t k = 0; k < elm[i].nnghbrs; k++) {
-         if ( (*elm[i].nghbr)(k) > 0 ) {
-            (*elm[i].vnghbr)(elm[i].tracked_index) = (*elm[i].nghbr)(k);
-            elm[i].tracked_index += 1;
-         }
-      }
-
-
-
-
-   // (2)Add vertex-neighbors
-      //do k = 1, elm[i].nvtx
-      for (size_t k = 0; k < elm[i].nvtx; k++) {
-         v1 = (*elm[i].vtx)(k);
-
-         //velms : do j = 1, node[v1).nelms
-         for (size_t j =0; j < node[v1].nelms; j++) {
-            e1 = (*node[v1].elm)(j);
-            if (e1 == i) continue; //velms;
-
-      //    Check if the element is already added.
-            found = false;
-            //do ii = 1, elm[i].nvnghbrs
-            for (size_t ii = 0; ii < elm[i].tracked_index; ii++) {
-               if ( e1 == (*elm[i].vnghbr)(ii) ) {
-                  found = true;
-                  break;
-               }
-            }
-
-   //       Add the element, e1, if not added yet.
-            if (not found) {
-               elm[i].tracked_index = elm[i].tracked_index + 1;
-               //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-               elm[i].vnghbr = new Array2D<int>(elm[i].tracked_index, 1);
-               (*elm[i].vnghbr)(elm[i].tracked_index-1) = e1;
-            }
-         }//velms loop
-
-         }//end elm[i].nvtx loop
-
-      ave_nghbr = ave_nghbr + elm[i].tracked_index;
-      if (elm[i].tracked_index < min_nghbr) imin = i;
-      if (elm[i].tracked_index > max_nghbr) imax = i;
-      min_nghbr = std::min(min_nghbr, elm[i].tracked_index);
-      max_nghbr = std::max(max_nghbr, elm[i].tracked_index);
-      if (elm[i].tracked_index < 3) {
-         cout << "--- Not enough neighbors: elm = " << i << 
-                  "elm[i].nvnghbrs= " << elm[i].tracked_index << endl;
-      }
-
-   }// elements7 loop
-
-   cout << "      ave_nghbr = " << ave_nghbr/nelms << endl;
-   cout << "      min_nghbr = " << min_nghbr << " elm = " << imin << endl;
-   cout << "      max_nghbr = " << max_nghbr << " elm = " << imax << endl;
-   cout << " "  << endl;
-
-
-   //do i = 1, nelms
-   for ( int i = 0; i < nelms; ++i ) {
-      elm[i].bmark = 0;
-   }
-
-   //bc_loop : do i = 1, nbound
-   for ( int i = 0; i < nbound; ++i ) {
-      if ( bound[i].bc_type == "dirichlet") {
-         //do j = 1, bound[i].nbfaces
-         for (size_t i = 0; i < bound[i].nbfaces; i++) {
-            elm[ (*bound[i].belm)(j) ].bmark = 1;
-         }//end do
-      }
-   }// end do bc_loop
-
-//--------------------------------------------------------------------------------
-
-
-
 
 } //  end function construct_grid_data
 
 //********************************************************************************
 
+
+
+
+
+
+//********************************************************************************
+//* Check the grid data.
+//*
+//* 1. Directed area must sum up to zero around every node.
+//* 2. Directed area must sum up to zero over the entire grid.
+//* 3. Global sum of the boundary normal vectors must vanish.
+//* 4. Global sum of the boundary face normal vectors must vanish.
+//* 5. Check element volumes which must be positive.
+//* 6. Check dual volumes which must be positive.
+//* 7. Global sum of the dual volumes must be equal to the sum of element volumes.
+//*
+//* Add more tests you can think of.
+//*
+//********************************************************************************
+//  subroutine check_grid_data
+
+//  use edu2d_my_main_data  , only : nnodes, node,  nelms,   elm, nedges, edge, &
+//                             nbound, bound
+//  use edu2d_constants     , only : p2, zero, half
+
+//  implicit none
+// //Local variables
+//  integer  :: i, j, n1, n2, ierr, k
+//  real(p2), dimension(nnodes,2) :: sum_dav_i
+//  real(p2), dimension(2) :: sum_dav, sum_bn
+//  real(p2), dimension(2) :: sum_bfn
+//  real(p2)               :: sum_volc, sum_vol
+//  real(p2)               :: mag_dav, mag_bn
+//  real(p2)               :: vol_min, vol_max, vol_ave
+
+//   write(*,*) "Checking grid data...."
+
+//   mag_dav = zero
+//   mag_bn  = zero
+
+// //--------------------------------------------------------------------------------
+// // Directed area sum check
+// //--------------------------------------------------------------------------------
+
+// // Compute the sum of the directed area for each node.
+
+//    sum_dav_i = zero
+//   do i = 1, nedges
+//    n1 = edge(i)%n1
+//    n2 = edge(i)%n2
+//    sum_dav_i(n1,:) = sum_dav_i(n1,:) + edge(i)%dav(:)*edge(i)%da
+//    sum_dav_i(n2,:) = sum_dav_i(n2,:) - edge(i)%dav(:)*edge(i)%da
+//    mag_dav = mag_dav + edge(i)%da
+//   end do
+//    mag_dav = mag_dav/real(nedges,p2)
+
+// // Add contribution from boundary edges.
+//   do i = 1, nbound
+//    do j = 1, bound(i)%nbfaces
+
+//      n1 = bound(i)%bnode(j)
+//      n2 = bound(i)%bnode(j+1)
+
+//      sum_dav_i(n1,1) = sum_dav_i(n1,1) + half*bound(i)%bfnx(j)*bound(i)%bfn(j)
+//      sum_dav_i(n1,2) = sum_dav_i(n1,2) + half*bound(i)%bfny(j)*bound(i)%bfn(j)
+
+//      sum_dav_i(n2,1) = sum_dav_i(n2,1) + half*bound(i)%bfnx(j)*bound(i)%bfn(j)
+//      sum_dav_i(n2,2) = sum_dav_i(n2,2) + half*bound(i)%bfny(j)*bound(i)%bfn(j)
+
+//    end do
+//   end do
+
+// // Compute also the sum of the boundary normal vector (at nodes).
+
+//   sum_bn = 0
+//   do i = 1, nbound
+//    do j = 1, bound(i)%nbnodes
+//      k = bound(i)%bnode(j)
+//      if (j > 1 .and. k==bound(i)%bnode(1)) cycle //Skip if the last node is equal to the first node).
+//     sum_bn(1)      = sum_bn(1)      + bound(i)%bnx(j)*bound(i)%bn(j)
+//     sum_bn(2)      = sum_bn(2)      + bound(i)%bny(j)*bound(i)%bn(j)
+//     mag_bn = mag_bn + abs(bound(i)%bn(j))
+//    end do
+//     mag_bn = mag_bn/real(bound(i)%nbnodes,p2)
+//   end do
+
+// // Global sum of boundary normal vectors must vanish.
+
+// //  if (sum_bn(1) > 1.0e-12_p2*mag_bn .and. sum_bn(2) > 1.0e-12_p2*mag_bn) then
+// //   write(*,*) "--- Global sum of the boundary normal vector:"
+// //   write(*,'(a19,es10.3)') "    sum of bn_x = ", sum_bn(1)
+// //   write(*,'(a19,es10.3)') "    sum of bn_y = ", sum_bn(2)
+// //   write(*,*) "Error: boundary normal vectors do not sum to zero..."
+// //   stop
+// //  endif
+
+// // Sum of the directed area vectors must vanish at every node.
+
+//   do i = 1, nnodes
+//    if (abs(sum_dav_i(i,1))>1.0e-12_p2*mag_dav .or. abs(sum_dav_i(i,2))>1.0e-12_p2*mag_dav) then
+//    write(*,'(a11,i5,a7,2es10.3,a9,2es10.3)') &
+//     " --- node=", i, " (x,y)=", node(i)%x, node(i)%y, " sum_dav=",sum_dav_i(i,:)
+//    endif
+//   end do
+
+//    write(*,*) "--- Max sum of directed area vector around a node:"
+//    write(*,*) "  max(sum_dav_i_x) = ", maxval(sum_dav_i(:,1))
+//    write(*,*) "  max(sum_dav_i_y) = ", maxval(sum_dav_i(:,2))
+
+//   if (maxval(abs(sum_dav_i(:,1)))>1.0e-12_p2*mag_dav .or. &
+//       maxval(abs(sum_dav_i(:,2)))>1.0e-12_p2*mag_dav) then
+//    write(*,*) "--- Max sum of directed area vector around a node:"
+//    write(*,*) "  max(sum_dav_i_x) = ", maxval(sum_dav_i(:,1))
+//    write(*,*) "  max(sum_dav_i_y) = ", maxval(sum_dav_i(:,2))
+//    write(*,*) "Error: directed area vectors do not sum to zero..."
+//    stop
+//   endif
+
+// // Of course, the global sum of the directed area vector sum must vanish.
+//    sum_dav = zero
+//   do i = 1, nnodes
+//    sum_dav = sum_dav + sum_dav_i(i,:)
+//   end do
+
+//    write(*,*) "--- Global sum of the directed area vector:"
+//    write(*,'(a19,es10.3)') "    sum of dav_x = ", sum_dav(1)
+//    write(*,'(a19,es10.3)') "    sum of dav_y = ", sum_dav(2)
+
+//   if (sum_dav(1) > 1.0e-12_p2*mag_dav .and. sum_dav(2) > 1.0e-12_p2*mag_dav) then
+//    write(*,*) "Error: directed area vectors do not sum globally to zero..."
+//    write(*,*) "--- Global sum of the directed area vector:"
+//    write(*,'(a19,es10.3)') "    sum of dav_x = ", sum_dav(1)
+//    write(*,'(a19,es10.3)') "    sum of dav_y = ", sum_dav(2)
+//    stop
+//   endif
