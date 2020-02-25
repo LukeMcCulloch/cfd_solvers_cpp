@@ -266,7 +266,7 @@ public:
   class elm_type{
     public:
 
-      elm_type(){}
+      elm_type(){ tracked_index = 0;}
       ~elm_type(){
         delete vtx;
         delete nghbr;
@@ -302,6 +302,7 @@ public:
       real ar;                     //Element volume aspect ratio
       Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
       Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
+      int tracked_index;
 
 };
 

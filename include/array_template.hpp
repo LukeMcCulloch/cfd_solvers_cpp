@@ -94,7 +94,7 @@ class Array2D{
         // set up data size of matrix
         int nrows, ncols;
         int storage_size;
-        size_t tracked_index;
+        int tracked_index;
 
         // malloc host memory
         T* array;

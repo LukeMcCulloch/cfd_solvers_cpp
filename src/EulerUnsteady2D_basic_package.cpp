@@ -1970,84 +1970,179 @@ cout << "Generating CC scheme data......" << endl;
          imax = 1;
 
    // Initialization
-   //elements6 : do i = 1, nelms
+   //elements6 
    for (size_t i =0; i< nelms; i++) {
       elm[i].nvnghbrs = 0;
-   }//end do elements6
+   }//elements6
 
+// //--------------------------------------------------------------------------------
+// // Collect vertex-neighbors
+// //
+// //  
+//    //elements7 : do i = 1, nelms
+//    for (size_t i = 0; i < nelms; i++) {
+//    // (1)Add face-neighbors
+//       //do k = 1, elm(i).nnghbrs
+//       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+//          if ( (*elm[i].nghbr)(k) > 0 ) {
+//             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+//             //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+            
+//             elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+//             (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
+//          }
+//       }
+
+
+
+//    // (2)Add vertex-neighbors
+//       //do k = 1, elm[i].nvtx
+//       for (size_t k = 0; k < elm[i].nvtx; k++) {
+//          v1 = (*elm[i].vtx)(k);
+
+//          //velms : do j = 1, node[v1).nelms
+//          for (size_t j =0; j < node[v1].nelms; j++) {
+//             e1 = (*node[v1].elm)(j);
+//             if (e1 == i) continue; //velms;
+
+//       //    Check if the element is already added.
+//             found = false;
+//             //do ii = 1, elm[i].nvnghbrs
+//             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
+//                if ( e1 == (*elm[i].vnghbr)(ii) ) {
+//                   found = true;
+//                   break;
+//                }
+//             }
+
+//    //       Add the element, e1, if not added yet.
+//             if (not found) {
+//                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
+//                //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+//                elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
+//                (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
+//             }
+//          }//velms loop
+
+//          }//end elm[i].nvtx loop
+
+//       ave_nghbr = ave_nghbr + elm[i].nvnghbrs;
+//       if (elm[i].nvnghbrs < min_nghbr) imin = i;
+//       if (elm[i].nvnghbrs > max_nghbr) imax = i;
+//       min_nghbr = std::min(min_nghbr, elm[i].nvnghbrs);
+//       max_nghbr = std::max(max_nghbr, elm[i].nvnghbrs);
+//       if (elm[i].nvnghbrs < 3) {
+//          cout << "--- Not enough neighbors: elm = " << i << 
+//                   "elm[i].nvnghbrs= " << elm[i].nvnghbrs << endl;
+//       }
+
+//    }// elements7 loop
+
+//    cout << "      ave_nghbr = " << ave_nghbr/nelms << endl;
+//    cout << "      min_nghbr = " << min_nghbr << " elm = " << imin << endl;
+//    cout << "      max_nghbr = " << max_nghbr << " elm = " << imax << endl;
+//    cout << " "  << endl;
+
+
+//    //do i = 1, nelms
+//    for ( int i = 0; i < nelms; ++i ) {
+//       elm[i].bmark = 0;
+//    }
+
+//    //bc_loop : do i = 1, nbound
+//    for ( int i = 0; i < nbound; ++i ) {
+//       if ( bound[i].bc_type == "dirichlet") {
+//          //do j = 1, bound[i].nbfaces
+//          for (size_t i = 0; i < bound[i].nbfaces; i++) {
+//             elm[ (*bound[i].belm)(j) ].bmark = 1;
+//          }//end do
+//       }
+//    }// end do bc_loop
+
+//--------------------------------------------------------------------------------
+
+
+
+//--------------------------------------------------------------------------------
 // Collect vertex-neighbors
+//
+//  
    //elements7 : do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
-
-
    // (1)Add face-neighbors
       //do k = 1, elm(i).nnghbrs
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
          if ( (*elm[i].nghbr)(k) > 0 ) {
             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
 
-            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
+            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+            //elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+            //(*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
          }
       }
-      // TLM loops to avoid realloc:
-      // for (size_t k = 0; k < elm[i].nnghbrs; k++) {
-      //    if ( (*elm[i].nghbr)(k) > 0 ) {
-      //       elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-      //    }
-      // }
-      // for (size_t k = 0; k < elm[i].nnghbrs; k++) {
-      //    if ( (*elm[i].nghbr)(k) > 0 ) {
-      //       (*elm[i].vnghbr)(elm[i].nvnghbrs) = (*elm[i].nghbr)(k);
-      //    }
-      // }
+   } // end elements 7 loop here
+
+   for (size_t i = 0; i < nelms; i++) {
+      //TLM loops to avoid realloc:
+      if ( elm[i].nvnghbrs > 0 ) {
+            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+         }
+   } // end elements 7 loop here
+
+   //elements7
+   for (size_t i = 0; i < nelms; i++) {
+      for (size_t k = 0; k < elm[i].nnghbrs; k++) {
+         if ( (*elm[i].nghbr)(k) > 0 ) {
+            (*elm[i].vnghbr)(elm[i].tracked_index) = (*elm[i].nghbr)(k);
+            elm[i].tracked_index += 1;
+         }
+      }
 
 
 
 
-// (2)Add vertex-neighbors
-   //do k = 1, elm[i].nvtx
-   for (size_t k = 0; k < elm[i].nvtx; k++) {
-      v1 = (*elm[i].vtx)(k);
+   // (2)Add vertex-neighbors
+      //do k = 1, elm[i].nvtx
+      for (size_t k = 0; k < elm[i].nvtx; k++) {
+         v1 = (*elm[i].vtx)(k);
 
-      //velms : do j = 1, node[v1).nelms
-      for (size_t j =0; j < node[v1].nelms; j++) {
-         e1 = (*node[v1].elm)(j);
-         if (e1 == i) continue; //velms;
+         //velms : do j = 1, node[v1).nelms
+         for (size_t j =0; j < node[v1].nelms; j++) {
+            e1 = (*node[v1].elm)(j);
+            if (e1 == i) continue; //velms;
 
-   //    Check if the element is already added.
-         found = false;
-         //do ii = 1, elm[i].nvnghbrs
-         for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
-            if ( e1 == (*elm[i].vnghbr)(ii) ) {
-               found = true;
-               break;
+      //    Check if the element is already added.
+            found = false;
+            //do ii = 1, elm[i].nvnghbrs
+            for (size_t ii = 0; ii < elm[i].tracked_index; ii++) {
+               if ( e1 == (*elm[i].vnghbr)(ii) ) {
+                  found = true;
+                  break;
+               }
             }
-         }
 
-//    Add the element, e1, if not added yet.
-         if (not found) {
-            elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
-            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
-         }
-      }//end do velms
+   //       Add the element, e1, if not added yet.
+            if (not found) {
+               elm[i].tracked_index = elm[i].tracked_index + 1;
+               //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
+               elm[i].vnghbr = new Array2D<int>(elm[i].tracked_index, 1);
+               (*elm[i].vnghbr)(elm[i].tracked_index-1) = e1;
+            }
+         }//velms loop
 
-   }//end do
+         }//end elm[i].nvtx loop
 
-   ave_nghbr = ave_nghbr + elm[i].nvnghbrs;
-   if (elm[i].nvnghbrs < min_nghbr) imin = i;
-   if (elm[i].nvnghbrs > max_nghbr) imax = i;
-   min_nghbr = std::min(min_nghbr, elm[i].nvnghbrs);
-   max_nghbr = std::max(max_nghbr, elm[i].nvnghbrs);
-   if (elm[i].nvnghbrs < 3) {
-      cout << "--- Not enough neighbors: elm = " << i << 
-               "elm[i].nvnghbrs= " << elm[i].nvnghbrs << endl;
-   }
+      ave_nghbr = ave_nghbr + elm[i].tracked_index;
+      if (elm[i].tracked_index < min_nghbr) imin = i;
+      if (elm[i].tracked_index > max_nghbr) imax = i;
+      min_nghbr = std::min(min_nghbr, elm[i].tracked_index);
+      max_nghbr = std::max(max_nghbr, elm[i].tracked_index);
+      if (elm[i].tracked_index < 3) {
+         cout << "--- Not enough neighbors: elm = " << i << 
+                  "elm[i].nvnghbrs= " << elm[i].tracked_index << endl;
+      }
 
-   }//end do elements7
+   }// elements7 loop
 
    cout << "      ave_nghbr = " << ave_nghbr/nelms << endl;
    cout << "      min_nghbr = " << min_nghbr << " elm = " << imin << endl;
@@ -2070,10 +2165,12 @@ cout << "Generating CC scheme data......" << endl;
       }
    }// end do bc_loop
 
-// //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
 
-}
-//  end subroutine construct_grid_data
+
+
+
+} //  end function construct_grid_data
 
 //********************************************************************************
 
