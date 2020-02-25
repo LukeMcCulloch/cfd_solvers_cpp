@@ -659,10 +659,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       // save and reallocate:
       node[v1].nelms = node[v1].nelms + 1;
-      //cout << "save1 = " << endl;
-      Array2D<int> save1 =  *node[v1].elm; // copy constructor
-      //cout << "save1 is = " << endl;
-      //print(save1);
+      Array2D<int> save1 =  (*node[v1].elm); // copy constructor
       node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
       for (size_t ra = 0; ra < save1.storage_size; ra++){
          (*node[v1].elm).array[ra] = save1.array[ra];
@@ -763,7 +760,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       // save and reallocate:
       node[v2].nelms = node[v2].nelms + 1;
-      Array2D<int> save2 =  *node[v2].elm; // copy constructor
+      Array2D<int> save2 =  (*node[v2].elm); // copy constructor
       node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
       for (size_t ra = 0; ra < save2.storage_size; ra++){
          (*node[v2].elm).array[ra] = save2.array[ra];
@@ -775,7 +772,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       // // save and reallocate:
       node[v3].nelms = node[v3].nelms + 1;
-      Array2D<int> save3 =  *node[v3].elm; // copy constructor
+      Array2D<int> save3 =  (*node[v3].elm); // copy constructor
       node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
       for (size_t ra = 0; ra < save3.storage_size; ra++){
          (*node[v3].elm).array[ra] = save3.array[ra];
@@ -1802,7 +1799,7 @@ A: no, those were statically allocated, not pointers to
          }
          else {
             cout << " Boundary-adjacent element not found. Error..." << endl;
-            //std::exit(0);//stop
+            std::exit(0);//stop
          }
 
 
@@ -1828,11 +1825,11 @@ A: no, those were statically allocated, not pointers to
    ave_nghbr = node[0].nnghbrs;
    min_nghbr = node[0].nnghbrs;
    max_nghbr = node[0].nnghbrs;
-      imin = 0;
-      imax = 0;
-   //if (node[1].nnghbrs==2) {
+      imin = 1;
+      imax = 1;
+   if (node[0].nnghbrs==2) {
       cout << "--- 2 neighbors for the node = " << 0 << endl;
-   //}
+   }
 
   //do i = 2, nnodes
    for (size_t i = 1; i < nnodes; i++) {
@@ -1846,6 +1843,8 @@ A: no, those were statically allocated, not pointers to
       }
    }
 
+  cout << "      nnodes    = " << nnodes    << endl;
+  cout << "      ave_nghbr = " << ave_nghbr << endl;
   cout << "      ave_nghbr = " << ave_nghbr/nnodes << endl;
   cout << "      min_nghbr = " << min_nghbr << " at node " << imin << endl;
   cout << "      max_nghbr = " << max_nghbr << " at node " << imax << endl;
