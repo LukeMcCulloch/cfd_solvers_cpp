@@ -2005,7 +2005,7 @@ cout << "Generating CC scheme data......" << endl;
       elm[i].nvnghbrs = 1;
       //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
       //Array2D<int> save4 = (*elm[i].vnghbr);
-      elm[i].vnghbr = new Array2D<int>( elm[i].vnghbr,1);
+      elm[i].vnghbr = new Array2D<int>( 1,1);
       // for (size_t ra; ra < save4.storage_size; ra++) {
       //    (*elm[i].vnghbr).array[ra] = save4.array[ra];
       // }
@@ -2125,7 +2125,7 @@ cout << "Generating CC scheme data......" << endl;
 
 
 // //--------------------------------------------------------------------------------
-// // Collect vertex-neighbors
+// // Collect vertex-neighbors (alt attempt)
 // //
 // //  
 //    //elements7 : do i = 1, nelms
@@ -2254,7 +2254,9 @@ cout << "Generating CC scheme data......" << endl;
 //* Add more tests you can think of.
 //*
 //********************************************************************************
-//  subroutine check_grid_data
+void EulerSolver2D::MainData2D::check_grid_data() {
+
+}
 
 //  use edu2d_my_main_data  , only : nnodes, node,  nelms,   elm, nedges, edge, &
 //                             nbound, bound

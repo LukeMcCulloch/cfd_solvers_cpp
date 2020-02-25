@@ -436,6 +436,7 @@ namespace EulerSolver2D{
     // build the grid:
     void read_grid(std::string datafile_grid_in, std::string datafile_bcmap_in);
     void construct_grid_data();
+    void check_grid_data();
 
     //  Parameters
 
