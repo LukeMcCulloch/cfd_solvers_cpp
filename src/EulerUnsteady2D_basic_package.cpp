@@ -1151,6 +1151,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             nedges = nedges + 1;
          }
       }
+      
       else if (elm[i].nvtx==4) {
 
       v4 = (*elm[i].vtx)(3);
@@ -2255,81 +2256,79 @@ cout << "Generating CC scheme data......" << endl;
 //*
 //********************************************************************************
 void EulerSolver2D::MainData2D::check_grid_data() {
-
-}
-
 //  use edu2d_my_main_data  , only : nnodes, node,  nelms,   elm, nedges, edge, &
 //                             nbound, bound
 //  use edu2d_constants     , only : p2, zero, half
 
-//  implicit none
-// //Local variables
-//  integer  :: i, j, n1, n2, ierr, k
-//  real(p2), dimension(nnodes,2) :: sum_dav_i
-//  real(p2), dimension(2) :: sum_dav, sum_bn
-//  real(p2), dimension(2) :: sum_bfn
-//  real(p2)               :: sum_volc, sum_vol
-//  real(p2)               :: mag_dav, mag_bn
-//  real(p2)               :: vol_min, vol_max, vol_ave
+   // //Local variables
+   int i, j, n1, n2, ierr, k;
+   Array2D<real>  sum_dav_i = Array2D<real>(nnodes,2);
+   Array2D<real>  sum_dav(2,1), sum_bn(2,1);
+   Array2D<real>  sum_bfn(2,1);
+   real                   sum_volc, sum_vol;
+   real                   mag_dav, mag_bn;
+   real                   vol_min, vol_max, vol_ave;
 
-//   write(*,*) "Checking grid data...."
+   cout << "Checking grid data...." << endl;
 
-//   mag_dav = zero
-//   mag_bn  = zero
+   mag_dav = zero;
+   mag_bn  = zero;
 
-// //--------------------------------------------------------------------------------
-// // Directed area sum check
-// //--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+// Directed area sum check
+//--------------------------------------------------------------------------------
 
-// // Compute the sum of the directed area for each node.
+// Compute the sum of the directed area for each node.
 
-//    sum_dav_i = zero
-//   do i = 1, nedges
-//    n1 = edge(i)%n1
-//    n2 = edge(i)%n2
-//    sum_dav_i(n1,:) = sum_dav_i(n1,:) + edge(i)%dav(:)*edge(i)%da
-//    sum_dav_i(n2,:) = sum_dav_i(n2,:) - edge(i)%dav(:)*edge(i)%da
-//    mag_dav = mag_dav + edge(i)%da
-//   end do
-//    mag_dav = mag_dav/real(nedges,p2)
+   sum_dav_i = zero;
+   for (size_t i = 0; i < nedges; i++) {
+      n1 = edge[i].n1;
+      n2 = edge[i].n2;
+      sum_dav_i(n1,0) = sum_dav_i(n1,0) + edge[i].dav(0)*edge[i].da;
+      sum_dav_i(n2,0) = sum_dav_i(n2,0) - edge[i].dav(0)*edge[i].da;
+      sum_dav_i(n1,1) = sum_dav_i(n1,1) + edge[i].dav(1)*edge[i].da;
+      sum_dav_i(n2,1) = sum_dav_i(n2,1) - edge[i].dav(1)*edge[i].da;
+      mag_dav = mag_dav + edge[i].da;
+      mag_dav = mag_dav/real(nedges);
+   }
 
-// // Add contribution from boundary edges.
-//   do i = 1, nbound
-//    do j = 1, bound(i)%nbfaces
+// Add contribution from boundary edges.
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-//      n1 = bound(i)%bnode(j)
-//      n2 = bound(i)%bnode(j+1)
+      n1 = (*bound[i].bnode)(j);
+      n2 = (*bound[i].bnode)(j+1);
 
-//      sum_dav_i(n1,1) = sum_dav_i(n1,1) + half*bound(i)%bfnx(j)*bound(i)%bfn(j)
-//      sum_dav_i(n1,2) = sum_dav_i(n1,2) + half*bound(i)%bfny(j)*bound(i)%bfn(j)
+      sum_dav_i(n1,1) = sum_dav_i(n1,1) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
+      sum_dav_i(n1,2) = sum_dav_i(n1,2) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
 
-//      sum_dav_i(n2,1) = sum_dav_i(n2,1) + half*bound(i)%bfnx(j)*bound(i)%bfn(j)
-//      sum_dav_i(n2,2) = sum_dav_i(n2,2) + half*bound(i)%bfny(j)*bound(i)%bfn(j)
+      sum_dav_i(n2,1) = sum_dav_i(n2,1) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
+      sum_dav_i(n2,2) = sum_dav_i(n2,2) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
 
-//    end do
-//   end do
+      }
+   }
 
-// // Compute also the sum of the boundary normal vector (at nodes).
+// Compute also the sum of the boundary normal vector (at nodes).
 
-//   sum_bn = 0
-//   do i = 1, nbound
-//    do j = 1, bound(i)%nbnodes
-//      k = bound(i)%bnode(j)
-//      if (j > 1 .and. k==bound(i)%bnode(1)) cycle //Skip if the last node is equal to the first node).
-//     sum_bn(1)      = sum_bn(1)      + bound(i)%bnx(j)*bound(i)%bn(j)
-//     sum_bn(2)      = sum_bn(2)      + bound(i)%bny(j)*bound(i)%bn(j)
-//     mag_bn = mag_bn + abs(bound(i)%bn(j))
-//    end do
-//     mag_bn = mag_bn/real(bound(i)%nbnodes,p2)
-//   end do
+   sum_bn = 0;
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbnodes; j++) {
+         k = (*bound[i].bnode)(j);
+         if (j > 1 and k==(*bound[i].bnode)(0)) continue; //Skip if the last node is equal to the first node).
+         sum_bn(1)      = sum_bn(1)      + (*bound[i].bnx)(j)*(*bound[i].bn)(j);
+         sum_bn(2)      = sum_bn(2)      + (*bound[i].bny)(j)*(*bound[i].bn)(j);
+         mag_bn = mag_bn + abs((*bound[i].bn)(j));
+      }
+      mag_bn = mag_bn/real(bound[i].nbnodes);//
+   }
 
-// // Global sum of boundary normal vectors must vanish.
+// Global sum of boundary normal vectors must vanish.
 
 // //  if (sum_bn(1) > 1.0e-12_p2*mag_bn .and. sum_bn(2) > 1.0e-12_p2*mag_bn) then
-// //   write(*,*) "--- Global sum of the boundary normal vector:"
+//    cout << "--- Global sum of the boundary normal vector:"
 // //   write(*,'(a19,es10.3)') "    sum of bn_x = ", sum_bn(1)
 // //   write(*,'(a19,es10.3)') "    sum of bn_y = ", sum_bn(2)
-// //   write(*,*) "Error: boundary normal vectors do not sum to zero..."
+//    cout << "Error: boundary normal vectors do not sum to zero..."
 // //   stop
 // //  endif
 
@@ -2372,3 +2371,124 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 //    write(*,'(a19,es10.3)') "    sum of dav_y = ", sum_dav(2)
 //    stop
 //   endif
+
+
+
+// //--------------------------------------------------------------------------------
+// // Global sum check for boundary face vector
+// //--------------------------------------------------------------------------------
+//   sum_bfn = 0
+//   do i = 1, nbound
+//    do j = 1, bound[i].nbfaces
+//      sum_bfn(1) =  sum_bfn(1) + (*bound[i].bfnx)(j)*(*bound[i].bfn)(j)
+//      sum_bfn(2) =  sum_bfn(2) + (*bound[i].bfny)(j)*(*bound[i].bfn)(j)
+//    end do
+//   end do
+
+//    write(*,*) "--- Global sum of the boundary face vector:"
+//    write(*,'(a19,es10.3)') "    sum of bfn_x = ", sum_bfn(1)
+//    write(*,'(a19,es10.3)') "    sum of bfn_y = ", sum_bfn(2)
+
+//   if (sum_bfn(1) > 1.0e-12_p2*mag_bn .and. sum_bfn(2) > 1.0e-12_p2*mag_bn) then
+//    write(*,*) "Error: boundary face normals do not sum globally to zero..."
+//    write(*,*) "--- Global sum of the boundary face normal vector:"
+//    write(*,'(a19,es10.3)') "    sum of bfn_x = ", sum_bfn(1)
+//    write(*,'(a19,es10.3)') "    sum of bfn_y = ", sum_bfn(2)
+//    stop
+//   endif
+
+// //--------------------------------------------------------------------------------
+// // Volume check
+// //--------------------------------------------------------------------------------
+// // (1)Check the element volume: make sure there are no zero or negative volumes
+
+//    vol_min =  1.0e+15
+//    vol_max = -1.0
+//    vol_ave =  zero
+
+//        ierr = 0
+//    sum_volc = zero
+//   do i = 1, nelms
+
+//       vol_min = min(vol_min,elm(i)%vol)
+//       vol_max = max(vol_max,elm(i)%vol)
+//       vol_ave = vol_ave + elm(i)%vol
+
+//    sum_volc = sum_volc + elm(i)%vol
+
+//    if (elm(i)%vol < zero) then
+//      write(*,*) "Negative volc=",elm(i)%vol, " elm=",i, " stop..."
+//      ierr = ierr + 1
+//    endif
+
+//    if (abs(elm(i)%vol) < 1.0e-14_p2) then
+//      write(*,*) "Vanishing volc=",elm(i)%vol, " elm=",i, " stop..."
+//      ierr = ierr + 1
+//    endif
+
+//   end do
+
+//    vol_ave = vol_ave / real(nelms)
+
+//    write(*,*)
+//    write(*,'(a30,es25.15)') "    minimum element volume = ", vol_min
+//    write(*,'(a30,es25.15)') "    maximum element volume = ", vol_max
+//    write(*,'(a30,es25.15)') "    average element volume = ", vol_ave
+//    write(*,*)
+
+// //--------------------------------------------------------------------------------
+// // (2)Check the dual volume (volume around a node)
+
+//    vol_min =  1.0e+15
+//    vol_max = -1.0
+//    vol_ave =  zero
+
+//       ierr = 0
+//    sum_vol = zero
+//   do i = 1, nnodes
+
+//       vol_min = min(vol_min,node(i)%vol)
+//       vol_max = max(vol_max,node(i)%vol)
+//       vol_ave = vol_ave + node(i)%vol
+
+//    sum_vol = sum_vol + node(i)%vol
+
+//    if (node(i)%vol < zero) then
+//      write(*,*) "Negative vol=",node(i)%vol, " node=",i, " stop..."
+//      ierr = ierr + 1
+//    endif
+
+//    if (abs(node(i)%vol) < 1.0e-14_p2) then
+//      write(*,*) "Vanishing vol=",node(i)%vol, " node=",i, " stop..."
+//      ierr = ierr + 1
+//    endif
+
+//   end do
+
+//    vol_ave = vol_ave / real(nnodes)
+
+//    write(*,*)
+//    write(*,'(a30,es25.15)') "    minimum dual volume = ", vol_min
+//    write(*,'(a30,es25.15)') "    maximum dual volume = ", vol_max
+//    write(*,'(a30,es25.15)') "    average dual volume = ", vol_ave
+//    write(*,*)
+
+
+//   if (ierr > 0) stop
+
+//   if (abs(sum_vol-sum_volc) > 1.0e-08_p2*sum_vol) then
+//    write(*,*) "--- Global sum of volume: must be the same"
+//    write(*,'(a19,es10.3)') "    sum of volc = ", sum_volc
+//    write(*,'(a19,es10.3)') "    sum of vol  = ", sum_vol
+//    write(*,'(a22,es10.3)') " sum_vol-sum_volc  = ", sum_vol-sum_volc
+//    write(*,*) "Error: sum of dual volumes and cell volumes do not match..."
+//    stop
+//   endif
+
+//   call check_skewness_nc
+//   call compute_ar
+
+   cout << " " << endl;
+   cout << "Grid data look good\n" << endl;
+
+} //end  check_grid_data
