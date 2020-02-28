@@ -2334,12 +2334,18 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 // // Sum of the directed area vectors must vanish at every node.
 
-//   do i = 1, nnodes
-//    if (abs(sum_dav_i(i,1))>1.0e-12_p2*mag_dav .or. abs(sum_dav_i(i,2))>1.0e-12_p2*mag_dav) then
-//    write(*,'(a11,i5,a7,2es10.3,a9,2es10.3)') &
-//     " --- node=", i, " (x,y)=", node(i)%x, node(i)%y, " sum_dav=",sum_dav_i(i,:)
-//    endif
-//   end do
+   // do i = 1, nnodes
+   //    if (abs(sum_dav_i(i,1))>1.0e-12_p2*mag_dav .or. abs(sum_dav_i(i,2))>1.0e-12_p2*mag_dav) then
+   //       write(*,'(a11,i5,a7,2es10.3,a9,2es10.3)') &
+   //          " --- node=", i, " (x,y)=", node(i)%x, node(i)%y, " sum_dav=",sum_dav_i(i,:)
+   //    endif
+   // end do
+
+   for (size_t i = 0; i < nnodes; i++) {
+         if ( abs( sum_dav(i,0) ) > 1.0e-12 * mag_dav or abs( sum_dav_i(i,1) ) > 1.0e-12 * mag_dav) {
+            cout << " --- node="<< i << " (x,y)=" << node[i].x << node[i].y << " sum_dav=" << sum_dav_i(i,0) << sum_dav_i(i,1);
+         }
+   }
 
 //    write(*,*) "--- Max sum of directed area vector around a node:"
 //    write(*,*) "  max(sum_dav_i_x) = ", maxval(sum_dav_i(:,1))
