@@ -2315,8 +2315,8 @@ void EulerSolver2D::MainData2D::check_grid_data() {
       for (size_t j = 0; j < bound[i].nbnodes; j++) {
          k = (*bound[i].bnode)(j);
          if (j > 1 and k==(*bound[i].bnode)(0)) continue; //Skip if the last node is equal to the first node).
-         sum_bn(1)      = sum_bn(1)      + (*bound[i].bnx)(j)*(*bound[i].bn)(j);
-         sum_bn(2)      = sum_bn(2)      + (*bound[i].bny)(j)*(*bound[i].bn)(j);
+         sum_bn(0)      = sum_bn(0)      + (*bound[i].bnx)(j)*(*bound[i].bn)(j);
+         sum_bn(1)      = sum_bn(1)      + (*bound[i].bny)(j)*(*bound[i].bn)(j);
          mag_bn = mag_bn + abs((*bound[i].bn)(j));
       }
       mag_bn = mag_bn/real(bound[i].nbnodes);//
@@ -2324,13 +2324,14 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 // Global sum of boundary normal vectors must vanish.
 
-// //  if (sum_bn(1) > 1.0e-12_p2*mag_bn .and. sum_bn(2) > 1.0e-12_p2*mag_bn) then
-//    cout << "--- Global sum of the boundary normal vector:"
-// //   write(*,'(a19,es10.3)') "    sum of bn_x = ", sum_bn(1)
-// //   write(*,'(a19,es10.3)') "    sum of bn_y = ", sum_bn(2)
-//    cout << "Error: boundary normal vectors do not sum to zero..."
-// //   stop
-// //  endif
+ if (sum_bn(1) > 1.0e-12*mag_bn and sum_bn(2) > 1.0e-12*mag_bn) {
+
+   cout << "--- Global sum of the boundary normal vector:" << endl;
+   cout << "    sum of bn_x = " << sum_bn(0)  << endl;
+   cout << "    sum of bn_y = " << sum_bn(1)  << endl;
+   cout << "Error: boundary normal vectors do not sum to zero..." << endl;
+   //stop program
+}
 
 // // Sum of the directed area vectors must vanish at every node.
 
@@ -2343,7 +2344,7 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
    for (size_t i = 0; i < nnodes; i++) {
          if ( abs( sum_dav(i,0) ) > 1.0e-12 * mag_dav or abs( sum_dav_i(i,1) ) > 1.0e-12 * mag_dav) {
-            cout << " --- node="<< i << " (x,y)=" << node[i].x << node[i].y << " sum_dav=" << sum_dav_i(i,0) << sum_dav_i(i,1);
+            cout << " --- node="<< i << " (x,y)=" << node[i].x << node[i].y << " sum_dav=" << sum_dav_i(i,0) << sum_dav_i(i,1) << endl;
          }
    }
 
@@ -2370,7 +2371,7 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 //    write(*,'(a19,es10.3)') "    sum of dav_x = ", sum_dav(1)
 //    write(*,'(a19,es10.3)') "    sum of dav_y = ", sum_dav(2)
 
-//   if (sum_dav(1) > 1.0e-12_p2*mag_dav .and. sum_dav(2) > 1.0e-12_p2*mag_dav) then
+//   if (sum_dav(1) > 1.0e-12_p2*mag_dav and sum_dav(2) > 1.0e-12_p2*mag_dav) then
 //    write(*,*) "Error: directed area vectors do not sum globally to zero..."
 //    write(*,*) "--- Global sum of the directed area vector:"
 //    write(*,'(a19,es10.3)') "    sum of dav_x = ", sum_dav(1)
@@ -2395,7 +2396,7 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 //    write(*,'(a19,es10.3)') "    sum of bfn_x = ", sum_bfn(1)
 //    write(*,'(a19,es10.3)') "    sum of bfn_y = ", sum_bfn(2)
 
-//   if (sum_bfn(1) > 1.0e-12_p2*mag_bn .and. sum_bfn(2) > 1.0e-12_p2*mag_bn) then
+//   if (sum_bfn(1) > 1.0e-12_p2*mag_bn and sum_bfn(2) > 1.0e-12_p2*mag_bn) then
 //    write(*,*) "Error: boundary face normals do not sum globally to zero..."
 //    write(*,*) "--- Global sum of the boundary face normal vector:"
 //    write(*,'(a19,es10.3)') "    sum of bfn_x = ", sum_bfn(1)
