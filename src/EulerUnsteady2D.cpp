@@ -309,7 +309,7 @@ void program_2D_euler_rk2(){
    E2Ddata.construct_grid_data();
 
 // (3) Check the grid data (It is always good to check them before use//)
-//       check_grid_data();
+   E2Ddata.check_grid_data();
    cout << "now in program_2D_euler_rk2" << endl;
 
 // // (4) Prepare LSQ gradients

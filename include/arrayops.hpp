@@ -210,5 +210,18 @@ Cross(const Array2D<T>& a, const Array2D<T>& b) {
 }
 
 
+//
+//***********************************************************
+// misc functions
+template <class T>
+T MaxColVal(Array2D<T> A, int col) {
+  T max_ = 0.0;
+  for (size_t i = 0; i < A.nrows; i++) {
+    max_ = max(max_,A(i,col));
+  }
+  return max_;
+}
+
+
 
 #endif //__ARRAYOPS_TEMPLATE_INCLUDED__

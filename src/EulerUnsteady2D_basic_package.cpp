@@ -139,29 +139,29 @@ using std::endl;
 //* 1. "datafile_grid_in" is assumed to have been written in the following format:
 //*
 //*   -----------------------------------------------------------------------
-//*    write(*,*) nnodes, ntria, nquad //Numbers of nodes, triangles and quads
+//*    cout <<  nnodes, ntria, nquad //Numbers of nodes, triangles and quads
 //*
 //*   do i = 1, nnodes
-//*    write(*,*) x(i), y(i) //(x,y) coordinates of each node
+//*    cout <<  x(i), y(i) //(x,y) coordinates of each node
 //*   end do
 //*
 //*   do i = 1, ntria        //Nodes of triangles ordered counterclockwise
-//*    write(*,*) node_1(i), node_2(i), node_3(i)
+//*    cout <<  node_1(i), node_2(i), node_3(i)
 //*   end do
 //*
 //*   do i = 1, nquad        //Nodes of quadrilaterals ordered counterclockwise
-//*    write(*,*) node_1(i), node_2(i), node_3(i), node_4(i)
+//*    cout <<  node_1(i), node_2(i), node_3(i), node_4(i)
 //*   end do
 //* 
-//*    write(*,*) nbound     //Number of boundary segments
+//*    cout <<  nbound     //Number of boundary segments
 //*
 //*   do i = 1, nbound
-//*    write(*,*) nbnodes(i) //Number of nodes on each segment
+//*    cout <<  nbnodes(i) //Number of nodes on each segment
 //*   end do
 //*
 //*   do i = 1, nbound
 //*    do j = 1, nbnodes(i)
-//*     write(*,*) bnode(j)  //Node number of each node j in segment i
+//*     cout <<  bnode(j)  //Node number of each node j in segment i
 //*    end do
 //*   end do
 //*   -----------------------------------------------------------------------
@@ -177,9 +177,9 @@ using std::endl;
 //* 2. "datafile_bcmap_in" is assumed have been written in the following format:
 //*
 //*   -----------------------------------------------------------------------
-//*    write(*,*) "Boundary Segment              Boundary Condition"
+//*    cout <<  "Boundary Segment              Boundary Condition"
 //*   do i = 1, nbound
-//*    write(*,*) i, bc_name
+//*    cout <<  i, bc_name
 //*   end do
 //*   -----------------------------------------------------------------------
 //*
@@ -670,7 +670,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       if (i == 160400) {
          cout << "----------------------------------" << endl;
          cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << ", node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
          ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
          cout << "ielm = " << ielm << endl;
          cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
@@ -679,7 +679,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       if (i == 319201) {
          cout << "----------------------------------" << endl;
          cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << ", node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
          ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
          cout << "ielm = " << ielm << endl;
          cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
@@ -689,7 +689,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       if (i == 80200) {
          cout << "----------------------------------" << endl;
          cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << ", node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
          ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
          cout << "ielm = " << ielm << endl;
          cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
@@ -700,7 +700,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       if (i == 159201) {
          cout << "----------------------------------" << endl;
          cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << ", node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
          ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
          cout << "ielm = " << ielm << endl; 
          cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
@@ -837,7 +837,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3  << endl;
             cout << "  (x4,y4)=" << x4 << y4  << endl;
             cout << "  (xc,yc)=" << xc << yc  << endl;
-            //stop
+            //std::exit(0);//stop
          }
 
          if (tri_area(x2,x3,xc,y2,y3,yc)<=zero) {
@@ -847,7 +847,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3  << endl;
             cout << "  (x4,y4)=" << x4 << y4  << endl;
             cout << "  (xc,yc)=" << xc << yc  << endl;
-            //stop
+            //std::exit(0);//stop
          }
 
          if (tri_area(x3,x4,xc,y3,y4,yc)<=zero) {
@@ -857,7 +857,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3 << endl;
             cout << "  (x4,y4)=" << x4 << y4 << endl;
             cout << "  (xc,yc)=" << xc << yc << endl;
-            //stop
+            //std::exit(0);//stop
          }
 
          if (tri_area(x4,x1,xc,y4,y1,yc)<=zero) {
@@ -867,7 +867,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3  << endl;
             cout << "  (x4,y4)=" << x4 << y4  << endl;
             cout << "  (xc,yc)=" << xc << yc  << endl;
-            //stop
+            //std::exit(0);//stop
          }
 
       //  Distribution of element number to the 4th node of the quadrilateral
@@ -2292,73 +2292,88 @@ void EulerSolver2D::MainData2D::check_grid_data() {
       mag_dav = mag_dav/real(nedges);
    }
 
-// Add contribution from boundary edges.
-   for (size_t i = 0; i < nbound; i++) {
-      for (size_t j = 0; j < bound[i].nbfaces; j++) {
+// // Add contribution from boundary edges.
+//    for (size_t i = 0; i < nbound; i++) {
+//       for (size_t j = 0; j < bound[i].nbfaces; j++) {
 
-      n1 = (*bound[i].bnode)(j);
-      n2 = (*bound[i].bnode)(j+1);
+//       n1 = (*bound[i].bnode)(j);
+//       n2 = (*bound[i].bnode)(j+1);
 
-      sum_dav_i(n1,1) = sum_dav_i(n1,1) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
-      sum_dav_i(n1,2) = sum_dav_i(n1,2) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
+//       sum_dav_i(n1,1) = sum_dav_i(n1,1) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
+//       sum_dav_i(n1,2) = sum_dav_i(n1,2) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
 
-      sum_dav_i(n2,1) = sum_dav_i(n2,1) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
-      sum_dav_i(n2,2) = sum_dav_i(n2,2) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
+//       sum_dav_i(n2,1) = sum_dav_i(n2,1) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
+//       sum_dav_i(n2,2) = sum_dav_i(n2,2) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
 
-      }
-   }
+//       }
+//    }
 
-// Compute also the sum of the boundary normal vector (at nodes).
+// // Compute also the sum of the boundary normal vector (at nodes).
 
-   sum_bn = 0;
-   for (size_t i = 0; i < nbound; i++) {
-      for (size_t j = 0; j < bound[i].nbnodes; j++) {
-         k = (*bound[i].bnode)(j);
-         if (j > 1 and k==(*bound[i].bnode)(0)) continue; //Skip if the last node is equal to the first node).
-         sum_bn(0)      = sum_bn(0)      + (*bound[i].bnx)(j)*(*bound[i].bn)(j);
-         sum_bn(1)      = sum_bn(1)      + (*bound[i].bny)(j)*(*bound[i].bn)(j);
-         mag_bn = mag_bn + abs((*bound[i].bn)(j));
-      }
-      mag_bn = mag_bn/real(bound[i].nbnodes);//
-   }
+//    sum_bn = 0;
+//    for (size_t i = 0; i < nbound; i++) {
+//       for (size_t j = 0; j < bound[i].nbnodes; j++) {
+//          k = (*bound[i].bnode)(j);
+//          if (j > 1 and k==(*bound[i].bnode)(0)) continue; //Skip if the last node is equal to the first node).
+//          sum_bn(0)      = sum_bn(0)      + (*bound[i].bnx)(j)*(*bound[i].bn)(j);
+//          sum_bn(1)      = sum_bn(1)      + (*bound[i].bny)(j)*(*bound[i].bn)(j);
+//          mag_bn = mag_bn + abs((*bound[i].bn)(j));
+//       }
+//       mag_bn = mag_bn/real(bound[i].nbnodes);//
+//    }
 
-// Global sum of boundary normal vectors must vanish.
+// // Global sum of boundary normal vectors must vanish.
 
- if (sum_bn(1) > 1.0e-12*mag_bn and sum_bn(2) > 1.0e-12*mag_bn) {
+//  if (sum_bn(1) > 1.0e-12*mag_bn and sum_bn(2) > 1.0e-12*mag_bn) {
 
-   cout << "--- Global sum of the boundary normal vector:" << endl;
-   cout << "    sum of bn_x = " << sum_bn(0)  << endl;
-   cout << "    sum of bn_y = " << sum_bn(1)  << endl;
-   cout << "Error: boundary normal vectors do not sum to zero..." << endl;
-   //stop program
-}
+//    cout << "--- Global sum of the boundary normal vector:" << endl;
+//    cout << "    sum of bn_x = " << sum_bn(0)  << endl;
+//    cout << "    sum of bn_y = " << sum_bn(1)  << endl;
+//    cout << "Error: boundary normal vectors do not sum to zero..." << endl;
+//    std::exit(0);//stop program
+// }
 
-// // Sum of the directed area vectors must vanish at every node.
+// // // Sum of the directed area vectors must vanish at every node.
 
-   // do i = 1, nnodes
-   //    if (abs(sum_dav_i(i,1))>1.0e-12_p2*mag_dav .or. abs(sum_dav_i(i,2))>1.0e-12_p2*mag_dav) then
-   //       write(*,'(a11,i5,a7,2es10.3,a9,2es10.3)') &
-   //          " --- node=", i, " (x,y)=", node(i)%x, node(i)%y, " sum_dav=",sum_dav_i(i,:)
-   //    endif
-   // end do
+//    // do i = 1, nnodes
+//    //    if (abs(sum_dav_i(i,1))>1.0e-12_p2*mag_dav .or. abs(sum_dav_i(i,2))>1.0e-12_p2*mag_dav) then
+//    //       write(*,'(a11,i5,a7,2es10.3,a9,2es10.3)') &
+//    //          " --- node=" <<  i <<   (x,y)=" <<  node(i)%x, node(i)%y <<   sum_dav=" << sum_dav_i(i,:)
+//    //    endif
+//    // end do
 
-   for (size_t i = 0; i < nnodes; i++) {
-         if ( abs( sum_dav(i,0) ) > 1.0e-12 * mag_dav or abs( sum_dav_i(i,1) ) > 1.0e-12 * mag_dav) {
-            cout << " --- node="<< i << " (x,y)=" << node[i].x << node[i].y << " sum_dav=" << sum_dav_i(i,0) << sum_dav_i(i,1) << endl;
-         }
-   }
+//    for (size_t i = 0; i < nnodes; i++) {
+//          if ( abs( sum_dav(i,0) ) > 1.0e-12 * mag_dav or abs( sum_dav_i(i,1) ) > 1.0e-12 * mag_dav) {
+//             cout << " --- node="<< i << " (x,y)=" << node[i].x << node[i].y << " sum_dav=" << sum_dav_i(i,0) << sum_dav_i(i,1) << endl;
+//          }
+//    }
 
-//    write(*,*) "--- Max sum of directed area vector around a node:"
-//    write(*,*) "  max(sum_dav_i_x) = ", maxval(sum_dav_i(:,1))
-//    write(*,*) "  max(sum_dav_i_y) = ", maxval(sum_dav_i(:,2))
+//    cout << "--- Max sum of directed area vector around a node:" << endl;
+//    // cout << "  max(sum_dav_i_x) = " <<  maxval(sum_dav_i(:,0)) << endl;
+//    // cout << "  max(sum_dav_i_y) = " <<  maxval(sum_dav_i(:,1)) << endl;
+//    cout << "  max(sum_dav_i_x) = " <<  MaxColVal(sum_dav_i,0) << endl;
+//    cout << "  max(sum_dav_i_y) = " <<  MaxColVal(sum_dav_i,1) << endl;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //   if (maxval(abs(sum_dav_i(:,1)))>1.0e-12_p2*mag_dav .or. &
-//       maxval(abs(sum_dav_i(:,2)))>1.0e-12_p2*mag_dav) then
-//    write(*,*) "--- Max sum of directed area vector around a node:"
-//    write(*,*) "  max(sum_dav_i_x) = ", maxval(sum_dav_i(:,1))
-//    write(*,*) "  max(sum_dav_i_y) = ", maxval(sum_dav_i(:,2))
-//    write(*,*) "Error: directed area vectors do not sum to zero..."
-//    stop
+//       maxval(abs(sum_dav_i(:,2)))>1.0e-12_p2*mag_dav)   {
+//    cout << "--- Max sum of directed area vector around a node:" << endl;
+//    cout << "  max(sum_dav_i_x) = " <<  maxval(sum_dav_i(:,1)) << endl;
+//    cout << "  max(sum_dav_i_y) = " <<  maxval(sum_dav_i(:,2)) << endl;
+//    cout << "Error: directed area vectors do not sum to zero..." << endl;
+//    std::exit(0);//stop
 //   endif
 
 // // Of course, the global sum of the directed area vector sum must vanish.
@@ -2367,16 +2382,16 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 //    sum_dav = sum_dav + sum_dav_i(i,:)
 //   end do
 
-//    write(*,*) "--- Global sum of the directed area vector:"
-//    write(*,'(a19,es10.3)') "    sum of dav_x = ", sum_dav(1)
-//    write(*,'(a19,es10.3)') "    sum of dav_y = ", sum_dav(2)
+//    cout << "--- Global sum of the directed area vector:" << endl;
+//    cout << "    sum of dav_x = " <<  sum_dav(1) << endl;
+//    cout << "    sum of dav_y = " <<  sum_dav(2) << endl;
 
-//   if (sum_dav(1) > 1.0e-12_p2*mag_dav and sum_dav(2) > 1.0e-12_p2*mag_dav) then
-//    write(*,*) "Error: directed area vectors do not sum globally to zero..."
-//    write(*,*) "--- Global sum of the directed area vector:"
-//    write(*,'(a19,es10.3)') "    sum of dav_x = ", sum_dav(1)
-//    write(*,'(a19,es10.3)') "    sum of dav_y = ", sum_dav(2)
-//    stop
+//   if (sum_dav(1) > 1.0e-12_p2*mag_dav and sum_dav(2) > 1.0e-12_p2*mag_dav)   {
+//    cout << "Error: directed area vectors do not sum globally to zero..." << endl;
+//    cout << "--- Global sum of the directed area vector:" << endl;
+//    cout << "    sum of dav_x = " <<  sum_dav(1) << endl;
+//    cout << "    sum of dav_y = " <<  sum_dav(2) << endl;
+//    std::exit(0);//stop
 //   endif
 
 
@@ -2392,16 +2407,16 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 //    end do
 //   end do
 
-//    write(*,*) "--- Global sum of the boundary face vector:"
-//    write(*,'(a19,es10.3)') "    sum of bfn_x = ", sum_bfn(1)
-//    write(*,'(a19,es10.3)') "    sum of bfn_y = ", sum_bfn(2)
+//    cout << "--- Global sum of the boundary face vector:"
+//    cout << "    sum of bfn_x = " <<  sum_bfn(1) << endl;
+//    cout << "    sum of bfn_y = " <<  sum_bfn(2) << endl;
 
-//   if (sum_bfn(1) > 1.0e-12_p2*mag_bn and sum_bfn(2) > 1.0e-12_p2*mag_bn) then
-//    write(*,*) "Error: boundary face normals do not sum globally to zero..."
-//    write(*,*) "--- Global sum of the boundary face normal vector:"
-//    write(*,'(a19,es10.3)') "    sum of bfn_x = ", sum_bfn(1)
-//    write(*,'(a19,es10.3)') "    sum of bfn_y = ", sum_bfn(2)
-//    stop
+//   if (sum_bfn(1) > 1.0e-12_p2*mag_bn and sum_bfn(2) > 1.0e-12_p2*mag_bn)   {
+//    cout << "Error: boundary face normals do not sum globally to zero..." << endl;
+//    cout << "--- Global sum of the boundary face normal vector:" << endl;
+//    cout << "    sum of bfn_x = " <<  sum_bfn(1) << endl;
+//    cout << "    sum of bfn_y = " <<  sum_bfn(2) << endl;
+//    std::exit(0);//stop
 //   endif
 
 // //--------------------------------------------------------------------------------
@@ -2423,13 +2438,13 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 //    sum_volc = sum_volc + elm(i)%vol
 
-//    if (elm(i)%vol < zero) then
-//      write(*,*) "Negative volc=",elm(i)%vol, " elm=",i, " stop..."
+//    if (elm(i)%vol < zero)   {
+//      cout << "Negative volc=" << elm(i)%vol <<   elm=" << i <<   stop..."
 //      ierr = ierr + 1
 //    endif
 
-//    if (abs(elm(i)%vol) < 1.0e-14_p2) then
-//      write(*,*) "Vanishing volc=",elm(i)%vol, " elm=",i, " stop..."
+//    if (abs(elm(i)%vol) < 1.0e-14_p2)   {
+//      cout << "Vanishing volc=" << elm(i)%vol <<   elm=" << i <<   stop..."
 //      ierr = ierr + 1
 //    endif
 
@@ -2437,11 +2452,11 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 //    vol_ave = vol_ave / real(nelms)
 
-//    write(*,*)
-//    write(*,'(a30,es25.15)') "    minimum element volume = ", vol_min
-//    write(*,'(a30,es25.15)') "    maximum element volume = ", vol_max
-//    write(*,'(a30,es25.15)') "    average element volume = ", vol_ave
-//    write(*,*)
+//    cout << " "
+//    write(*,'(a30,es25.15)') "    minimum element volume = " <<  vol_min
+//    write(*,'(a30,es25.15)') "    maximum element volume = " <<  vol_max
+//    write(*,'(a30,es25.15)') "    average element volume = " <<  vol_ave
+//    cout << " "
 
 // //--------------------------------------------------------------------------------
 // // (2)Check the dual volume (volume around a node)
@@ -2460,13 +2475,13 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 //    sum_vol = sum_vol + node(i)%vol
 
-//    if (node(i)%vol < zero) then
-//      write(*,*) "Negative vol=",node(i)%vol, " node=",i, " stop..."
+//    if (node(i)%vol < zero)   {
+//      cout << "Negative vol=" << node(i)%vol <<   node=" << i <<   stop..."
 //      ierr = ierr + 1
 //    endif
 
-//    if (abs(node(i)%vol) < 1.0e-14_p2) then
-//      write(*,*) "Vanishing vol=",node(i)%vol, " node=",i, " stop..."
+//    if (abs(node(i)%vol) < 1.0e-14_p2)   {
+//      cout << "Vanishing vol=" << node(i)%vol <<   node=" << i <<   stop..."
 //      ierr = ierr + 1
 //    endif
 
@@ -2474,22 +2489,22 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 //    vol_ave = vol_ave / real(nnodes)
 
-//    write(*,*)
-//    write(*,'(a30,es25.15)') "    minimum dual volume = ", vol_min
-//    write(*,'(a30,es25.15)') "    maximum dual volume = ", vol_max
-//    write(*,'(a30,es25.15)') "    average dual volume = ", vol_ave
-//    write(*,*)
+//    cout << " "
+//    write(*,'(a30,es25.15)') "    minimum dual volume = " <<  vol_min
+//    write(*,'(a30,es25.15)') "    maximum dual volume = " <<  vol_max
+//    write(*,'(a30,es25.15)') "    average dual volume = " <<  vol_ave
+//    cout << " "
 
 
-//   if (ierr > 0) stop
+//   if (ierr > 0) std::exit(0);//stop
 
-//   if (abs(sum_vol-sum_volc) > 1.0e-08_p2*sum_vol) then
-//    write(*,*) "--- Global sum of volume: must be the same"
-//    write(*,'(a19,es10.3)') "    sum of volc = ", sum_volc
-//    write(*,'(a19,es10.3)') "    sum of vol  = ", sum_vol
-//    write(*,'(a22,es10.3)') " sum_vol-sum_volc  = ", sum_vol-sum_volc
-//    write(*,*) "Error: sum of dual volumes and cell volumes do not match..."
-//    stop
+//   if (abs(sum_vol-sum_volc) > 1.0e-08_p2*sum_vol)   {
+//    cout << "--- Global sum of volume: must be the same"
+//    cout << "    sum of volc = " <<  sum_volc
+//    cout << "    sum of vol  = " <<  sum_vol
+//    write(*,'(a22,es10.3)') " sum_vol-sum_volc  = " <<  sum_vol-sum_volc
+//    cout << "Error: sum of dual volumes and cell volumes do not match..."
+//    std::exit(0);//stop
 //   endif
 
 //   call check_skewness_nc
