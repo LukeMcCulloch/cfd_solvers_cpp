@@ -2505,3 +2505,186 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 } //end  check_grid_data
 
 
+
+
+//*******************************************************************************
+//* Skewness computation for edges.
+//*******************************************************************************
+void EulerSolver2D::MainData2D::check_skewness_nc() {
+
+   int i;
+   real e_dot_n, e_dot_n_min, e_dot_n_max, alpha;
+
+      e_dot_n = zero;
+   e_dot_n_min = 100000.0;
+   e_dot_n_max =-100000.0;
+
+   //edges : do i = 1, nedges
+   for (size_t i = 0; i < nedges; i++) {
+
+      alpha = edge[i].ev(0)*edge[i].dav(1) + edge[i].ev(1) * edge[i].dav(2);
+      e_dot_n     = e_dot_n + std::abs(alpha);
+      e_dot_n_min = std::min(e_dot_n_min, real(abs(alpha)) );
+      e_dot_n_max = std::max(e_dot_n_max, real(abs(alpha)) );
+
+   } //end do edges
+
+   e_dot_n = e_dot_n / real(nedges);
+
+   cout << " " <<  "\n";
+   cout << " ------ Skewness check (NC control volume) ----------";
+   cout << "   L1(e_dot_n) = " << e_dot_n << "\n";
+   cout << "  Min(e_dot_n) = " << e_dot_n_min << "\n";
+   cout << "  Max(e_dot_n) = " << e_dot_n_max << "\n";
+   cout << " ----------------------------------------------------" << endl;
+
+ }//end subroutine check_skewness_nc
+
+
+// //*******************************************************************************
+// //* Control volume aspect ratio
+// //*******************************************************************************
+// void EulerSolver2D::MainData2D::compute_ar() {
+// //  use edu2d_my_main_data  , only : node, nnodes, elm, nelms
+// //  use edu2d_constants     , only : p2, zero, one, half, two
+
+
+//  int i, n1, n2;
+//  real ar, ar_min, ar_max, nnodes_eff;
+
+//  int k;
+//  real side_max, side(4), side_mid, side_min, height;
+
+// // Initialization
+
+//    //node1 : do i = 1, nnodes
+//    for (size_t i = 0; i < nnodes; i++) {
+//       node[i].ar     = zero
+//    } //node1
+
+// // Compute element aspect-ratio: longest_side^2 / vol
+
+//   elm1: do i = 1, nelms
+
+//    side_max = -one
+   
+//    do k = 1, elm[i].nvtx
+
+//      n1 = elm[i].vtx(k)
+//     if (k == elm[i].nvtx) then
+//      n2 = elm[i].vtx(1)
+//     else
+//      n2 = elm[i].vtx(k+1)
+//     endif
+
+//      side(k) = sqrt( (node(n2)%x-node(n1)%x)**2 + (node(n2)%y-node(n1)%y)**2 )
+//     side_max =  std::max(side_max, side(k))
+
+//    end do
+
+//    if (elm[i].nvtx == 3) then
+
+//  // AR for triangle:  Ratio of a half of a square with side_max to volume
+//     elm[i].ar = (half*side_max**2) / elm[i].vol
+
+//     if     (side(1) >= side(2) .and. side(1) >= side(3)) {}
+
+//        side_max = side(1)
+//       if (side(2) >= side(3)) then
+//        side_mid = side(2); side_min = side(3);
+//       else
+//        side_mid = side(3); side_min = side(2);
+//       endif
+// }
+//     else if (side(2) >= side(1) .and. side(2) >= side(3)) {
+
+//        side_max = side(2);
+//       if (side(1) >= side(3)) then
+//        side_mid = side(1); side_min = side(3);
+//       else
+//        side_mid = side(3); side_min = side(1);
+//       endif
+
+//     else
+
+//        side_max = side(3);
+//       if (side(1) >= side(2)) then
+//        side_mid = side(1); side_min = side(2);
+//       else
+//        side_mid = side(2); side_min = side(1);
+//       endif
+
+//     endif
+
+//        height = two*elm[i].vol/side_mid;
+//     elm[i].ar = side_mid/height;
+
+//    else
+
+//   // AR for quad: Ratio of a square with side_max to volume
+//     elm[i].ar = side_max**2 / elm[i].vol;
+
+//    endif
+
+//   end do elm1
+
+// // Compute the aspect ratio:
+//   node2 : do i = 1, nnodes
+
+//     node[i].ar = zero
+//    do k = 1, node[i].nelms
+//     node[i].ar = node[i].ar + elm(node[i].elm(k))%ar
+//    end do
+
+//     node[i].ar = node[i].ar / real(node[i].nelms, p2)
+
+//   end do node2;
+
+// // Compute the min/max and L1 of AR
+
+//   nnodes_eff= zero;
+//          ar = zero;
+//      ar_min = 100000.0;
+//      ar_max =-100000.0;
+
+//   node3: do i = 1, nnodes
+//    if (node[i].bmark /= 0) cycle node3
+//    ar     = ar + abs(node[i].ar)
+//    ar_min = std::mi(ar_min, abs(node[i].ar))
+//    ar_max = std::max(ar_max, abs(node[i].ar))
+//    nnodes_eff = nnodes_eff + one
+//   end do node3
+
+//   ar = ar / nnodes_eff
+
+//  cout << " "
+//  cout << " ------ Aspect ratio check (NC control volume) ----------" << endl;
+//  cout << " Interior nodes only" << endl;
+//  cout << "   L1(AR) = ", ar << endl;
+//  cout << "  Min(AR) = ", ar_min << endl;
+//  cout << "  Max(AR) = ", ar_max << endl;
+
+//   nnodes_eff= zero;
+//          ar = zero;
+//      ar_min = 100000.0;
+//      ar_max =-100000.0;
+
+//   node4: do i = 1, nnodes
+//    if (node[i].bmark == 0) cycle node4
+//    ar     = ar + abs(node[i].ar);
+//    ar_min = std::min(ar_min, abs(node[i].ar));
+//    ar_max = std::max(ar_max, abs(node[i].ar));
+//    nnodes_eff = nnodes_eff + one;
+//   end do node4
+
+//   ar = ar / nnodes_eff;
+
+//  cout << " " << endl;
+//  cout << " Boundary nodes only" << endl;
+//  cout << "   L1(AR) = ", ar << endl;
+//  cout << "  std::min(AR) = ", ar_min << endl;
+//  cout << "  Max(AR) = ", ar_max << endl;
+//  cout << " --------------------------------------------------------" << endl;
+
+//  } // compute_ar
+
