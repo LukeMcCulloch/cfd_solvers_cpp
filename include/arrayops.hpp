@@ -10,6 +10,7 @@
 
 // #include "array_template.hpp"
 
+#include <cmath>
 
 // addition of two Array2Ds
 template <class T>
@@ -216,11 +217,24 @@ Cross(const Array2D<T>& a, const Array2D<T>& b) {
 template <class T>
 T MaxColVal(Array2D<T> A, int col) {
   T max_ = 0.0;
-  for (size_t i = 0; i < A.nrows; i++) {
+  for (int i = 0; i < A.nrows; i++) {
     max_ = max(max_,A(i,col));
   }
   return max_;
 }
+
+
+template <class T>
+Array2D<T>
+abs( Array2D<T>& A ) {
+    Array2D<T> result(A.nrows,A.ncols);
+    for (int i = 0; i < A.storage_size; i++) {
+        result.array[i] = abs( A.array[i] );
+    }
+    return result;
+}
+
+
 
 
 
