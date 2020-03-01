@@ -1334,8 +1334,13 @@ A: no, those were statically allocated, not pointers to
       // Magnitude and unit vector
       edge[i].da  = sqrt( edge[i].dav(0) * edge[i].dav(0) + \
                                  edge[i].dav(1) * edge[i].dav(1) );
+      cout << " edge dav before division = " << edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
       edge[i].dav = edge[i].dav / edge[i].da;
-
+      cout << " edge dav after division = " <<  edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
+      if (edge[i].da < 1.e-5) {
+         cout << "ERROR: collapsed edge" << endl;
+         std::exit(0);
+      }
       // Edge vector
 
       edge[i].ev(0) = node[n2].x - node[n1].x;
@@ -2298,6 +2303,10 @@ void EulerSolver2D::MainData2D::check_grid_data() {
       cout << (*sum_dav_i)(n2,0) << endl;
       cout << (*sum_dav_i)(n1,1) << endl;
       cout << (*sum_dav_i)(n2,1) << endl;
+
+      cout << edge[i].dav(0) << endl;
+      cout << edge[i].dav(1) << endl;
+      cout << " edge da = " << edge[i].da << endl;
    }
 
 // Add contribution from boundary edges.
