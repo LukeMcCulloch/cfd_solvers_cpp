@@ -2382,28 +2382,30 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 
 
-// //--------------------------------------------------------------------------------
-// // Global sum check for boundary face vector
-// //--------------------------------------------------------------------------------
-//   sum_bfn = 0
-//   do i = 1, nbound
-//    do j = 1, bound[i].nbfaces
-//      sum_bfn(1) =  sum_bfn(1) + (*bound[i].bfnx)(j)*(*bound[i].bfn)(j)
-//      sum_bfn(2) =  sum_bfn(2) + (*bound[i].bfny)(j)*(*bound[i].bfn)(j)
-//    end do
-//   end do
+//--------------------------------------------------------------------------------
+// Global sum check for boundary face vector
+//--------------------------------------------------------------------------------
+   sum_bfn = 0;
+   // do i = 1, nbound
+   //    do j = 1, bound[i].nbfaces
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbfaces; j++) {
+         sum_bfn(0) =  sum_bfn(0) + (*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
+         sum_bfn(1) =  sum_bfn(1) + (*bound[i].bfny)(j)*(*bound[i].bfn)(j);
+      }
+   }
 
-//    cout << "--- Global sum of the boundary face vector:"
-//    cout << "    sum of bfn_x = " <<  sum_bfn(1) << endl;
-//    cout << "    sum of bfn_y = " <<  sum_bfn(2) << endl;
+   cout << "--- Global sum of the boundary face vector:" << endl;
+   cout << "    sum of bfn_x = " <<  sum_bfn(0) << endl;
+   cout << "    sum of bfn_y = " <<  sum_bfn(1) << endl;
 
-//   if (sum_bfn(1) > 1.0e-12 *mag_bn and sum_bfn(2) > 1.0e-12 *mag_bn)   {
-//    cout << "Error: boundary face normals do not sum globally to zero..." << endl;
-//    cout << "--- Global sum of the boundary face normal vector:" << endl;
-//    cout << "    sum of bfn_x = " <<  sum_bfn(1) << endl;
-//    cout << "    sum of bfn_y = " <<  sum_bfn(2) << endl;
-//    std::exit(0);//stop
-//   }
+  if (sum_bfn(1) > 1.0e-12 *mag_bn and sum_bfn(2) > 1.0e-12 *mag_bn)   {
+   cout << "Error: boundary face normals do not sum globally to zero..." << endl;
+   cout << "--- Global sum of the boundary face normal vector:" << endl;
+   cout << "    sum of bfn_x = " <<  sum_bfn(0) << endl;
+   cout << "    sum of bfn_y = " <<  sum_bfn(1) << endl;
+   std::exit(0);//stop
+  }
 
 // //--------------------------------------------------------------------------------
 // // Volume check
