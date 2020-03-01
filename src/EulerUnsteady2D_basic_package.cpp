@@ -2260,7 +2260,7 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
    // //Local variables
    int i, j, n1, n2, ierr, k;
-   Array2D<real>  sum_dav_i = Array2D<real>(nnodes,2);
+   Array2D<real>*  sum_dav_i;
    Array2D<real>  sum_dav(2,1), sum_bn(2,1);
    Array2D<real>  sum_bfn(2,1);
    real                   sum_volc, sum_vol;
@@ -2272,22 +2272,32 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    mag_dav = zero;
    mag_bn  = zero;
 
+   sum_dav_i = new Array2D<real>(nnodes,2);
+
 //--------------------------------------------------------------------------------
 // Directed area sum check
 //--------------------------------------------------------------------------------
 
 // Compute the sum of the directed area for each node.
 
-   sum_dav_i = zero;
-   for (size_t i = 0; i < nedges; i++) {
+   (*sum_dav_i) = zero;
+   //print( (*sum_dav_i) );
+   //for (size_t i = 0; i < nedges; i++) {
+   for (size_t i = 0; i < 10; i++) {
       n1 = edge[i].n1;
       n2 = edge[i].n2;
-      sum_dav_i(n1,0) = sum_dav_i(n1,0) + edge[i].dav(0)*edge[i].da;
-      sum_dav_i(n2,0) = sum_dav_i(n2,0) - edge[i].dav(0)*edge[i].da;
-      sum_dav_i(n1,1) = sum_dav_i(n1,1) + edge[i].dav(1)*edge[i].da;
-      sum_dav_i(n2,1) = sum_dav_i(n2,1) - edge[i].dav(1)*edge[i].da;
+      (*sum_dav_i)(n1,0) = (*sum_dav_i)(n1,0) + edge[i].dav(0)*edge[i].da;
+      (*sum_dav_i)(n2,0) = (*sum_dav_i)(n2,0) - edge[i].dav(0)*edge[i].da;
+      (*sum_dav_i)(n1,1) = (*sum_dav_i)(n1,1) + edge[i].dav(1)*edge[i].da;
+      (*sum_dav_i)(n2,1) = (*sum_dav_i)(n2,1) - edge[i].dav(1)*edge[i].da;
       mag_dav = mag_dav + edge[i].da;
+      cout << "sum dav i =" << mag_dav << endl;
       mag_dav = mag_dav/real(nedges);
+      cout << "sum dav i, mag = " << mag_dav << endl;
+      cout << (*sum_dav_i)(n1,0) << endl;
+      cout << (*sum_dav_i)(n2,0) << endl;
+      cout << (*sum_dav_i)(n1,1) << endl;
+      cout << (*sum_dav_i)(n2,1) << endl;
    }
 
 // Add contribution from boundary edges.
@@ -2297,11 +2307,11 @@ void EulerSolver2D::MainData2D::check_grid_data() {
       n1 = (*bound[i].bnode)(j);
       n2 = (*bound[i].bnode)(j+1);
 
-      sum_dav_i(n1,0) = sum_dav_i(n1,0) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
-      sum_dav_i(n1,1) = sum_dav_i(n1,1) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
+      (*sum_dav_i)(n1,0) = (*sum_dav_i)(n1,0) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
+      (*sum_dav_i)(n1,1) = (*sum_dav_i)(n1,1) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
 
-      sum_dav_i(n2,0) = sum_dav_i(n2,0) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
-      sum_dav_i(n2,1) = sum_dav_i(n2,1) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
+      (*sum_dav_i)(n2,0) = (*sum_dav_i)(n2,0) + half*(*bound[i].bfnx)(j)*(*bound[i].bfn)(j);
+      (*sum_dav_i)(n2,1) = (*sum_dav_i)(n2,1) + half*(*bound[i].bfny)(j)*(*bound[i].bfn)(j);
 
       }
    }
@@ -2334,36 +2344,44 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 // Sum of the directed area vectors must vanish at every node.
 
    for (size_t i = 0; i < nnodes; i++) {
-         if ( abs( sum_dav_i(i,0) ) > 1.0e-12 * mag_dav or abs( sum_dav_i(i,1) ) > 1.0e-12 * mag_dav) {
+         if ( abs( (*sum_dav_i)(i,0) ) > 1.0e-12 * mag_dav or abs( (*sum_dav_i)(i,1) ) > 1.0e-12 * mag_dav) {
             cout  << " --- node=" << i 
                   << " (x,y)=" << node[i].x << node[i].y 
-                  << " sum_dav=" << sum_dav_i(i,0) << sum_dav_i(i,1) << endl;
+                  << " sum_dav=" << (*sum_dav_i)(i,0) << (*sum_dav_i)(i,1) << endl;
          }
    }
 
    cout << "--- Max sum of directed area vector around a node:" << endl;
-   // cout << "  max(sum_dav_i_x) = " <<  maxval(sum_dav_i(:,0)) << endl;
-   // cout << "  max(sum_dav_i_y) = " <<  maxval(sum_dav_i(:,1)) << endl;
-   cout << "  max(sum_dav_i_x) = " <<  MaxColVal(sum_dav_i,0) << endl;
-   cout << "  max(sum_dav_i_y) = " <<  MaxColVal(sum_dav_i,1) << endl;
+   // cout << "  max(sum_dav_i_x) = " <<  maxval((*sum_dav_i)(:,0)) << endl;
+   // cout << "  max(sum_dav_i_y) = " <<  maxval((*sum_dav_i)(:,1)) << endl;
+   cout << "  max(sum_dav_i_x) = " <<  MaxColVal( (*sum_dav_i),0) << endl;
+   cout << "  max(sum_dav_i_y) = " <<  MaxColVal( (*sum_dav_i),1) << endl;
 
 
 
 
-  if (MaxColVal( abs(sum_dav_i) , 0 ) > 1.0e-12 * mag_dav or
-      MaxColVal( abs(sum_dav_i) , 1 ) > 1.0e-12 * mag_dav)   {
+  if (MaxColVal( abs( (*sum_dav_i) ) , 0 ) > 1.0e-12 * mag_dav or
+      MaxColVal( abs( (*sum_dav_i) ) , 1 ) > 1.0e-12 * mag_dav)   {
    cout << "--- Max sum of directed area vector around a node:" << endl;
-   cout << "  max(sum_dav_i_x) = " <<  MaxColVal(sum_dav_i, 0) << endl;
-   cout << "  max(sum_dav_i_y) = " <<  MaxColVal(sum_dav_i, 1) << endl;
+   cout << "  max(sum_dav_i_x) = " <<  MaxColVal( (*sum_dav_i), 0) << endl;
+   cout << "  max(sum_dav_i_y) = " <<  MaxColVal( (*sum_dav_i), 1) << endl;
    cout << "Error: directed area vectors do not sum to zero..." << endl;
    std::exit(0);//stop
   }
 
 // Of course, the global sum of the directed area vector sum must vanish.
    sum_dav = zero;
-   for (size_t i = 0; i < nnodes; i++) {
-      sum_dav(0) = sum_dav(0) + sum_dav_i(i,0) ;
-      sum_dav(1) = sum_dav(1) + sum_dav_i(i,1) ;
+   cout << "sum_dav 0 = " << sum_dav(0) << endl;
+   cout << "sum_dav 1 = " << sum_dav(1) << endl;
+   //for (size_t i = 0; i < nnodes; i++) {
+   for (size_t i = 0; i < 10; i++) {
+      sum_dav(0) = sum_dav(0) + (*sum_dav_i)(i,0) ;
+      sum_dav(1) = sum_dav(1) + (*sum_dav_i)(i,1) ;
+      // cout << "sum_dav i,0 =" << (*sum_dav_i)(i,0)  << endl;
+      // cout << "sum_dav i,1 =" << (*sum_dav_i)(i,1) << endl;
+      cout << "sum_dav i =" << (*sum_dav_i)(i,0) << sum_dav(0) << endl;
+      cout << "sum_dav i =" << (*sum_dav_i)(i,1) << sum_dav(1) << endl;
+      cout << " add them = " << sum_dav(0) + (*sum_dav_i)(i,0) << endl;
    }
 
    cout << "--- Global sum of the directed area vector:" << endl;
