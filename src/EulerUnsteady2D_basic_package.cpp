@@ -2476,25 +2476,25 @@ void EulerSolver2D::MainData2D::check_grid_data() {
       }
    }
 
-//    vol_ave = vol_ave / real(nnodes)
+   vol_ave = vol_ave / real(nnodes);
 
-//    cout << " "
-//    cout << "    minimum dual volume = " <<  vol_min << endl;
-//    cout << "    maximum dual volume = " <<  vol_max << endl;
-//    cout << "    average dual volume = " <<  vol_ave << endl;
-//    cout << " "
+   cout << " " << endl;
+   cout << "    minimum dual volume = " <<  vol_min << endl;
+   cout << "    maximum dual volume = " <<  vol_max << endl;
+   cout << "    average dual volume = " <<  vol_ave << endl;
+   cout << " " << endl;
 
 
-//   if (ierr > 0) std::exit(0);//stop
+  if (ierr > 0) std::exit(0);//stop
 
-//   if (abs(sum_vol-sum_volc) > 1.0e-08 *sum_vol)   {
-//    cout << "--- Global sum of volume: must be the same" << endl;
-//    cout << "    sum of volc = " <<  sum_volc << endl;
-//    cout << "    sum of vol  = " <<  sum_vol << endl;
-//    cout << " sum_vol-sum_volc  = " <<  sum_vol-sum_volc << endl;
-//    cout << "Error: sum of dual volumes and cell volumes do not match..." << endl;
-//    std::exit(0);//stop
-//   }
+  if (abs(sum_vol-sum_volc) > 1.0e-08 *sum_vol)   {
+   cout << "--- Global sum of volume: must be the same" << endl;
+   cout << "    sum of volc = " <<  sum_volc << endl;
+   cout << "    sum of vol  = " <<  sum_vol << endl;
+   cout << " sum_vol-sum_volc  = " <<  sum_vol-sum_volc << endl;
+   cout << "Error: sum of dual volumes and cell volumes do not match..." << endl;
+   std::exit(0);//stop
+  }
 
 //   call check_skewness_nc
 //   call compute_ar
@@ -2503,3 +2503,5 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    cout << "Grid data look good\n" << endl;
 
 } //end  check_grid_data
+
+
