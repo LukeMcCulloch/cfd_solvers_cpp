@@ -13,7 +13,13 @@
 //*
 //********************************************************************************
 real tri_area(real x1, real x2, real x3, real y1, real y2, real y3) {
-   return 0.5*( x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2) );
+    real result = 0.5*( x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2) );
+    if (result < 1.e-10) {
+      cout << "ERROR: triangle with bad area" << endl;
+      cout << "triangle area = " << result << endl;
+      std::exit(0);
+    }
+    return result;
  }
 
 // real sumArray2d(Array2D<real> A, int col) {

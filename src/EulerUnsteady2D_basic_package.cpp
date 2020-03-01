@@ -806,10 +806,13 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          // Triangle centroid and volume
          elm[i].x   = third*(x1+x2+x3);
          elm[i].y   = third*(y1+y2+y3);
+         //cout << " tri area -1" << endl;
          elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
       }
       else if (elm[i].nvtx==4) {
 
+         cout << "need to fix reallocator for 4th node \n";
+         std::exit(0);
    //   this is a quad. Get the 4th vertex.
          v4 = (*elm[i].vtx)(4,0);
          x4 = node[v4].x;
@@ -823,11 +826,13 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          elm[i].x   = half*(xm1+xm2);
          elm[i].y   = half*(ym1+ym2);
    //   Volume is computed as a sum of two triangles: 1-2-3 and 1-3-4.
+         //cout << " tri area 0" << endl;
          elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3) + \
                      tri_area(x1,x3,x4,y1,y3,y4);
 
          xc = elm[i].x;
          yc = elm[i].y;
+         //cout << " tri area 1" << endl;
          if (tri_area(x1,x2,xc,y1,y2,yc)<=zero) {
             cout << " Centroid outside the quad element 12c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1  << endl;
@@ -838,6 +843,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             //std::exit(0);//stop
          }
 
+         //cout << " tri area 2" << endl;
          if (tri_area(x2,x3,xc,y2,y3,yc)<=zero) {
             cout << " Centroid outside the quad element 23c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1  << endl;
@@ -848,6 +854,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             //std::exit(0);//stop
          }
 
+         //cout << " tri area 3" << endl;
          if (tri_area(x3,x4,xc,y3,y4,yc)<=zero) {
             cout << " Centroid outside the quad element 34c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1 << endl;
@@ -858,6 +865,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             //std::exit(0);//stop
          }
 
+         //cout << " tri area 4" << endl;
          if (tri_area(x4,x1,xc,y4,y1,yc)<=zero) {
             cout << " Centroid outside the quad element 41c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1  << endl;
@@ -873,7 +881,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          // node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
          // (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
 
-         // easier way
+         // easier way TODO: fixme for quads
          (*node[v4].elm)((*node[v4].elm).tracked_index, 0) = i;
          (*node[v4].elm).tracked_index +=1;
 
@@ -1020,7 +1028,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }
 
    }
-
+int nbrprint = 3;
 // Begin constructing the element-neighbor data
    cout << "Begin constructing the element-neighbor data \n" << endl;
    //elements2 : do i = 1, nelms
@@ -1048,11 +1056,9 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          for (size_t j = 0; j < node[vR].nelms; j++) {
             jelm = (*node[vR].elm)(j);
             
-            //tlm issue seen here:
-            //cout << "jelm = " << jelm << endl;
             
             // cout << vR << " " << j << "   " << (*node[vR].elm)(j) << endl;
-            //if (i < 20) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
+            if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
 
             //edge_matching : do ii = 1, elm(jelm).nvtx;
             for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
@@ -1070,11 +1076,11 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
                   found = true;
                   //if (k < 2) cout << " v = " << vR << "  " << v1 << "  " << vL << "  " << v2 << endl;
                
-                  //cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   im = ii+1;
                   if (im > (elm[jelm].nvtx-1)) { 
                      im = im - (elm[jelm].nvtx-0); 
                   }
+                  if (i < nbrprint)  cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   break; //exit edge_matching  |
                } //endif       
 
@@ -1094,8 +1100,14 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          (*elm[jelm].nghbr)(im) = i;
       }
       else {
-         //(*elm[   i].nghbr)(in) = 0;
-         (*elm[   i].nghbr)(in) = 0;
+         (*elm[   i].nghbr)(in) = -1; //boundary
+      }
+
+
+      if (i < nbrprint) {
+         cout << " elm nghbrs...\n";
+         print((*elm[   i].nghbr));
+         cout << " ------------------\n";
       }
 
       }//    end do elm_vertex
@@ -1124,7 +1136,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //
 // NOTE: Count edges only if the neighbor element number is
 //       greater than the current element (i) to avoid double
-//       count. Zero element number indicates that it is outside
+//       count. -1 element number indicates that it is outside
 //       the domain (boundary face).
 
    //   elements0 : do i = 1, nelms
@@ -1137,15 +1149,15 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //    tri_quad0 : if (elm[i].nvtx==3) then
       if (elm[i].nvtx==3) {
 
-         if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==0 ) {
+         if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2) == -1 ) {
             nedges = nedges + 1;
          }
 
-         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
+         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) == -1 ) {
             nedges = nedges + 1;
          }
 
-         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
+         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) == -1 ) {
             nedges = nedges + 1;
          }
       }
@@ -1154,19 +1166,19 @@ cout << "DONE constructing the element-neighbor data " << endl;
 
       v4 = (*elm[i].vtx)(3);
 
-      if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) ==0 ) {
+      if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) == -1 ) {
          nedges = nedges + 1;
       }
 
-      if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
+      if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) == -1 ) {
          nedges = nedges + 1;
       }
 
-      if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) ==0 ) {
+      if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) == -1 ) {
          nedges = nedges + 1;
       }
 
-      if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
+      if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) == -1 ) {
        nedges = nedges + 1;
       }
 
@@ -1177,13 +1189,15 @@ cout << "DONE constructing the element-neighbor data " << endl;
 // Allocate the edge array.
    edge = new edge_type[nedges];
    for (size_t i = 0; i < nedges; i++) {
-      edge[i].e1 = 0;
-      edge[i].e2 = 0;
+      edge[i].e1 = -1;
+      edge[i].e2 = -1;
    }
    nedges = -1; //TLM fence post fix//
 
 // Construct the edge data:
 //  two end nodes (n1, n2), and left and right elements (e1, e2)
+
+   int maxprint = 1;
 
    //elements3 : do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
@@ -1197,8 +1211,18 @@ cout << "DONE constructing the element-neighbor data " << endl;
       //tri_quad2 : 
       if (elm[i].nvtx==3) {
 
-         if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==0 ) {
+         if (i<maxprint) {
+            cout << "printing edge vars to be set \n";
+            cout << "v1 = " << v1 << "\n";
+            cout << "v2 = " << v2 << "\n";
+            cout << "(*elm[i].nghbr)(0) = " << (*elm[i].nghbr)(0) << "\n";
+            cout << "(*elm[i].nghbr)(1) = " << (*elm[i].nghbr)(1) << "\n";
+            cout << "(*elm[i].nghbr)(2) = " << (*elm[i].nghbr)(2) << "\n";
+         }
 
+         if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==-1 ) {
+
+            if (i<maxprint) cout << "set edge 1\n";
             nedges = nedges + 1;
             edge[nedges].n1 = v1;
             edge[nedges].n2 = v2;
@@ -1207,7 +1231,8 @@ cout << "DONE constructing the element-neighbor data " << endl;
             // assert(v1 //= v2 && "v1 should not be equal to v2 -1");
          }
 
-         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==0 ) {
+         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==-1 ) {
+            if (i<maxprint) cout << "set edge 2\n";
             nedges = nedges + 1;
             edge[nedges].n1 = v2;
             edge[nedges].n2 = v3;
@@ -1216,7 +1241,8 @@ cout << "DONE constructing the element-neighbor data " << endl;
             // assert(v1 //= v2 && "v1 should not be equal to v2 -2" );
          }
 
-         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==0 ) {
+         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==-1 ) {
+            if (i<maxprint) cout << "set edge 3\n";
             nedges = nedges + 1;
             edge[nedges].n1 = v3;
             edge[nedges].n2 = v1;
@@ -1224,13 +1250,18 @@ cout << "DONE constructing the element-neighbor data " << endl;
             edge[nedges].e2 = (*elm[i].nghbr)(1);
             // assert(v1 //= v2 && "v1 should not be equal to v2 -3");
          }
+
+         // else {
+         //    cout << "ERROR: missed edge case! \n";
+         // }
+
       }
    //  Quadrilateral element
       else if (elm[i].nvtx==4) {
 
          v4 = (*elm[i].vtx)(3);
 
-         if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) ==0 ) {
+         if ( (*elm[i].nghbr)(2) > i or (*elm[i].nghbr)(2) == -1 ) {
             nedges = nedges + 1;
             edge[nedges].n1 = v1;
             edge[nedges].n2 = v2;
@@ -1239,7 +1270,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             // assert(v1 //= v2 && "v1 should not be equal to v2 -q1");
          }
 
-         if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) ==0 ) {
+         if ( (*elm[i].nghbr)(3) > i or (*elm[i].nghbr)(3) == -1 ) {
             nedges = nedges + 1;
             edge[nedges].n1 = v2;
             edge[nedges].n2 = v3;
@@ -1248,7 +1279,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             // assert(v1 //= v2 && "v1 should not be equal to v2 -q2");
          }
 
-         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) ==0 ) {
+         if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0) == -1 ) {
             nedges = nedges + 1;
             edge[nedges].n1 = v3;
             edge[nedges].n2 = v4;
@@ -1257,7 +1288,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
             // assert(v1 //= v2 && "v1 should not be equal to v2 -q3");
          }
 
-         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) ==0 ) {
+         if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1) == -1 ) {
             nedges = nedges + 1;
             edge[nedges].n1 = v4;
             edge[nedges].n2 = v1;
@@ -1289,6 +1320,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //   o-----------o-----------o
 //                n1
 //
+int pi = 0;
 //   edges : do i = 1, nedges
    for (size_t i = 0; i < nedges; i++) {
 
@@ -1296,6 +1328,9 @@ cout << "DONE constructing the element-neighbor data " << endl;
       n2 = edge[i].n2;
       e1 = edge[i].e1;
       e2 = edge[i].e2;
+      if (i < maxprint) {
+         cout << "edge[i] -> i, e1, e2 " << i << " " << e1 << " " << e2 << "\n";
+      }
       // edge centroids:
       xm = half*( node[n1].x + node[n2].x );
       ym = half*( node[n1].y + node[n2].y );
@@ -1312,34 +1347,50 @@ Q, should below be
 A: no, those were statically allocated, not pointers to
 */
       // Contribution from the left element
-      if (e1 > 0) {
+      if (e1 > -1) {
          xc = elm[e1].x;
          yc = elm[e1].y;
          edge[i].dav(0) = -(ym-yc);
          edge[i].dav(1) =   xm-xc;
+         if (i<maxprint) {
+            cout << "elm(e1) = " <<  elm[e1].x << " " << elm[e1].y << "\n";
+         }
       }
 
       // Contribution from the right element
-      if (e2 > 0) {
+      if (e2 > -1) {
          xc = elm[e2].x;
          yc = elm[e2].y;
          edge[i].dav(0) = edge[i].dav(0) -(yc-ym);
          edge[i].dav(1) = edge[i].dav(1) + xc-xm;
+         if (i<maxprint) {
+            cout << "elm(e2) = " <<  elm[e2].x << " " << elm[e2].y << "\n";
+         }
       }
 
       if (e1 < 0 and e2 < 0) {
          cout << "ERROR: e1 and e2 are both negative... " << endl;
+         cout << "n1 = " << n1 << "\n";
+         cout << "n2 = " << n2 << "\n";
+         cout << "e1 = " << e1 << "\n";
+         cout << "e2 = " << e2 << "\n";
       }
 
       // Magnitude and unit vector
       edge[i].da  = sqrt( edge[i].dav(0) * edge[i].dav(0) + \
                                  edge[i].dav(1) * edge[i].dav(1) );
-      cout << " edge dav before division = " << edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
+      //cout << " edge dav before division = " << edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
       edge[i].dav = edge[i].dav / edge[i].da;
-      cout << " edge dav after division = " <<  edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
-      if (edge[i].da < 1.e-5) {
-         cout << "ERROR: collapsed edge" << endl;
-         std::exit(0);
+      
+      if (i<maxprint) {
+         cout << "printing edge[i].dav \n";
+         print(edge[i].dav);
+         cout << " edge dav after division = " <<  edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
+         if (edge[i].da < 1.e-5) {
+            cout << "ERROR: collapsed edge" << endl;
+            //std::exit(0);
+         }
+         pi += 1;
       }
       // Edge vector
 
@@ -1598,8 +1649,8 @@ A: no, those were statically allocated, not pointers to
 // Boundary mark: It should be an array actually because some nodes are associated with
 //                more than one boundaries.
    for (size_t i = 0; i < nnodes; i++) {
-      node[i].bmark   = 0;
-      node[i].nbmarks = 0;
+      node[i].bmark   = -1;
+      node[i].nbmarks = -1;
    }
 
    for (size_t i = 0; i < nbound; i++) {
