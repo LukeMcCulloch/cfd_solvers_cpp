@@ -440,6 +440,18 @@ namespace EulerSolver2D{
     void check_skewness_nc();
     void compute_ar();
 
+
+    //output
+    void write_tecplot_file(const std::string& datafile);
+    void write_grid_file(const std::string& datafile);
+
+    //Output - grid files (TLM)
+    std::string  datafile_tria_tec = "TLM_tria_grid_tecplot.dat";
+    std::string  datafile_quad_tec = "TLM_quad_grid_tecplot.dat";
+    std::string  datafile_tria = "TLM_tria.grid";
+    std::string  datafile_quad = "TLM_quad.grid";
+    std::string  datafile_bcmap = "project.dat";
+
     //  Parameters
 
     //Number of equtaions/variables in the target equtaion.

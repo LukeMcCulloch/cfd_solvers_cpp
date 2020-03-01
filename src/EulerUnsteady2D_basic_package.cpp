@@ -2784,3 +2784,62 @@ void EulerSolver2D::MainData2D::compute_ar() {
 
 } // compute_ar
 
+
+
+//
+//*******************************
+// plot grids
+void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) {
+
+   int os;
+   // float entropy;
+
+   ofstream outfile;
+   //outfile.open ("tria_grid_tecplot.dat");
+   outfile.open (datafile);
+   outfile << "title = \"grid\" \n";
+   outfile << "variables = \"x\" \"y\" \n";
+   outfile << "zone N="  << nnodes << ",E= " << ntria+nquad << ",ET=quadrilateral,F=FEPOINT \n";
+   //--------------------------------------------------------------------------------
+   for (int i=0; i<nnodes; ++i) {
+      outfile << node[i].x << '\t' 
+               << node[i].y << "\n"; 
+   }
+   //--------------------------------------------------------------------------------
+   for ( int i = 0; i < nelms; ++i ) {
+      //Triangles
+      if (elm[i].nvtx==3) {
+         outfile  << (*elm[i].vtx)(0,0) << '\t' 
+                  << (*elm[i].vtx)(1,0) << '\t' 
+                  << (*elm[i].vtx)(2,0) << '\t' 
+                  << (*elm[i].vtx)(2,0) <<  "\n"; //The last one is a dummy.
+      }
+
+      //Quadrilaterals
+      else if (elm[i].nvtx==4) {
+         outfile  << (*elm[i].vtx)(0,0) << '\t' 
+                  << (*elm[i].vtx)(1,0) << '\t' 
+                  << (*elm[i].vtx)(2,0) << '\t' 
+                  << (*elm[i].vtx)(3,0) <<  "\n"; //The last one is a dummy.
+
+      }
+   }
+   //--------------------------------------------------------------------------------
+   outfile.close();
+
+
+
+    // ofstream outfile;
+    // outfile.open ("tria_grid_tecplot.dat");
+    // for (int i=1; i<ncells+1; ++i){
+    //     outfile << std::setprecision(16) << cell[i].xc << '\t'
+    //             << std::setprecision(16) << cell[i].w(0) << '\t'
+    //             << std::setprecision(16) << cell[i].w(1) << '\t'
+    //             << std::setprecision(16) << cell[i].w(2) << '\t'
+    //             << std::setprecision(16) << entropy <<  "\n";
+    // }
+    // outfile.close();
+
+}
+//--------------------------------------------------------------------------------
+

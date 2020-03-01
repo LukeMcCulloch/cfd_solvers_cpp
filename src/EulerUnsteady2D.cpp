@@ -312,6 +312,7 @@ void program_2D_euler_rk2(){
    E2Ddata.check_grid_data();
    cout << "now in program_2D_euler_rk2" << endl;
 
+   E2Ddata.write_tecplot_file(E2Ddata.datafile_tria_tec);
 // // (4) Prepare LSQ gradients
 //       compute_lsq_coeff_nc();
 //       check_lsq_coeff_nc();
