@@ -2485,19 +2485,19 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    cout << " " << endl;
 
 
-  if (ierr > 0) std::exit(0);//stop
+   if (ierr > 0) std::exit(0);//stop
 
-  if (abs(sum_vol-sum_volc) > 1.0e-08 *sum_vol)   {
-   cout << "--- Global sum of volume: must be the same" << endl;
-   cout << "    sum of volc = " <<  sum_volc << endl;
-   cout << "    sum of vol  = " <<  sum_vol << endl;
-   cout << " sum_vol-sum_volc  = " <<  sum_vol-sum_volc << endl;
-   cout << "Error: sum of dual volumes and cell volumes do not match..." << endl;
-   std::exit(0);//stop
-  }
+   if (abs(sum_vol-sum_volc) > 1.0e-08 *sum_vol)   {
+      cout << "--- Global sum of volume: must be the same" << endl;
+      cout << "    sum of volc = " <<  sum_volc << endl;
+      cout << "    sum of vol  = " <<  sum_vol << endl;
+      cout << " sum_vol-sum_volc  = " <<  sum_vol-sum_volc << endl;
+      cout << "Error: sum of dual volumes and cell volumes do not match..." << endl;
+      std::exit(0);//stop
+   }
 
-//   call check_skewness_nc
-//   call compute_ar
+   check_skewness_nc();
+   //compute_ar();
 
    cout << " " << endl;
    cout << "Grid data look good\n" << endl;
@@ -2522,7 +2522,7 @@ void EulerSolver2D::MainData2D::check_skewness_nc() {
    //edges : do i = 1, nedges
    for (size_t i = 0; i < nedges; i++) {
 
-      alpha = edge[i].ev(0)*edge[i].dav(1) + edge[i].ev(1) * edge[i].dav(2);
+      alpha = edge[i].ev(0)*edge[i].dav(1) + edge[i].ev(0) * edge[i].dav(1);
       e_dot_n     = e_dot_n + std::abs(alpha);
       e_dot_n_min = std::min(e_dot_n_min, real(abs(alpha)) );
       e_dot_n_max = std::max(e_dot_n_max, real(abs(alpha)) );
@@ -2532,7 +2532,7 @@ void EulerSolver2D::MainData2D::check_skewness_nc() {
    e_dot_n = e_dot_n / real(nedges);
 
    cout << " " <<  "\n";
-   cout << " ------ Skewness check (NC control volume) ----------";
+   cout << " ------ Skewness check (NC control volume) ----------\n";
    cout << "   L1(e_dot_n) = " << e_dot_n << "\n";
    cout << "  Min(e_dot_n) = " << e_dot_n_min << "\n";
    cout << "  Max(e_dot_n) = " << e_dot_n_max << "\n";
