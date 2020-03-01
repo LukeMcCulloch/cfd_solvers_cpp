@@ -1980,6 +1980,10 @@ cout << "Generating CC scheme data......" << endl;
       face[i].da     = sqrt( face[i].dav(0)*face[i].dav(0) +
                             face[i].dav(1)*face[i].dav(1) );
       face[i].dav    = face[i].dav / face[i].da;
+      if (face[i].da < 1.e-5) {
+         cout << "ERROR: collapsed face" << endl;
+         std::exit(0);
+      }
 
    } //end do faces
 
