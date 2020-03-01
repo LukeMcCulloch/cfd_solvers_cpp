@@ -1925,7 +1925,7 @@ cout << "Generating CC scheme data......" << endl;
       e2 = edge[i].e2;
 
       // Left element
-      if (e1 > 0) {
+      if (e1 > -1) {
          //do k = 1, elm[e1].nnghbrs;
          for (size_t k = 0; k < elm[e1].nnghbrs; k++) {
             if ( (*elm[e1].nghbr)(k)==e2) (*elm[e1].edge)(k) = i;
@@ -1933,7 +1933,7 @@ cout << "Generating CC scheme data......" << endl;
       }
 
       // Right element
-      if (e2 > 0) {
+      if (e2 > -1) {
          //do k = 1, elm[e2].nnghbrs;
          for (size_t k = 0; k < elm[e2].nnghbrs; k++) {
             if ( (*elm[e2].nghbr)(k)==e1)  (*elm[e2].edge)(k) = i;
@@ -2031,9 +2031,9 @@ cout << "Generating CC scheme data......" << endl;
       face[i].da     = sqrt( face[i].dav(0)*face[i].dav(0) +
                             face[i].dav(1)*face[i].dav(1) );
       face[i].dav    = face[i].dav / face[i].da;
-      if (face[i].da < 1.e-5) {
+      if (face[i].da < 1.e-10) {
          cout << "ERROR: collapsed face" << endl;
-         std::exit(0);
+         //std::exit(0);
       }
 
    } //end do faces
