@@ -803,13 +803,11 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       //tri_or_quad : if (elm(i).nvtx==3) then
       if (elm[i].nvtx==3) {
 
-      // Triangle centroid and volume
-      elm[i].x   = third*(x1+x2+x3);
-      elm[i].y   = third*(y1+y2+y3);
-      elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
-
+         // Triangle centroid and volume
+         elm[i].x   = third*(x1+x2+x3);
+         elm[i].y   = third*(y1+y2+y3);
+         elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
       }
-
       else if (elm[i].nvtx==4) {
 
    //   this is a quad. Get the 4th vertex.
@@ -2407,36 +2405,40 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    std::exit(0);//stop
   }
 
-// //--------------------------------------------------------------------------------
-// // Volume check
-// //--------------------------------------------------------------------------------
-// // (1)Check the element volume: make sure there are no zero or negative volumes
+//--------------------------------------------------------------------------------
+// Volume check
+//--------------------------------------------------------------------------------
+// (1)Check the element volume: make sure there are no zero or negative volumes
 
-//    vol_min =  1.0e+15
-//    vol_max = -1.0
-//    vol_ave =  zero
+   vol_min =  1.0e+15;
+   vol_max = -1.0;
+   vol_ave =  zero;
 
-//        ierr = 0
-//    sum_volc = zero
-//   do i = 1, nelms
+      ierr = 0;
+   sum_volc = zero;
+   for ( int i = 0; i < nelms; ++i ) {
 
-//       vol_min = min(vol_min,elm(i)%vol)
-//       vol_max = max(vol_max,elm(i)%vol)
-//       vol_ave = vol_ave + elm(i)%vol
+      vol_min = std::min(vol_min, elm[i].vol);
+      vol_max = std::max(vol_max, elm[i].vol);
+      vol_ave = vol_ave + elm[i].vol;
 
-//    sum_volc = sum_volc + elm(i)%vol
+   sum_volc = sum_volc + elm[i].vol;
 
-//    if (elm(i)%vol < zero)   {
-//      cout << "Negative volc=" << elm(i)%vol <<   elm=" << i <<   stop..."
-//      ierr = ierr + 1
-//    }
+   if (elm[i].vol < zero)   {
+     cout << "Negative volc=" << elm[i].vol <<   "elm= " << i <<  " stop..." << endl;
+     ierr = ierr + 1;
+   }
 
-//    if (abs(elm(i)%vol) < 1.0e-14 )   {
-//      cout << "Vanishing volc=" << elm(i)%vol <<   elm=" << i <<   stop..."
-//      ierr = ierr + 1
-//    }
+   if ( std::abs(elm[i].vol) < 1.0e-14 )   {
+     cout << "Vanishing volc= "  << elm[i].vol << " " 
+                                 << std::abs(elm[i].vol) 
+                                 <<   " elm= " << i 
+                                 << " stop..." << endl;
+     cout << " val = " << abs(elm[i].vol) << " tol = " << 1.0e-14 << endl;
+     ierr = ierr + 1;
+   }
 
-//   end do
+  }
 
 //    vol_ave = vol_ave / real(nelms)
 
@@ -2457,19 +2459,19 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 //    sum_vol = zero
 //   do i = 1, nnodes
 
-//       vol_min = min(vol_min,node(i)%vol)
-//       vol_max = max(vol_max,node(i)%vol)
-//       vol_ave = vol_ave + node(i)%vol
+//       vol_min = min(vol_min,node[i].vol)
+//       vol_max = max(vol_max,node[i].vol)
+//       vol_ave = vol_ave + node[i].vol
 
-//    sum_vol = sum_vol + node(i)%vol
+//    sum_vol = sum_vol + node[i].vol
 
-//    if (node(i)%vol < zero)   {
-//      cout << "Negative vol=" << node(i)%vol <<   node=" << i <<   stop..."
+//    if (node[i].vol < zero)   {
+//      cout << "Negative vol=" << node[i].vol <<   node=" << i <<   stop..."
 //      ierr = ierr + 1
 //    }
 
-//    if (abs(node(i)%vol) < 1.0e-14 )   {
-//      cout << "Vanishing vol=" << node(i)%vol <<   node=" << i <<   stop..."
+//    if (abs(node[i].vol) < 1.0e-14 )   {
+//      cout << "Vanishing vol=" << node[i].vol <<   node=" << i <<   stop..."
 //      ierr = ierr + 1
 //    }
 

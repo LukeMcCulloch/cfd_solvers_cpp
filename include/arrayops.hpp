@@ -238,4 +238,5 @@ abs( Array2D<T>& A ) {
 
 
 
+
 #endif //__ARRAYOPS_TEMPLATE_INCLUDED__
