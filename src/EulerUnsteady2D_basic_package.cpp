@@ -2440,60 +2440,59 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
   }
 
-//    vol_ave = vol_ave / real(nelms)
+   vol_ave = vol_ave / real(nelms);
 
-//    cout << " "
-//    write(*,'(a30,es25.15)') "    minimum element volume = " <<  vol_min
-//    write(*,'(a30,es25.15)') "    maximum element volume = " <<  vol_max
-//    write(*,'(a30,es25.15)') "    average element volume = " <<  vol_ave
-//    cout << " "
+   cout << " " << endl;
+   cout << "    minimum element volume = " <<  vol_min << endl;
+   cout << "    maximum element volume = " <<  vol_max << endl;
+   cout << "    average element volume = " <<  vol_ave << endl;
+   cout << " " << endl;
 
-// //--------------------------------------------------------------------------------
-// // (2)Check the dual volume (volume around a node)
+//--------------------------------------------------------------------------------
+// (2)Check the dual volume (volume around a node)
 
-//    vol_min =  1.0e+15
-//    vol_max = -1.0
-//    vol_ave =  zero
+   vol_min =  1.0e+15;
+   vol_max = -1.0;
+   vol_ave =  zero;
 
-//       ierr = 0
-//    sum_vol = zero
-//   do i = 1, nnodes
+      ierr = 0;
+   sum_vol = zero;
+   for (size_t i = 0; i < nnodes; i++) {
 
-//       vol_min = min(vol_min,node[i].vol)
-//       vol_max = max(vol_max,node[i].vol)
-//       vol_ave = vol_ave + node[i].vol
+      vol_min = std::min(vol_min,node[i].vol);
+      vol_max = std::max(vol_max,node[i].vol);
+      vol_ave = vol_ave + node[i].vol;
 
-//    sum_vol = sum_vol + node[i].vol
+      sum_vol = sum_vol + node[i].vol;
 
-//    if (node[i].vol < zero)   {
-//      cout << "Negative vol=" << node[i].vol <<   node=" << i <<   stop..."
-//      ierr = ierr + 1
-//    }
+      if (node[i].vol < zero)   {
+         cout << "Negative vol=" << node[i].vol <<   node << " << i <<   stop..." << endl;
+         ierr = ierr + 1;
+      }
 
-//    if (abs(node[i].vol) < 1.0e-14 )   {
-//      cout << "Vanishing vol=" << node[i].vol <<   node=" << i <<   stop..."
-//      ierr = ierr + 1
-//    }
-
-//   end do
+      if (std::abs(node[i].vol) < 1.0e-14 )   {
+         cout << "Vanishing vol=" << node[i].vol <<   node << " << i <<   stop..." << endl;
+         ierr = ierr + 1;
+      }
+   }
 
 //    vol_ave = vol_ave / real(nnodes)
 
 //    cout << " "
-//    write(*,'(a30,es25.15)') "    minimum dual volume = " <<  vol_min
-//    write(*,'(a30,es25.15)') "    maximum dual volume = " <<  vol_max
-//    write(*,'(a30,es25.15)') "    average dual volume = " <<  vol_ave
+//    cout << "    minimum dual volume = " <<  vol_min << endl;
+//    cout << "    maximum dual volume = " <<  vol_max << endl;
+//    cout << "    average dual volume = " <<  vol_ave << endl;
 //    cout << " "
 
 
 //   if (ierr > 0) std::exit(0);//stop
 
 //   if (abs(sum_vol-sum_volc) > 1.0e-08 *sum_vol)   {
-//    cout << "--- Global sum of volume: must be the same"
-//    cout << "    sum of volc = " <<  sum_volc
-//    cout << "    sum of vol  = " <<  sum_vol
-//    write(*,'(a22,es10.3)') " sum_vol-sum_volc  = " <<  sum_vol-sum_volc
-//    cout << "Error: sum of dual volumes and cell volumes do not match..."
+//    cout << "--- Global sum of volume: must be the same" << endl;
+//    cout << "    sum of volc = " <<  sum_volc << endl;
+//    cout << "    sum of vol  = " <<  sum_vol << endl;
+//    cout << " sum_vol-sum_volc  = " <<  sum_vol-sum_volc << endl;
+//    cout << "Error: sum of dual volumes and cell volumes do not match..." << endl;
 //    std::exit(0);//stop
 //   }
 
