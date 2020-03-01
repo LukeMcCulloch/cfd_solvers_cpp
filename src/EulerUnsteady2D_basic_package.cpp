@@ -2544,147 +2544,161 @@ void EulerSolver2D::MainData2D::check_skewness_nc() {
 // //*******************************************************************************
 // //* Control volume aspect ratio
 // //*******************************************************************************
-// void EulerSolver2D::MainData2D::compute_ar() {
-// //  use edu2d_my_main_data  , only : node, nnodes, elm, nelms
-// //  use edu2d_constants     , only : p2, zero, one, half, two
+void EulerSolver2D::MainData2D::compute_ar() {
+//  use edu2d_my_main_data  , only : node, nnodes, elm, nelms
+//  use edu2d_constants     , only : p2, zero, one, half, two
 
 
-//  int i, n1, n2;
-//  real ar, ar_min, ar_max, nnodes_eff;
+   int i, n1, n2;
+   real ar, ar_min, ar_max, nnodes_eff;
 
-//  int k;
-//  real side_max, side(4), side_mid, side_min, height;
+   int k;
+   real side_max, side_mid, side_min, height;
+   Array2D<real> side(4,1);
 
-// // Initialization
+   // Initialization
 
-//    //node1 : do i = 1, nnodes
-//    for (size_t i = 0; i < nnodes; i++) {
-//       node[i].ar     = zero
-//    } //node1
+   //node1 : do i = 1, nnodes
+   for (size_t i = 0; i < nnodes; i++) {
+      node[i].ar     = zero;
+   } //node1
 
-// // Compute element aspect-ratio: longest_side^2 / vol
+// Compute element aspect-ratio: longest_side^2 / vol
 
-//   elm1: do i = 1, nelms
+   //elm1: do i = 1, nelms
+   for (size_t i =0; i < nelms; i++) {
 
-//    side_max = -one
+      side_max = -one;
    
-//    do k = 1, elm[i].nvtx
+      //do k = 1, elm[i].nvtx
+      for (size_t k = 0; k < elm[i].nvtx; k ++) {
 
-//      n1 = elm[i].vtx(k)
-//     if (k == elm[i].nvtx) then
-//      n2 = elm[i].vtx(1)
-//     else
-//      n2 = elm[i].vtx(k+1)
-//     endif
+         n1 = (*elm[i].vtx)(k);
+         if (k == elm[i].nvtx) {
+            n2 = (*elm[i].vtx)(0);
+         }
+         else {
+            n2 = (*elm[i].vtx)(k+1);
+         }
 
-//      side(k) = sqrt( (node(n2)%x-node(n1)%x)**2 + (node(n2)%y-node(n1)%y)**2 )
-//     side_max =  std::max(side_max, side(k))
+         side(k) = sqrt( (node[n2].x-node[n1].x) * node[n2].x-node[n1].x \
+                           + (node[n2].y-node[n1].y) * (node[n2].y-node[n1].y) );
+         side_max =  std::max(side_max, side(k));
 
-//    end do
+      }//end do
 
-//    if (elm[i].nvtx == 3) then
+      if (elm[i].nvtx == 3) {
 
-//  // AR for triangle:  Ratio of a half of a square with side_max to volume
-//     elm[i].ar = (half*side_max**2) / elm[i].vol
+   // AR for triangle:  Ratio of a half of a square with side_max to volume
+         elm[i].ar = (half*side_max*side_max) / elm[i].vol;
 
-//     if     (side(1) >= side(2) .and. side(1) >= side(3)) {}
+         if (side(1) >= side(2) and side(1) >= side(3)) {
 
-//        side_max = side(1)
-//       if (side(2) >= side(3)) then
-//        side_mid = side(2); side_min = side(3);
-//       else
-//        side_mid = side(3); side_min = side(2);
-//       endif
-// }
-//     else if (side(2) >= side(1) .and. side(2) >= side(3)) {
+            side_max = side(1);
+            if (side(2) >= side(3)) {
+               side_mid = side(2); side_min = side(3);
+            }
+            else {
+               side_mid = side(3); side_min = side(2);
+            }
+         }
+         else if (side(2) >= side(1) and side(2) >= side(3)) {
 
-//        side_max = side(2);
-//       if (side(1) >= side(3)) then
-//        side_mid = side(1); side_min = side(3);
-//       else
-//        side_mid = side(3); side_min = side(1);
-//       endif
+            side_max = side(2);
+            if (side(1) >= side(3)) {
+               side_mid = side(1); side_min = side(3);
+            }
+            else {
+               side_mid = side(3); side_min = side(1);
+            }
+         }
+         else {
 
-//     else
+            side_max = side(3);
+            if (side(1) >= side(2)) {
+               side_mid = side(1); side_min = side(2);
+            } 
+            else {
+               side_mid = side(2); side_min = side(1);
+            }
 
-//        side_max = side(3);
-//       if (side(1) >= side(2)) then
-//        side_mid = side(1); side_min = side(2);
-//       else
-//        side_mid = side(2); side_min = side(1);
-//       endif
+         }
 
-//     endif
+         height = two*elm[i].vol/side_mid;
+         elm[i].ar = side_mid/height;
 
-//        height = two*elm[i].vol/side_mid;
-//     elm[i].ar = side_mid/height;
+      }
 
-//    else
+      else {
 
-//   // AR for quad: Ratio of a square with side_max to volume
-//     elm[i].ar = side_max**2 / elm[i].vol;
+   // AR for quad: Ratio of a square with side_max to volume
+      elm[i].ar = side_max*side_max / elm[i].vol;
 
-//    endif
+      } //endif
 
-//   end do elm1
+   }//end do elm1
 
-// // Compute the aspect ratio:
-//   node2 : do i = 1, nnodes
+   // Compute the aspect ratio:
+   //node2 : do i = 1, nnodes
+   for (size_t i = 0; i < nnodes; i++) {
 
-//     node[i].ar = zero
-//    do k = 1, node[i].nelms
-//     node[i].ar = node[i].ar + elm(node[i].elm(k))%ar
-//    end do
+      node[i].ar = zero;
+      //do k = 1, node[i].nelms
+      for (size_t k = 0; k < node[i].nelms; k++) {
+         node[i].ar = node[i].ar + elm[ (*node[i].elm)(k) ].ar;
+      } //end do
 
-//     node[i].ar = node[i].ar / real(node[i].nelms, p2)
+      node[i].ar = node[i].ar / real(node[i].nelms);
 
-//   end do node2;
+   } //end do node2;
 
-// // Compute the min/max and L1 of AR
+// Compute the min/max and L1 of AR
 
-//   nnodes_eff= zero;
-//          ar = zero;
-//      ar_min = 100000.0;
-//      ar_max =-100000.0;
+   nnodes_eff= zero;
+         ar = zero;
+      ar_min = 100000.0;
+      ar_max =-100000.0;
 
-//   node3: do i = 1, nnodes
-//    if (node[i].bmark /= 0) cycle node3
-//    ar     = ar + abs(node[i].ar)
-//    ar_min = std::mi(ar_min, abs(node[i].ar))
-//    ar_max = std::max(ar_max, abs(node[i].ar))
-//    nnodes_eff = nnodes_eff + one
-//   end do node3
+   //node3: do i = 1, nnodes
+   for (size_t i = 0; i < nnodes; i++) {
+      if (node[i].bmark /= 0) { continue; }//cycle node3 
+      ar     = ar + abs(node[i].ar);
+      ar_min = std::min(ar_min, std::abs(node[i].ar));
+      ar_max = std::max(ar_max, std::abs(node[i].ar));
+      nnodes_eff = nnodes_eff + one;
+   }//end do node3
 
-//   ar = ar / nnodes_eff
+   ar = ar / nnodes_eff;
 
-//  cout << " "
-//  cout << " ------ Aspect ratio check (NC control volume) ----------" << endl;
-//  cout << " Interior nodes only" << endl;
-//  cout << "   L1(AR) = ", ar << endl;
-//  cout << "  Min(AR) = ", ar_min << endl;
-//  cout << "  Max(AR) = ", ar_max << endl;
+   cout << " \n";
+   cout << " ------ Aspect ratio check (NC control volume) ----------\n";
+   cout << " Interior nodes only \n";
+   cout << "   L1(AR) = " << ar << "\n";
+   cout << "  Min(AR) = " << ar_min << "\n";
+   cout << "  Max(AR) = " << ar_max << endl;
 
-//   nnodes_eff= zero;
-//          ar = zero;
-//      ar_min = 100000.0;
-//      ar_max =-100000.0;
+   nnodes_eff= zero;
+         ar = zero;
+      ar_min = 100000.0;
+      ar_max =-100000.0;
 
-//   node4: do i = 1, nnodes
-//    if (node[i].bmark == 0) cycle node4
-//    ar     = ar + abs(node[i].ar);
-//    ar_min = std::min(ar_min, abs(node[i].ar));
-//    ar_max = std::max(ar_max, abs(node[i].ar));
-//    nnodes_eff = nnodes_eff + one;
-//   end do node4
+   //node4: do i = 1, nnodes
+   for (size_t i = 0; i < nnodes; i++) {
+      if (node[i].bmark == 0) {continue;} //cycle node4
+      ar     = ar + std::abs(node[i].ar);
+      ar_min = std::min(ar_min, real(abs(node[i].ar)) );
+      ar_max = std::max(ar_max, real(abs(node[i].ar)) );
+      nnodes_eff = nnodes_eff + one;
+   }//end do node4
 
-//   ar = ar / nnodes_eff;
+   ar = ar / nnodes_eff;
 
-//  cout << " " << endl;
-//  cout << " Boundary nodes only" << endl;
-//  cout << "   L1(AR) = ", ar << endl;
-//  cout << "  std::min(AR) = ", ar_min << endl;
-//  cout << "  Max(AR) = ", ar_max << endl;
-//  cout << " --------------------------------------------------------" << endl;
+   cout << " " << "\n";
+   cout << " Boundary nodes only" << "\n";
+   cout << "   L1(AR) = " << ar << "\n";
+   cout << "  std::min(AR) = " << ar_min << "\n";
+   cout << "  Max(AR) = " << ar_max << "\n";
+   cout << " --------------------------------------------------------" << endl;
 
-//  } // compute_ar
+} // compute_ar
 
