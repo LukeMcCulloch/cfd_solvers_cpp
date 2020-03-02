@@ -2874,7 +2874,7 @@ void EulerSolver2D::MainData2D::write_grid_file(const std::string& datafile) {//
       if (elm[i].nvtx==3) {
          outfile  << (*elm[i].vtx)(0,0) << '\t' 
                   << (*elm[i].vtx)(1,0) << '\t' 
-                  << (*elm[i].vtx)(2,0) << '\t' 
+                  //<< (*elm[i].vtx)(2,0) << '\t' 
                   << (*elm[i].vtx)(2,0) <<  "\n"; //The last one is a dummy.
       }
 
