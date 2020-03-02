@@ -2579,7 +2579,7 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    }
 
    check_skewness_nc();
-   //compute_ar();
+   compute_ar();
 
    cout << " " << endl;
    cout << "Grid data look good\n" << endl;
@@ -2656,7 +2656,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
       for (size_t k = 0; k < elm[i].nvtx; k ++) {
 
          n1 = (*elm[i].vtx)(k);
-         if (k == elm[i].nvtx) {
+         if (k == elm[i].nvtx-1) {
             n2 = (*elm[i].vtx)(0);
          }
          else {
@@ -2674,34 +2674,34 @@ void EulerSolver2D::MainData2D::compute_ar() {
    // AR for triangle:  Ratio of a half of a square with side_max to volume
          elm[i].ar = (half*side_max*side_max) / elm[i].vol;
 
-         if (side(1) >= side(2) and side(1) >= side(3)) {
+         if (side(0) >= side(1) and side(0) >= side(2)) {
 
-            side_max = side(1);
-            if (side(2) >= side(3)) {
-               side_mid = side(2); side_min = side(3);
+            side_max = side(0);
+            if (side(1) >= side(2)) {
+               side_mid = side(1); side_min = side(2);
             }
             else {
-               side_mid = side(3); side_min = side(2);
+               side_mid = side(2); side_min = side(1);
             }
          }
-         else if (side(2) >= side(1) and side(2) >= side(3)) {
+         else if (side(1) >= side(0) and side(1) >= side(2)) {
 
-            side_max = side(2);
-            if (side(1) >= side(3)) {
-               side_mid = side(1); side_min = side(3);
+            side_max = side(1);
+            if (side(0) >= side(2)) {
+               side_mid = side(0); side_min = side(2);
             }
             else {
-               side_mid = side(3); side_min = side(1);
+               side_mid = side(2); side_min = side(0);
             }
          }
          else {
 
-            side_max = side(3);
-            if (side(1) >= side(2)) {
-               side_mid = side(1); side_min = side(2);
+            side_max = side(2);
+            if (side(0) >= side(1)) {
+               side_mid = side(0); side_min = side(1);
             } 
             else {
-               side_mid = side(2); side_min = side(1);
+               side_mid = side(1); side_min = side(0);
             }
 
          }
@@ -2734,7 +2734,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
 
    } //end do node2;
 
-// Compute the min/max and L1 of AR
+// // Compute the min/max and L1 of AR
 
    nnodes_eff= zero;
          ar = zero;
@@ -2743,7 +2743,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
 
    //node3: do i = 1, nnodes
    for (size_t i = 0; i < nnodes; i++) {
-      if (node[i].bmark /= 0) { continue; }//cycle node3 
+      if (node[i].bmark != 0) { continue; }//cycle node3 
       ar     = ar + abs(node[i].ar);
       ar_min = std::min(ar_min, std::abs(node[i].ar));
       ar_max = std::max(ar_max, std::abs(node[i].ar));
