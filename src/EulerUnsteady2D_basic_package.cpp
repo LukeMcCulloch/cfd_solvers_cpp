@@ -2802,7 +2802,7 @@ void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) 
    outfile << "zone N="  << nnodes << ",E= " << ntria+nquad << ",ET=quadrilateral,F=FEPOINT \n";
    //--------------------------------------------------------------------------------
    for (int i=0; i<nnodes; ++i) {
-      outfile << node[i].x << '\t' 
+      outfile  << node[i].x << '\t' 
                << node[i].y << "\n"; 
    }
    //--------------------------------------------------------------------------------
@@ -2843,3 +2843,141 @@ void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) 
 }
 //--------------------------------------------------------------------------------
 
+
+
+
+
+//********************************************************************************
+// This subroutine writes a grid file to be read by a solver.
+// NOTE: Unlike the tecplot file, this files contains boundary info.
+//********************************************************************************
+void EulerSolver2D::MainData2D::write_grid_file(const std::string& datafile) {//(char* datafile)
+    int i,j,os;
+//--------------------------------------------------------------------------------
+    ofstream outfile;
+    outfile.open (datafile);
+
+//--------------------------------------------------------------------------------
+// Grid size: # of nodes, # of triangles, # of quadrilaterals
+    outfile <<  nnodes << '\t' << ntria << '\t' << nquad << "\n";
+
+//--------------------------------------------------------------------------------
+// Node data
+   for (int i=0; i<nnodes; ++i) {
+   outfile  << node[i].x << '\t' 
+            << node[i].y << "\n";
+   }
+
+//--------------------------------------------------------------------------------
+   for ( int i = 0; i < nelms; ++i ) {
+      //Triangles
+      if (elm[i].nvtx==3) {
+         outfile  << (*elm[i].vtx)(0,0) << '\t' 
+                  << (*elm[i].vtx)(1,0) << '\t' 
+                  << (*elm[i].vtx)(2,0) << '\t' 
+                  << (*elm[i].vtx)(2,0) <<  "\n"; //The last one is a dummy.
+      }
+
+      //Quadrilaterals
+      else if (elm[i].nvtx==4) {
+         outfile  << (*elm[i].vtx)(0,0) << '\t' 
+                  << (*elm[i].vtx)(1,0) << '\t' 
+                  << (*elm[i].vtx)(2,0) << '\t' 
+                  << (*elm[i].vtx)(3,0) <<  "\n"; //The last one is a dummy.
+
+      }
+   }
+
+// Boundary data:
+// NOTE: These boundary data are specific to the shock diffraction problem.
+//
+//  Example: nx=ny=7
+//
+//   in = inflow
+//    w = wall
+//    e = outflow
+//    o = interior nodes
+//  inw = this node belongs to both inflow and wall boundaries.
+//   we = this node belongs to both wall and outflow boundaries.
+//
+//   inw----w----w----w----w----w----we
+//     |    |    |    |    |    |    |
+//    in----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//    in----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//   inw----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//     w----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//     w----o----o----o----o----o----e
+//     |    |    |    |    |    |    |
+//    we----e----e----e----e----e----e
+//
+
+// Number of boundary segments
+   outfile <<  nbound << "\n"; //5
+
+
+
+   //  outfile <<  (ny-1)/2+1  << "\n"; //Inflow
+   //  outfile <<  (ny-1)/2+1  << "\n"; //Left Wall
+   //  outfile <<   nx << "\n";         //Bottom Outflow
+   //  outfile <<   ny  << "\n";        //Right  Outflow
+   //  outfile <<   nx  << "\n";        //Top Wall
+
+   //  outfile << "\n";
+
+
+//    std::cout << " Boundary conditions:" << std::endl;
+   for (size_t i = 0; i < nbound; i++) {
+      //std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
+      outfile << bound[i].nbnodes << "\n";
+   }
+
+    outfile << "\n";
+
+   for (size_t i = 0; i < nbound; i++) {
+      for (size_t j = 0; j < bound[i].nbnodes; j++) {
+         outfile << (*bound[i].bnode)(j,0) << "\n";
+      }
+   }
+// // Inflow boundary
+//     //do j = ny, (ny-1)/2+1, -1
+//     for (int j=ny-1; j<(ny-1)/2+1; ++j) {
+//         i = 1;
+//         outfile <<  i + (j-1)*nx  << "\n";  
+//     }
+
+// // // Left wall boundary
+//     //do j = (ny-1)/2+1, 1, -1
+//     for (int j=(ny-1)/2+1; j>=1; --j) {
+//         i = 1;
+//         outfile <<  i + (j-1)*nx  << "\n";  
+//     }
+
+// // // Bottom outflow boundary
+// //     do i = 1, nx
+//     for (int i=nx-1; i<nx; ++i) {
+//         j = 1;
+//         outfile <<  i + (j-1)*nx  << "\n";  
+//     }
+
+// // // Right outflow boundary
+// //     do j = 1, ny
+//     for (int j=1; j<ny; ++j) {
+//         i = nx;
+//         outfile <<  i + (j-1)*nx  << "\n";  
+//     }
+
+// // // Top wall boundary
+// //     do i = nx, 1, -1
+//     for (int i=0; i<nx; ++i) {
+//         j = ny;
+//         outfile <<  i + (j-1)*nx  << "\n";  
+//     }
+
+//--------------------------------------------------------------------------------
+    outfile.close();
+}
+//********************************************************************************
