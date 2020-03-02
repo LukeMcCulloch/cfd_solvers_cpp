@@ -2744,7 +2744,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
    //node3: do i = 1, nnodes
    for (size_t i = 0; i < nnodes; i++) {
       if (node[i].bmark != 0) { continue; }//cycle node3 
-      ar     = ar + abs(node[i].ar);
+      ar     = ar + real(abs(node[i].ar));
       ar_min = std::min(ar_min, real(abs(node[i].ar)) );
       ar_max = std::max(ar_max, real(abs(node[i].ar)) );
       nnodes_eff = nnodes_eff + one;
@@ -2767,7 +2767,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
    //node4: do i = 1, nnodes
    for (size_t i = 0; i < nnodes; i++) {
       if (node[i].bmark == 0) {continue;} //cycle node4
-      ar     = ar + abs(node[i].ar);
+      ar     = ar + real(abs(node[i].ar));
       ar_min = std::min(ar_min, real(abs(node[i].ar)) );
       ar_max = std::max(ar_max, real(abs(node[i].ar)) );
       nnodes_eff = nnodes_eff + one;
@@ -2778,7 +2778,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
    cout << " " << "\n";
    cout << " Boundary nodes only" << "\n";
    cout << "   L1(AR) = " << ar << "\n";
-   cout << "  std::min(AR) = " << ar_min << "\n";
+   cout << "  min(AR) = " << ar_min << "\n";
    cout << "  Max(AR) = " << ar_max << "\n";
    cout << " --------------------------------------------------------" << endl;
 
