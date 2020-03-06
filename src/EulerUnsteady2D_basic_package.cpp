@@ -1978,7 +1978,7 @@ cout << "Generating CC scheme data......" << endl;
    //   allocate(face(nfaces))
    face = new face_type[nfaces];
 
-   nfaces = 0;
+   nfaces = -1;
 
 //   elements5 : do i = 1, nelms
    for ( size_t i = 0; i < nelms; i++) {
