@@ -559,7 +559,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    } 
    nedges = 0;
    cout << "\nnnodes = " << nnodes << endl;
-   cout << "nelms = " << nnodes << "\n" << endl;
+   cout << "nelms = " << nelms << "\n" << endl;
 
 //--------------------------------------------------------------------------------
 // Loop over elements and construct the fololowing data.
@@ -667,45 +667,45 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       (*node[v1].elm)(node[v1].nelms-1, 0) = i;
 
 
-      if (i == 160400) {
-         cout << "----------------------------------" << endl;
-         cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-         cout << "ielm = " << ielm << endl;
-         cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         cout << "----------------------------------" << endl;
-      }
-      if (i == 319201) {
-         cout << "----------------------------------" << endl;
-         cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-         cout << "ielm = " << ielm << endl;
-         cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         cout << "----------------------------------" << endl;
-      }
+      // if (i == 160400) {
+      //    cout << "----------------------------------" << endl;
+      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
+      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
+      //    cout << "ielm = " << ielm << endl;
+      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    cout << "----------------------------------" << endl;
+      // }
+      // if (i == 319201) {
+      //    cout << "----------------------------------" << endl;
+      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
+      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
+      //    cout << "ielm = " << ielm << endl;
+      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    cout << "----------------------------------" << endl;
+      // }
 
-      if (i == 80200) {
-         cout << "----------------------------------" << endl;
-         cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-         cout << "ielm = " << ielm << endl;
-         cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         cout << "----------------------------------" << endl;
-      }
+      // if (i == 80200) {
+      //    cout << "----------------------------------" << endl;
+      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
+      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
+      //    cout << "ielm = " << ielm << endl;
+      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    cout << "----------------------------------" << endl;
+      // }
 
 
-      if (i == 159201) {
-         cout << "----------------------------------" << endl;
-         cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-         cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-         cout << "ielm = " << ielm << endl; 
-         cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-         cout << "----------------------------------" << endl;
-      }
+      // if (i == 159201) {
+      //    cout << "----------------------------------" << endl;
+      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
+      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
+      //    cout << "ielm = " << ielm << endl; 
+      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
+      //    cout << "----------------------------------" << endl;
+      // }
 
       // node[v2].nelms = node[v2].nelms + 1;
       // // node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
@@ -1028,7 +1028,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }
 
    }
-int nbrprint = 3;
+int nbrprint = 2;
 // Begin constructing the element-neighbor data
    cout << "Begin constructing the element-neighbor data \n" << endl;
    //elements2 : do i = 1, nelms
@@ -1320,7 +1320,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //   o-----------o-----------o
 //                n1
 //
-int pi = 0;
+//int pi = 0;
 //   edges : do i = 1, nedges
    for (size_t i = 0; i < nedges; i++) {
 
@@ -1390,10 +1390,9 @@ A: no, those were statically allocated, not pointers to
             cout << "ERROR: collapsed edge" << endl;
             //std::exit(0);
          }
-         pi += 1;
+         //pi += 1;
       }
       // Edge vector
-
       edge[i].ev(0) = node[n2].x - node[n1].x;
       edge[i].ev(1) = node[n2].y - node[n1].y;
       edge[i].e     = sqrt( edge[i].ev(0) * edge[i].ev(0) + \
@@ -2160,7 +2159,7 @@ cout << "Generating CC scheme data......" << endl;
 
    //do i = 1, nelms
    for ( int i = 0; i < nelms; ++i ) {
-      elm[i].bmark = 0;
+      elm[i].bmark = -1;
    }
 
    //bc_loop : do i = 1, nbound
@@ -2170,7 +2169,7 @@ cout << "Generating CC scheme data......" << endl;
          cout << "Found dirichlet condition " << endl;
          //do j = 1, bound[i].nbfaces
          for (size_t i = 0; i < bound[i].nbfaces; i++) {
-            elm[ (*bound[i].belm)(j) ].bmark = 1;
+            elm[ (*bound[i].belm)(j) ].bmark = 0;
          }//end do
       }
 
@@ -2412,6 +2411,9 @@ void EulerSolver2D::MainData2D::check_grid_data() {
             cout  << " --- node=" << i 
                   << " (x,y)=" << node[i].x << node[i].y 
                   << " sum_dav=" << (*sum_dav_i)(i,0) << (*sum_dav_i)(i,1) << endl;
+            
+         cout << "Error: Sum of the directed area vectors large sum_dav..." << endl;
+         std::exit(0);//stop program
          }
    }
 
@@ -2424,28 +2426,28 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 
 
-  if (MaxColVal( abs( (*sum_dav_i) ) , 0 ) > 1.0e-12 * mag_dav or
+   if (MaxColVal( abs( (*sum_dav_i) ) , 0 ) > 1.0e-12 * mag_dav or
       MaxColVal( abs( (*sum_dav_i) ) , 1 ) > 1.0e-12 * mag_dav)   {
-   cout << "--- Max sum of directed area vector around a node:" << endl;
-   cout << "  max(sum_dav_i_x) = " <<  MaxColVal( (*sum_dav_i), 0) << endl;
-   cout << "  max(sum_dav_i_y) = " <<  MaxColVal( (*sum_dav_i), 1) << endl;
-   cout << "Error: directed area vectors do not sum to zero..." << endl;
-   std::exit(0);//stop
-  }
+      cout << "--- Max sum of directed area vector around a node:" << endl;
+      cout << "  max(sum_dav_i_x) = " <<  MaxColVal( (*sum_dav_i), 0) << endl;
+      cout << "  max(sum_dav_i_y) = " <<  MaxColVal( (*sum_dav_i), 1) << endl;
+      cout << "Error: directed area vectors do not sum to zero..." << endl;
+      std::exit(0);//stop
+   }
 
 // Of course, the global sum of the directed area vector sum must vanish.
    sum_dav = zero;
    cout << "sum_dav 0 = " << sum_dav(0) << endl;
    cout << "sum_dav 1 = " << sum_dav(1) << endl;
-   //for (size_t i = 0; i < nnodes; i++) {
-   for (size_t i = 0; i < 10; i++) {
+   for (size_t i = 0; i < nnodes; i++) {
+   //for (size_t i = 0; i < 10; i++) {
       sum_dav(0) = sum_dav(0) + (*sum_dav_i)(i,0) ;
       sum_dav(1) = sum_dav(1) + (*sum_dav_i)(i,1) ;
       // cout << "sum_dav i,0 =" << (*sum_dav_i)(i,0)  << endl;
       // cout << "sum_dav i,1 =" << (*sum_dav_i)(i,1) << endl;
-      cout << "sum_dav i =" << (*sum_dav_i)(i,0) << sum_dav(0) << endl;
-      cout << "sum_dav i =" << (*sum_dav_i)(i,1) << sum_dav(1) << endl;
-      cout << " add them = " << sum_dav(0) + (*sum_dav_i)(i,0) << endl;
+      //cout << "sum_dav i =" << (*sum_dav_i)(i,0) << sum_dav(0) << endl;
+      //cout << "sum_dav i =" << (*sum_dav_i)(i,1) << sum_dav(1) << endl;
+      //cout << " add them = " << sum_dav(0) + (*sum_dav_i)(i,0) << endl;
    }
 
    cout << "--- Global sum of the directed area vector:" << endl;
@@ -2743,7 +2745,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
 
    //node3: do i = 1, nnodes
    for (size_t i = 0; i < nnodes; i++) {
-      if (node[i].bmark != 0) { continue; }//cycle node3 
+      if (node[i].bmark != -1) { continue; }//cycle node3 
       ar     = ar + real(abs(node[i].ar));
       ar_min = std::min(ar_min, real(abs(node[i].ar)) );
       ar_max = std::max(ar_max, real(abs(node[i].ar)) );
@@ -2766,7 +2768,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
 
    //node4: do i = 1, nnodes
    for (size_t i = 0; i < nnodes; i++) {
-      if (node[i].bmark == 0) {continue;} //cycle node4
+      if (node[i].bmark == -1) {continue;} //cycle node4
       ar     = ar + real(abs(node[i].ar));
       ar_min = std::min(ar_min, real(abs(node[i].ar)) );
       ar_max = std::max(ar_max, real(abs(node[i].ar)) );
