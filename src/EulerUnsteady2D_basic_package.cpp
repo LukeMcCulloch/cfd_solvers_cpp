@@ -1028,6 +1028,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }
 
    }
+(*elm[   i].nghbr) = -1;
 int nbrprint = 2;
 // Begin constructing the element-neighbor data
    cout << "Begin constructing the element-neighbor data \n" << endl;
@@ -1049,10 +1050,10 @@ int nbrprint = 2;
          if (k == elm[i].nvtx-1) vL = (*elm[i].vtx)(0); //1-1
          vR = (*elm[i].vtx)(k);
 
-      //   Loop over the surrounding elements of the node vR,
-      //   and find the element neighbor from them.
+         //   Loop over the surrounding elements of the node vR,
+         //   and find the element neighbor from them.
          found = false;
-      //elms_around_vR : do j = 1, node(vR).nelms;
+         //elms_around_vR
          for (size_t j = 0; j < node[vR].nelms; j++) {
             jelm = (*node[vR].elm)(j);
             
@@ -1060,7 +1061,7 @@ int nbrprint = 2;
             // cout << vR << " " << j << "   " << (*node[vR].elm)(j) << endl;
             if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
 
-            //edge_matching : do ii = 1, elm(jelm).nvtx;
+            //edge_matching
             for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
                
                v1 = (*elm[jelm].vtx)(ii);
@@ -1068,7 +1069,7 @@ int nbrprint = 2;
                if (ii  > 0) { 
                   v2 = (*elm[jelm].vtx)(ii-1); 
                }
-               else if (ii == 0) { 
+               if (ii == 0) { 
                   v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); 
                } //TLM fix: array bounds overrun fixed here
                
@@ -1078,7 +1079,7 @@ int nbrprint = 2;
                
                   im = ii+1;
                   if (im > (elm[jelm].nvtx-1)) { 
-                     im = im - (elm[jelm].nvtx-0); 
+                     im = 0;//im - (elm[jelm].nvtx-0); 
                   }
                   if (i < nbrprint)  cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   break; //exit edge_matching  |
