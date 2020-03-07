@@ -1664,7 +1664,7 @@ A: no, those were statically allocated, not pointers to
 //                more than one boundaries.
    for (size_t i = 0; i < nnodes; i++) {
       node[i].bmark   = -1;
-      node[i].nbmarks = -1;
+      node[i].nbmarks = 0;
    }
 
    for (size_t i = 0; i < nbound; i++) {
@@ -2186,7 +2186,7 @@ cout << "Generating CC scheme data......" << endl;
          cout << "Found dirichlet condition " << endl;
          //do j = 1, bound[i].nbfaces
          for (size_t i = 0; i < bound[i].nbfaces; i++) {
-            elm[ (*bound[i].belm)(j) ].bmark = 0;
+            elm[ (*bound[i].belm)(j) ].bmark = 1;
          }//end do
       }
 
@@ -2628,10 +2628,10 @@ void EulerSolver2D::MainData2D::check_skewness_nc() {
    //edges : do i = 1, nedges
    for (size_t i = 0; i < nedges; i++) {
 
-      alpha = edge[i].ev(0)*edge[i].dav(1) + edge[i].ev(0) * edge[i].dav(1);
+      alpha = edge[i].ev(0) * edge[i].dav(0) + edge[i].ev(1) * edge[i].dav(1);
       e_dot_n     = e_dot_n + std::abs(alpha);
-      e_dot_n_min = std::min(e_dot_n_min, real(abs(alpha)) );
-      e_dot_n_max = std::max(e_dot_n_max, real(abs(alpha)) );
+      e_dot_n_min = std::min(e_dot_n_min, std::abs(alpha) );
+      e_dot_n_max = std::max(e_dot_n_max, std::abs(alpha) );
 
    } //end do edges
 
