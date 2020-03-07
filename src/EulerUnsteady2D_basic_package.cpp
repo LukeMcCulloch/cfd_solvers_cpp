@@ -1057,9 +1057,9 @@ int nbrprint = 2;
          for (size_t j = 0; j < node[vR].nelms; j++) {
             jelm = (*node[vR].elm)(j);
             
-            
-            // cout << vR << " " << j << "   " << (*node[vR].elm)(j) << endl;
-            if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
+            if (i < nbrprint) cout <<  " j = " << j << endl;
+            if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << (*node[vR].elm)(j) << endl;
+            //if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
 
             //edge_matching
             for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
@@ -1073,10 +1073,14 @@ int nbrprint = 2;
                   v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); 
                } //TLM fix: array bounds overrun fixed here
                
+               // if (i < nbrprint)  cout << " v = " << vR 
+               //                         << "  " << v1 
+               //                         << "  " << vL 
+               //                         << "  " << v2 << endl;
+               
                if (v1==vR and v2==vL) {
                   found = true;
-                  //if (k < 2) cout << " v = " << vR << "  " << v1 << "  " << vL << "  " << v2 << endl;
-               
+                  
                   im = ii+1;
                   if (im > (elm[jelm].nvtx-1)) { 
                      im = 0;//im - (elm[jelm].nvtx-0); 
@@ -1988,7 +1992,7 @@ cout << "Generating CC scheme data......" << endl;
 
    nfaces = 0;
 
-//   elements5 : do i = 1, nelms
+   //   elements5
    for ( size_t i = 0; i < nelms; i++) {
       //do k = 1, elm(i).nnghbrs
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
@@ -2014,7 +2018,7 @@ cout << "Generating CC scheme data......" << endl;
                face[nfaces-1].n2 = v1;
             }
          }
-         else if (jelm == 0) {
+         else if (jelm == -1) {
             // if (elm[jelm].bmark != -1){
             //    cout << "ERROR: this is supposed to be a boundary \n";
             //    cout << "jelm = " << jelm << endl;
@@ -2025,13 +2029,13 @@ cout << "Generating CC scheme data......" << endl;
       //    Skip boundary faces.
          }
 
-      }//end do
-   }//   end do elements5
+      }//end for
+   }// elements5
 
 // Loop over faces
 // Construct directed area vector.
 
-   //faces : do i = 1, nfaces
+   //faces
    for (size_t i = 0; i < nfaces; i++) {
 
       n1 = face[i].n1;
@@ -2608,6 +2612,12 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    cout << " " << endl;
    cout << "Grid data look good\n" << endl;
 
+   cout << " " << endl;
+   cout << "    nfaces = " <<  nfaces << endl;
+   cout << "    nedges = " <<  nedges << endl;
+   cout << "    nbound = " <<  nbound << endl;
+   cout << "    nelms = " <<  nelms << endl;
+   cout << " " << endl;
 } //end  check_grid_data
 
 
