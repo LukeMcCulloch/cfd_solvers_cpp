@@ -1555,7 +1555,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
          }
          else {
             v1 = (*bound[i].bnode)[j-1][0];
-            v2 = (*bound[i].bnode)[j][0];
+            v2 = (*bound[i].bnode)[j  ][0];
             v3 = (*bound[i].bnode)[j+1][0];
          }
 
@@ -1819,7 +1819,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 
                in = ii;
                im = ii+1;
-               if (im > elm[ielm].nvtx-1 ) { im = 0;}//im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
+               if (im > elm[ielm].nvtx-1 ) { im = im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
               
                vt1 = (*elm[ielm].vtx)(in); //(in); //TLM these are bad
                vt2 = (*elm[ielm].vtx)(im); //TLM these are bad
@@ -1863,7 +1863,6 @@ cout << "DONE constructing the element-neighbor data " << endl;
             cout << " Boundary-adjacent element not found. Error..." << endl;
             std::exit(0);//stop
          }
-
 
       }
    }
@@ -2074,7 +2073,7 @@ cout << "Generating CC scheme data......" << endl;
 
    //do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
-      //elm[i].nvnghbrs = 1; //TLM set 0 here to speed up by avoiding loop below.
+      elm[i].nvnghbrs = 0; //TLM set 0 here to speed up by avoiding loop below.
       //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
       //Array2D<int> save4 = (*elm[i].vnghbr);
       elm[i].vnghbr = new Array2D<int>( 1,1);
@@ -2126,7 +2125,7 @@ cout << "Generating CC scheme data......" << endl;
          v1 = (*elm[i].vtx)(k);
 
          //velms : do j = 1, node[v1).nelms
-         for (size_t j =0; j < node[v1].nelms; j++) {
+         for (size_t j = 0; j < node[v1].nelms; j++) {
             e1 = (*node[v1].elm)(j);
             if (e1 == i) continue; //velms;
 
