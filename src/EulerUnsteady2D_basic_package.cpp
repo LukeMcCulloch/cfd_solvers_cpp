@@ -1338,14 +1338,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
       
       edge[i].dav = zero;
 
-/*
-Q, should below be
 
-(*edge[i].dav)(0) 
-
-
-A: no, those were statically allocated, not pointers to
-*/
       // Contribution from the left element
       if (e1 > -1) {
          xc = elm[e1].x;
@@ -1377,7 +1370,7 @@ A: no, those were statically allocated, not pointers to
       }
 
       // Magnitude and unit vector
-      edge[i].da  = sqrt( edge[i].dav(0) * edge[i].dav(0) + \
+      edge[i].da  = std::sqrt( edge[i].dav(0) * edge[i].dav(0) + \
                                  edge[i].dav(1) * edge[i].dav(1) );
       //cout << " edge dav before division = " << edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
       edge[i].dav = edge[i].dav / edge[i].da;
@@ -1395,7 +1388,7 @@ A: no, those were statically allocated, not pointers to
       // Edge vector
       edge[i].ev(0) = node[n2].x - node[n1].x;
       edge[i].ev(1) = node[n2].y - node[n1].y;
-      edge[i].e     = sqrt( edge[i].ev(0) * edge[i].ev(0) + \
+      edge[i].e     = std::sqrt( edge[i].ev(0) * edge[i].ev(0) + \
                                   edge[i].ev(1) * edge[i].ev(1) );
       edge[i].ev    = edge[i].ev / edge[i].e;
 
@@ -1526,7 +1519,7 @@ A: no, those were statically allocated, not pointers to
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbnodes; j++) {
 
-         (*bound[i].bn)(j)  = sqrt( (*bound[i].bnx)(j) * (*bound[i].bnx)(j) + \
+         (*bound[i].bn)(j)  = std::sqrt( (*bound[i].bnx)(j) * (*bound[i].bnx)(j) + \
                                      (*bound[i].bny)(j) * (*bound[i].bny)(j) );
          //   Minus sign for outward pointing normal
          (*bound[i].bnx)(j) =  - (*bound[i].bnx)(j) / (*bound[i].bn)(j);
@@ -1587,12 +1580,12 @@ A: no, those were statically allocated, not pointers to
          continue; // cycle
       }
 
-     dsL = sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
-     dsR = sqrt( (x3-x2)*(x3-x2) + (y3-y2)*(y3-y2) );
+     dsL = std::sqrt( (x2-x1)*(x2-x1) + (y2-y1)*(y2-y1) );
+     dsR = std::sqrt( (x3-x2)*(x3-x2) + (y3-y2)*(y3-y2) );
       dx = dsR*x1/(dsL*(-dsL-dsR))-x2/dsR+x2/dsL+dsL*x3/((dsR+dsL)*dsR);
       dy = dsR*y1/(dsL*(-dsL-dsR))-y2/dsR+y2/dsL+dsL*y3/((dsR+dsL)*dsR);
 
-     ds  = sqrt( dx*dx + dy*dy );
+     ds  = std::sqrt( dx*dx + dy*dy );
      (*bound[i].bnx)(j) = -( -dy / ds );
      (*bound[i].bny)(j) = -(  dx / ds );
 
@@ -1727,7 +1720,7 @@ A: no, those were statically allocated, not pointers to
             // cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
          }
 
-         (*bound[i].bfn)(j,0)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
+         (*bound[i].bfn)(j,0)  =  std::sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j,0) = -(y1-y2) / (*bound[i].bfn)(j);
          (*bound[i].bfny)(j) =  (x1-x2) / (*bound[i].bfn)(j);
 
@@ -1749,7 +1742,7 @@ A: no, those were statically allocated, not pointers to
          //    cout << "bound[i].nbfaces = " << bound[i].nbfaces << endl;
          // }
 
-         (*bound[i].bfn)(j)  =  sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
+         (*bound[i].bfn)(j)  =  std::sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
          (*bound[i].bfnx)(j) = -(y1-y2) / (*bound[i].bfn)(j);
          (*bound[i].bfny)(j) =  (x1-x2) / (*bound[i].bfn)(j);
 
@@ -1979,9 +1972,8 @@ cout << "Generating CC scheme data......" << endl;
 //       neighbor data just for an educational purpose.
 
    nfaces = 0;
-   //elements4 : do i = 1, nelms
+   //elements4
    for (size_t i = 0; i < nelms; i++) {
-      //do k = 1, elm(i).nnghbrs
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
          jelm = (*elm[i].nghbr)(k);
          if (jelm > i) {
@@ -2022,6 +2014,13 @@ cout << "Generating CC scheme data......" << endl;
             }
          }
          else if (jelm == 0) {
+            // if (elm[jelm].bmark != -1){
+            //    cout << "ERROR: this is supposed to be a boundary \n";
+            //    cout << "jelm = " << jelm << endl;
+            //    cout << "elm[jelm].bmark = " << elm[jelm].bmark << "\n";
+            //    cout << "-------------------------------------------"<< endl;
+            //    std::exit(0); 
+            // }
       //    Skip boundary faces.
          }
 
@@ -2042,7 +2041,7 @@ cout << "Generating CC scheme data......" << endl;
       // Face vector
       face[i].dav(0) = -( node[n2].y - node[n1].y );
       face[i].dav(1) =    node[n2].x - node[n1].x;
-      face[i].da     = sqrt( face[i].dav(0)*face[i].dav(0) +
+      face[i].da     = std::sqrt( face[i].dav(0)*face[i].dav(0) +
                             face[i].dav(1)*face[i].dav(1) );
       face[i].dav    = face[i].dav / face[i].da;
       if (face[i].da < 1.e-10) {
@@ -2075,7 +2074,7 @@ cout << "Generating CC scheme data......" << endl;
 
    //do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
-      elm[i].nvnghbrs = 1; //TLM set 0 here to speed up by avoiding loop below.
+      //elm[i].nvnghbrs = 1; //TLM set 0 here to speed up by avoiding loop below.
       //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
       //Array2D<int> save4 = (*elm[i].vnghbr);
       elm[i].vnghbr = new Array2D<int>( 1,1);
@@ -2107,7 +2106,7 @@ cout << "Generating CC scheme data......" << endl;
       // (1)Add face-neighbors
       //do k = 1, elm(i).nnghbrs
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
-         if ( (*elm[i].nghbr)(k) > 0 ) {
+         if ( (*elm[i].nghbr)(k) > -1 ) {
             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
             //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs) //TLM TODO: redo with reallocation
             Array2D<int> save5 = (*elm[i].vnghbr);
@@ -2154,7 +2153,7 @@ cout << "Generating CC scheme data......" << endl;
             }
          }//velms loop
 
-         }//end elm[i].nvtx loop
+      }//end elm[i].nvtx loop
 
       ave_nghbr = ave_nghbr + elm[i].nvnghbrs;
       if (elm[i].nvnghbrs < min_nghbr) imin = i;
@@ -2167,7 +2166,7 @@ cout << "Generating CC scheme data......" << endl;
       }
 
    }// elements7 loop
-
+   cout << "      ave_nghbr(sum) = " << ave_nghbr << " nelms = " << nelms << endl;
    cout << "      ave_nghbr = " << ave_nghbr/nelms << endl;
    cout << "      min_nghbr = " << min_nghbr << " elm = " << imin << endl;
    cout << "      max_nghbr = " << max_nghbr << " elm = " << imax << endl;
@@ -2425,15 +2424,15 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 // Sum of the directed area vectors must vanish at every node.
 
    for (size_t i = 0; i < nnodes; i++) {
-         if ( abs( (*sum_dav_i)(i,0) ) > 1.0e-12 * mag_dav or 
-               abs( (*sum_dav_i)(i,1) ) > 1.0e-12 * mag_dav)
+         if ( std::abs( (*sum_dav_i)(i,0) ) > 1.0e-4 * mag_dav or 
+               std::abs( (*sum_dav_i)(i,1) ) > 1.0e-4 * mag_dav)
          {
-            cout  << " --- node=" << i 
-                  << " (x,y)=" << node[i].x << node[i].y 
-                  << " sum_dav=" << (*sum_dav_i)(i,0) << (*sum_dav_i)(i,1) << endl;
-            
-            cout << "Error: Sum of the directed area vectors large sum_dav..." << endl;
-            std::exit(0);//stop program
+            cout << "Error: Sum of the directed area vectors large sum_dav...\n";
+            cout  << " --- node=" << i << "\n"
+                  << " (x,y)=" << node[i].x << " , " << node[i].y << "\n"
+                  << " sum_dav=" << (*sum_dav_i)(i,0) << " , " << (*sum_dav_i)(i,1) << endl;
+            cout << "-------------------------------------------------------" << endl;
+            //std::exit(0);//stop program
          }
    }
    //print( (*sum_dav_i) );
@@ -2687,7 +2686,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
             n2 = (*elm[i].vtx)(k+1);
          }
 
-         side(k) = sqrt( (node[n2].x-node[n1].x) * (node[n2].x-node[n1].x) \
+         side(k) = std::sqrt( (node[n2].x-node[n1].x) * (node[n2].x-node[n1].x) \
                            + (node[n2].y-node[n1].y) * (node[n2].y-node[n1].y) );
          side_max =  std::max(side_max, side(k));
 
