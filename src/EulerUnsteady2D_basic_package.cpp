@@ -2687,7 +2687,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
             n2 = (*elm[i].vtx)(k+1);
          }
 
-         side(k) = sqrt( (node[n2].x-node[n1].x) * node[n2].x-node[n1].x \
+         side(k) = sqrt( (node[n2].x-node[n1].x) * (node[n2].x-node[n1].x) \
                            + (node[n2].y-node[n1].y) * (node[n2].y-node[n1].y) );
          side_max =  std::max(side_max, side(k));
 
