@@ -2774,7 +2774,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
    //node3: do i = 1, nnodes
    for (size_t i = 0; i < nnodes; i++) {
       if (node[i].bmark != -1) { continue; }//cycle node3 
-      ar     = ar + real(abs(node[i].ar));
+      ar     = ar + std::abs(node[i].ar);
       ar_min = std::min(ar_min, std::abs(node[i].ar) );
       ar_max = std::max(ar_max, std::abs(node[i].ar) );
       nnodes_eff = nnodes_eff + one;
@@ -2797,7 +2797,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
    //node4: do i = 1, nnodes
    for (size_t i = 0; i < nnodes; i++) {
       if (node[i].bmark == -1) {continue;} //cycle node4
-      ar     = ar + real(abs(node[i].ar));
+      ar     = ar + std::abs(node[i].ar);
       ar_min = std::min(ar_min, std::abs(node[i].ar) );
       ar_max = std::max(ar_max, std::abs(node[i].ar) );
       nnodes_eff = nnodes_eff + one;
