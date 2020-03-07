@@ -2702,30 +2702,36 @@ void EulerSolver2D::MainData2D::compute_ar() {
 
             side_max = side(0);
             if (side(1) >= side(2)) {
-               side_mid = side(1); side_min = side(2);
+               side_mid = side(1); 
+               side_min = side(2);
             }
             else {
-               side_mid = side(2); side_min = side(1);
+               side_mid = side(2); 
+               side_min = side(1);
             }
          }
          else if (side(1) >= side(0) and side(1) >= side(2)) {
 
             side_max = side(1);
             if (side(0) >= side(2)) {
-               side_mid = side(0); side_min = side(2);
+               side_mid = side(0); 
+               side_min = side(2);
             }
             else {
-               side_mid = side(2); side_min = side(0);
+               side_mid = side(2); 
+               side_min = side(0);
             }
          }
          else {
 
             side_max = side(2);
             if (side(0) >= side(1)) {
-               side_mid = side(0); side_min = side(1);
+               side_mid = side(0);
+               side_min = side(1);
             } 
             else {
-               side_mid = side(1); side_min = side(0);
+               side_mid = side(1);
+               side_min = side(0);
             }
 
          }
@@ -2769,8 +2775,8 @@ void EulerSolver2D::MainData2D::compute_ar() {
    for (size_t i = 0; i < nnodes; i++) {
       if (node[i].bmark != -1) { continue; }//cycle node3 
       ar     = ar + real(abs(node[i].ar));
-      ar_min = std::min(ar_min, real(abs(node[i].ar)) );
-      ar_max = std::max(ar_max, real(abs(node[i].ar)) );
+      ar_min = std::min(ar_min, std::abs(node[i].ar) );
+      ar_max = std::max(ar_max, std::abs(node[i].ar) );
       nnodes_eff = nnodes_eff + one;
    }//end do node3
 
@@ -2792,8 +2798,8 @@ void EulerSolver2D::MainData2D::compute_ar() {
    for (size_t i = 0; i < nnodes; i++) {
       if (node[i].bmark == -1) {continue;} //cycle node4
       ar     = ar + real(abs(node[i].ar));
-      ar_min = std::min(ar_min, real(abs(node[i].ar)) );
-      ar_max = std::max(ar_max, real(abs(node[i].ar)) );
+      ar_min = std::min(ar_min, std::abs(node[i].ar) );
+      ar_max = std::max(ar_max, std::abs(node[i].ar) );
       nnodes_eff = nnodes_eff + one;
    }//end do node4
 
