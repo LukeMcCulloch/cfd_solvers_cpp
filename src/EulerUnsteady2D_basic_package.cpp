@@ -546,7 +546,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    // // Some initialization
    v2 = 0;
-   vL = 0;
+   vL = -1;
    im = 0;
    jelm = 0;
 
@@ -1420,6 +1420,14 @@ A: no, those were statically allocated, not pointers to
       node[i].nnghbrs = 0;
    }
 
+   //dummy allocations:
+   for (size_t i = 0; i < nedges; i++) {
+      n1 = edge[i].n1;
+      n2 = edge[i].n2;
+      node[n1].nghbr = new Array2D<int>(1, 1);
+      node[n2].nghbr = new Array2D<int>(1, 1);
+   }
+
 // Loop over edges and distribute the node numbers:
 
    //edges4 : do i = 1, nedges
@@ -1431,15 +1439,22 @@ A: no, those were statically allocated, not pointers to
 
       // (1) Add n1 to the neighbor list of n2
       node[n1].nnghbrs = node[n1].nnghbrs + 1;
+      Array2D<int> save7 = (*node[n1].nghbr);
       node[n1].nghbr = new Array2D<int>(node[n1].nnghbrs, 1);
+         for (size_t ra; ra < save7.storage_size; ra++) {
+            (*node[n1].nghbr).array[ra] = save7.array[ra];
+         }
       (*node[n1].nghbr)( node[n1].nnghbrs - 1 ) = n2; // more fence post trickery
 
 
       // (2) Add n2 to the neighbor list of n1
       node[n2].nnghbrs = node[n2].nnghbrs + 1;
+      Array2D<int> save8 = (*node[n2].nghbr);
       node[n2].nghbr = new Array2D<int>(node[n2].nnghbrs, 1);
+         for (size_t ra; ra < save8.storage_size; ra++) {
+            (*node[n2].nghbr).array[ra] = save8.array[ra];
+         }
       (*node[n2].nghbr)( node[n2].nnghbrs - 1 ) = n1;
-
 
 
    } //end do edges4
@@ -1491,11 +1506,11 @@ A: no, those were statically allocated, not pointers to
          // quick expansion for understanding:
          // int num = (*bound[i].bnode)(j);
          // x1 = node[num].x;
-         x1 = node[ (*bound[i].bnode)[j  ][0] ].x;
-         y1 = node[ (*bound[i].bnode)[j  ][0] ].y;
+         x1 = node[ (*bound[i].bnode)(j) ].x;
+         y1 = node[ (*bound[i].bnode)(j) ].y;
 
-         x2 = node[ (*bound[i].bnode)[j+1][0] ].x;
-         y2 = node[ (*bound[i].bnode)[j+1][0] ].y;
+         x2 = node[ (*bound[i].bnode)(j+1) ].x;
+         y2 = node[ (*bound[i].bnode)(j+1) ].y;
 
       //   Normal vector pointing into the domain at this point.
          (*bound[i].bnx)(j) = (*bound[i].bnx)(j) + half*( -(y2-y1) );
@@ -1801,7 +1816,7 @@ A: no, those were statically allocated, not pointers to
          for (size_t k = 0; k < node[v1].nelms; k ++) {
             //k = node[v1].nelms-1;
 
-            ielm = (*node[v1].elm)(k, 0); //[k][0];
+            ielm = (*node[v1].elm)(k); //[k][0];
 
 
             //cout << "v1, k, ielm  " << v1 << "    " << k << "    " << ielm << endl;
@@ -1879,8 +1894,8 @@ A: no, those were statically allocated, not pointers to
    ave_nghbr = node[0].nnghbrs;
    min_nghbr = node[0].nnghbrs;
    max_nghbr = node[0].nnghbrs;
-      imin = 1;
-      imax = 1;
+      imin = 0;
+      imax = 0;
    if (node[0].nnghbrs==2) {
       cout << "--- 2 neighbors for the node = " << 0 << endl;
    }
@@ -1978,7 +1993,7 @@ cout << "Generating CC scheme data......" << endl;
    //   allocate(face(nfaces))
    face = new face_type[nfaces];
 
-   nfaces = -1;
+   nfaces = 0;
 
 //   elements5 : do i = 1, nelms
    for ( size_t i = 0; i < nelms; i++) {
@@ -1990,20 +2005,20 @@ cout << "Generating CC scheme data......" << endl;
 
             nfaces = nfaces + 1;
 
-            face[nfaces].e1 = i;
-            face[nfaces].e2 = jelm;
+            face[nfaces-1].e1 = i;
+            face[nfaces-1].e2 = jelm;
 
             iedge = (*elm[i].edge)(k);
             v1 = edge[iedge].n1;
             v2 = edge[iedge].n2;
 
             if (edge[iedge].e1 == jelm) {
-               face[nfaces].n1 = v1;
-               face[nfaces].n2 = v2;
+               face[nfaces-1].n1 = v1;
+               face[nfaces-1].n2 = v2;
             }
             else {
-               face[nfaces].n1 = v2;
-               face[nfaces].n2 = v1;
+               face[nfaces-1].n1 = v2;
+               face[nfaces-1].n2 = v1;
             }
          }
          else if (jelm == 0) {
@@ -2032,7 +2047,7 @@ cout << "Generating CC scheme data......" << endl;
       face[i].dav    = face[i].dav / face[i].da;
       if (face[i].da < 1.e-10) {
          cout << "ERROR: collapsed face" << endl;
-         //std::exit(0);
+         std::exit(0);
       }
 
    } //end do faces
@@ -2060,7 +2075,7 @@ cout << "Generating CC scheme data......" << endl;
 
    //do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
-      elm[i].nvnghbrs = 1;
+      elm[i].nvnghbrs = 1; //TLM set 0 here to speed up by avoiding loop below.
       //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
       //Array2D<int> save4 = (*elm[i].vnghbr);
       elm[i].vnghbr = new Array2D<int>( 1,1);
@@ -2072,8 +2087,8 @@ cout << "Generating CC scheme data......" << endl;
    ave_nghbr = 0;
    min_nghbr = 10000;
    max_nghbr =-10000;
-         imin = 1;
-         imax = 1;
+         imin = 0;
+         imax = 0;
 
    // Initialization
    //elements6 
@@ -2087,7 +2102,9 @@ cout << "Generating CC scheme data......" << endl;
 //  
    //elements7 : do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
-   // (1)Add face-neighbors
+
+
+      // (1)Add face-neighbors
       //do k = 1, elm(i).nnghbrs
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
          if ( (*elm[i].nghbr)(k) > 0 ) {
@@ -2104,7 +2121,7 @@ cout << "Generating CC scheme data......" << endl;
 
 
 
-   // (2)Add vertex-neighbors
+      // (2)Add vertex-neighbors
       //do k = 1, elm[i].nvtx
       for (size_t k = 0; k < elm[i].nvtx; k++) {
          v1 = (*elm[i].vtx)(k);
@@ -2341,27 +2358,28 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
    (*sum_dav_i) = zero;
    //print( (*sum_dav_i) );
-   //for (size_t i = 0; i < nedges; i++) {
-   for (size_t i = 0; i < 10; i++) {
+   for (size_t i = 0; i < nedges; i++) {
+   //for (size_t i = 0; i < 10; i++) {
       n1 = edge[i].n1;
       n2 = edge[i].n2;
       (*sum_dav_i)(n1,0) = (*sum_dav_i)(n1,0) + edge[i].dav(0)*edge[i].da;
-      (*sum_dav_i)(n2,0) = (*sum_dav_i)(n2,0) - edge[i].dav(0)*edge[i].da;
       (*sum_dav_i)(n1,1) = (*sum_dav_i)(n1,1) + edge[i].dav(1)*edge[i].da;
+      (*sum_dav_i)(n2,0) = (*sum_dav_i)(n2,0) - edge[i].dav(0)*edge[i].da;
       (*sum_dav_i)(n2,1) = (*sum_dav_i)(n2,1) - edge[i].dav(1)*edge[i].da;
       mag_dav = mag_dav + edge[i].da;
-      cout << "sum dav i =" << mag_dav << endl;
-      mag_dav = mag_dav/real(nedges);
-      cout << "sum dav i, mag = " << mag_dav << endl;
-      cout << (*sum_dav_i)(n1,0) << endl;
-      cout << (*sum_dav_i)(n2,0) << endl;
-      cout << (*sum_dav_i)(n1,1) << endl;
-      cout << (*sum_dav_i)(n2,1) << endl;
+      // cout << (*sum_dav_i)(n1,0) << endl;
+      // cout << (*sum_dav_i)(n2,0) << endl;
+      // cout << (*sum_dav_i)(n1,1) << endl;
+      // cout << (*sum_dav_i)(n2,1) << endl;
 
-      cout << edge[i].dav(0) << endl;
-      cout << edge[i].dav(1) << endl;
-      cout << " edge da = " << edge[i].da << endl;
+      // cout << edge[i].dav(0) << endl;
+      // cout << edge[i].dav(1) << endl;
+      // cout << " edge da = " << edge[i].da << endl;
    }
+   //ok:
+   cout << "sum edge[i].da =" << mag_dav << endl;
+   mag_dav = mag_dav/real(nedges);
+   cout << "sum dav i, mag = " << mag_dav << endl;
 
 // Add contribution from boundary edges.
    for (size_t i = 0; i < nbound; i++) {
@@ -2385,7 +2403,7 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbnodes; j++) {
          k = (*bound[i].bnode)(j);
-         if (j > 1 and k==(*bound[i].bnode)(0)) continue; //Skip if the last node is equal to the first node).
+         if (j > 0 and k==(*bound[i].bnode)(0)) continue; //Skip if the last node is equal to the first node).
          sum_bn(0)      = sum_bn(0)      + (*bound[i].bnx)(j)*(*bound[i].bn)(j);
          sum_bn(1)      = sum_bn(1)      + (*bound[i].bny)(j)*(*bound[i].bn)(j);
          mag_bn = mag_bn + abs((*bound[i].bn)(j));
@@ -2407,15 +2425,18 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 // Sum of the directed area vectors must vanish at every node.
 
    for (size_t i = 0; i < nnodes; i++) {
-         if ( abs( (*sum_dav_i)(i,0) ) > 1.0e-12 * mag_dav or abs( (*sum_dav_i)(i,1) ) > 1.0e-12 * mag_dav) {
+         if ( abs( (*sum_dav_i)(i,0) ) > 1.0e-12 * mag_dav or 
+               abs( (*sum_dav_i)(i,1) ) > 1.0e-12 * mag_dav)
+         {
             cout  << " --- node=" << i 
                   << " (x,y)=" << node[i].x << node[i].y 
                   << " sum_dav=" << (*sum_dav_i)(i,0) << (*sum_dav_i)(i,1) << endl;
             
-         cout << "Error: Sum of the directed area vectors large sum_dav..." << endl;
-         std::exit(0);//stop program
+            cout << "Error: Sum of the directed area vectors large sum_dav..." << endl;
+            std::exit(0);//stop program
          }
    }
+   //print( (*sum_dav_i) );
 
    cout << "--- Max sum of directed area vector around a node:" << endl;
    // cout << "  max(sum_dav_i_x) = " <<  maxval((*sum_dav_i)(:,0)) << endl;
@@ -2427,7 +2448,8 @@ void EulerSolver2D::MainData2D::check_grid_data() {
 
 
    if (MaxColVal( abs( (*sum_dav_i) ) , 0 ) > 1.0e-12 * mag_dav or
-      MaxColVal( abs( (*sum_dav_i) ) , 1 ) > 1.0e-12 * mag_dav)   {
+      MaxColVal( abs( (*sum_dav_i) ) , 1 ) > 1.0e-12 * mag_dav)   
+   {
       cout << "--- Max sum of directed area vector around a node:" << endl;
       cout << "  max(sum_dav_i_x) = " <<  MaxColVal( (*sum_dav_i), 0) << endl;
       cout << "  max(sum_dav_i_y) = " <<  MaxColVal( (*sum_dav_i), 1) << endl;
@@ -2439,8 +2461,8 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    sum_dav = zero;
    cout << "sum_dav 0 = " << sum_dav(0) << endl;
    cout << "sum_dav 1 = " << sum_dav(1) << endl;
-   for (size_t i = 0; i < nnodes; i++) {
    //for (size_t i = 0; i < 10; i++) {
+   for (size_t i = 0; i < nnodes; i++) {
       sum_dav(0) = sum_dav(0) + (*sum_dav_i)(i,0) ;
       sum_dav(1) = sum_dav(1) + (*sum_dav_i)(i,1) ;
       // cout << "sum_dav i,0 =" << (*sum_dav_i)(i,0)  << endl;
