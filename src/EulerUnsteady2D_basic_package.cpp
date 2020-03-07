@@ -1300,6 +1300,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
       }//    endif tri_quad2
 
    }//   end do elements3
+   nedges += 1;
 
 // Loop over edges
 // Construct edge vector and directed area vector.
