@@ -666,6 +666,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       }
       (*node[v1].elm)(node[v1].nelms-1, 0) = i;
 
+      //print((*node[v1].elm));
 
       // if (i == 160400) {
       //    cout << "----------------------------------" << endl;
@@ -840,7 +841,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3  << endl;
             cout << "  (x4,y4)=" << x4 << y4  << endl;
             cout << "  (xc,yc)=" << xc << yc  << endl;
-            //std::exit(0);//stop
+            std::exit(0);
          }
 
          //cout << " tri area 2" << endl;
@@ -851,7 +852,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3  << endl;
             cout << "  (x4,y4)=" << x4 << y4  << endl;
             cout << "  (xc,yc)=" << xc << yc  << endl;
-            //std::exit(0);//stop
+            std::exit(0);
          }
 
          //cout << " tri area 3" << endl;
@@ -862,7 +863,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3 << endl;
             cout << "  (x4,y4)=" << x4 << y4 << endl;
             cout << "  (xc,yc)=" << xc << yc << endl;
-            //std::exit(0);//stop
+            std::exit(0);
          }
 
          //cout << " tri area 4" << endl;
@@ -873,7 +874,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             cout << "  (x3,y3)=" << x3 << y3  << endl;
             cout << "  (x4,y4)=" << x4 << y4  << endl;
             cout << "  (xc,yc)=" << xc << yc  << endl;
-            //std::exit(0);//stop
+            std::exit(0);
          }
 
       //  Distribution of element number to the 4th node of the quadrilateral
@@ -1083,7 +1084,7 @@ int nbrprint = 2;
                   
                   im = ii+1;
                   if (im > (elm[jelm].nvtx-1)) { 
-                     im = 0;//im - (elm[jelm].nvtx-0); 
+                     im = im - (elm[jelm].nvtx-0); 
                   }
                   if (i < nbrprint)  cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   break; //exit edge_matching  |
@@ -1415,6 +1416,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //       o            o: neighbors (edge-connected nghbrs)
 //
 
+   cout << " --- Node-neighbor (edge connected vertex) data:" << endl;
    for (size_t i = 0; i < nnodes; i++) {
       node[i].nnghbrs = 0;
    }
@@ -1800,7 +1802,6 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //    do j = 1, bound[i].nbfaces
    for (size_t i = 0; i < nbound; i++) {
       for (size_t j = 0; j < bound[i].nbfaces; j++) {
-      //for (size_t j = 0; j < 1; j++) {
 
          //   bface is defined by the nodes v1 and v2.
          v1 = (*bound[i].bnode)(j) ;
@@ -2075,7 +2076,7 @@ cout << "Generating CC scheme data......" << endl;
 //          i: Element of interest
 //          o: Vertex neighbors (k = 1,2,...,9)
 
-   cout << " --- Vertex-neighbor data:" << endl;
+   cout << " --- Vertex-neighbor (vertex of neighbor element) data:" << endl;
 
    //do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
@@ -2141,12 +2142,14 @@ cout << "Generating CC scheme data......" << endl;
             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
                if ( e1 == (*elm[i].vnghbr)(ii) ) {
                   found = true;
+                  //cout << "Found element match e1 = " << e1 << endl;
                   break;
                }
             }
 
    //       Add the element, e1, if not added yet.
             if (not found) {
+               //cout << "NO element match e1 = " << e1 << endl;
                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
                //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs) //TLM TODO: redo with reallocation
                Array2D<int> save6 = (*elm[i].vnghbr);
@@ -2159,6 +2162,10 @@ cout << "Generating CC scheme data......" << endl;
          }//velms loop
 
       }//end elm[i].nvtx loop
+      // cout << "--- elm[798].vnghbr" << endl;
+      // print( (*elm[798].vnghbr) );
+      // cout << "--- elm[804].vnghbr" << endl;
+      // print( (*elm[804].vnghbr) );
 
       ave_nghbr = ave_nghbr + elm[i].nvnghbrs;
       if (elm[i].nvnghbrs < min_nghbr) imin = i;
@@ -2168,6 +2175,7 @@ cout << "Generating CC scheme data......" << endl;
       if (elm[i].nvnghbrs < 3) {
          cout << "--- Not enough neighbors: elm = " << i << 
                   "elm[i].nvnghbrs= " << elm[i].nvnghbrs << endl;
+         std::exit(0);
       }
 
    }// elements7 loop
@@ -2363,7 +2371,6 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    (*sum_dav_i) = zero;
    //print( (*sum_dav_i) );
    for (size_t i = 0; i < nedges; i++) {
-   //for (size_t i = 0; i < 10; i++) {
       n1 = edge[i].n1;
       n2 = edge[i].n2;
       (*sum_dav_i)(n1,0) = (*sum_dav_i)(n1,0) + edge[i].dav(0)*edge[i].da;
@@ -2465,7 +2472,6 @@ void EulerSolver2D::MainData2D::check_grid_data() {
    sum_dav = zero;
    cout << "sum_dav 0 = " << sum_dav(0) << endl;
    cout << "sum_dav 1 = " << sum_dav(1) << endl;
-   //for (size_t i = 0; i < 10; i++) {
    for (size_t i = 0; i < nnodes; i++) {
       sum_dav(0) = sum_dav(0) + (*sum_dav_i)(i,0) ;
       sum_dav(1) = sum_dav(1) + (*sum_dav_i)(i,1) ;
