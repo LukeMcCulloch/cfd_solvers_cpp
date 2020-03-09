@@ -181,7 +181,8 @@ public:
     // destructor
     ~Solver();
 
-    void euler_solver_main();
+    void euler_solver_main(EulerSolver2D::MainData2D& E2Ddata);
+    void compute_lsq_coeff_nc();
 };
 
 
