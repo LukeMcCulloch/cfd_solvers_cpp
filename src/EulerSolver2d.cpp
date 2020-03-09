@@ -107,8 +107,9 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc() {
 // !* Note: Here, we use only the first component of u=(u1,u2,u3), i.e., ivar=1.
 // !*
 // !********************************************************************************
-//void EulerSolver2D::Solver::check_lsq_coeff_nc() {
-   
+void EulerSolver2D::Solver::check_lsq_coeff_nc() {
+
+}
 
 //  use edu2d_constants   , only : p2, one, two
 //  use edu2d_my_main_data, only : nnodes, node
@@ -232,4 +233,4 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc() {
 //   write(*,*)
 
 
-//}//  end check_lsq_coeff_nc
+//} //  end check_lsq_coeff_nc
