@@ -57,8 +57,8 @@ void EulerSolver2D::Solver::euler_solver_main(){
 
    // //Local variables
    Array2D<real> res_norm(4,3); //Residual norms(L1,L2,Linf)
-   // real(p2), dimension(:,:), allocatable :: u0;       //Saved solution
-   // real(p2) :: dt, time;    //Time step and actual time
+   Array2D<real>*  u0;       //Saved solution
+   real dt, time;    //Time step and actual time
    int i_time_step; //Number of time steps
    int i;
 
