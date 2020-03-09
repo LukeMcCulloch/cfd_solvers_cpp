@@ -65,17 +65,17 @@ void EulerSolver2D::Solver::euler_solver_main(){
    // // Allocate the temporary solution array needed for the Runge-Kutta method.
    // allocate(u0(nnodes,4));
 
-   // // These parameters are set in main.f90. Here just print them on display.
-   // cout << " \n";
-   // cout << "Calling the Euler solver...";
-   // cout << " \n";
+   // These parameters are set in main. Here just print them on display.
+   cout << " \n";
+   cout << "Calling the Euler solver...";
+   cout << " \n";
    // cout << "                  M_inf = " <<  M_inf << " \n";
    // cout << "                    CFL = " <<  CFL << " \n";
    // cout << "             final time = " <<  t_final << " \n";
    // cout << "          time_step_max = " <<  time_step_max << " \n";
    // cout << "          inviscid_flux = " <<  trim(inviscid_flux) << " \n";
    // cout << "           limiter_type = " <<  trim(limiter_type) << " \n";
-   // cout << " \n";
+   cout << " \n";
 
    //--------------------------------------------------------------------------------
    // First, make sure that normal mass flux is zero at all solid boundary nodes.
