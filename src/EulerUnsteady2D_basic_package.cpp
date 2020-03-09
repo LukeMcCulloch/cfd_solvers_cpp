@@ -2121,6 +2121,8 @@ cout << "Generating CC scheme data......" << endl;
                (*elm[i].vnghbr).array[ra] = save5.array[ra];
             }
             (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
+            if (i<10*maxprint) cout << "setting " << (*elm[i].nghbr)(k)<< endl;
+            if (i<10*maxprint) cout << " to elm[i] vnghbr = " << elm[i].nvnghbrs-1 << endl;
          }
       }
 
@@ -2131,25 +2133,36 @@ cout << "Generating CC scheme data......" << endl;
       for (size_t k = 0; k < elm[i].nvtx; k++) {
          v1 = (*elm[i].vtx)(k);
 
-         //velms : do j = 1, node[v1).nelms
+         //velms : doj = 1, node[v1).nelms
          for (size_t j = 0; j < node[v1].nelms; j++) {
+
+            if (i<10*maxprint) cout << " good start HIGH after break" << endl;
             e1 = (*node[v1].elm)(j);
-            if (e1 == i) continue; //velms;
+            if (e1 == i)  {
+               if (i<10*maxprint) cout << " e1 == i = " << i << " " << e1 <<  endl;
+               continue; //velms;
+            }
 
       //    Check if the element is already added.
             found = false;
             //do ii = 1, elm[i].nvnghbrs
             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
+               if (i<10*maxprint) cout << "checking " << (*elm[i].vnghbr)(ii) << endl;
                if ( e1 == (*elm[i].vnghbr)(ii) ) {
                   found = true;
-                  //cout << "Found element match e1 = " << e1 << endl;
+                  if (i<10*maxprint) cout << "Found element match e1 = " << e1 << " " << (*elm[i].vnghbr)(ii) << endl;
+                  if (i<10*maxprint) cout << " break" << endl;
                   break;
                }
+               if (i<10*maxprint) cout << " skip after break" << endl;
             }
+            if (i<10*maxprint) cout << " good start LOW after break" << endl;
 
    //       Add the element, e1, if not added yet.
             if (not found) {
-               //cout << "NO element match e1 = " << e1 << endl;
+               
+               if (i<10*maxprint) cout << "NO element match e1 = " << e1 << endl;
+               
                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
                //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs) //TLM TODO: redo with reallocation
                Array2D<int> save6 = (*elm[i].vnghbr);
@@ -2175,7 +2188,7 @@ cout << "Generating CC scheme data......" << endl;
       if (elm[i].nvnghbrs < 3) {
          cout << "--- Not enough neighbors: elm = " << i << 
                   "elm[i].nvnghbrs= " << elm[i].nvnghbrs << endl;
-         std::exit(0);
+         //std::exit(0);
       }
 
    }// elements7 loop

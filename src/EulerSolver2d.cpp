@@ -1,10 +1,12 @@
 
 // //======================================
 // // 2D Euler sovler
-// #include "../include/EulerUnsteady2D_basic_package.h"
-// #include "../include/EulerUnsteady2D.h"
+// 2D Eiuler approximate Riemann sovler
+#include "../include/EulerUnsteady2D.h"
 
 
+//======================================
+#include "../include/EulerUnsteady2D_basic_package.h"
 
 // EulerSolver2D::MainData2D::MainData2D() {
 
@@ -30,3 +32,57 @@
 // EulerSolver2D::MainData2D::~MainData2D() {
 //     delete[] node;
 //     }
+
+EulerSolver2D::Solver::Solver(){}
+
+
+EulerSolver2D::Solver::~Solver(){
+   printf("destruct Solver");
+}
+
+
+//********************************************************************************
+//********************************************************************************
+//********************************************************************************
+//* Euler solver: Node-Centered Finite-Volume Method (Edge-Based)
+//*
+//* - Node-centered finite-volume method for unstructured grids(quad/tri/mixed)
+//* - Roe flux with an entropy fix and Rotated-RHLL flux
+//* - Reconstruction by unweighted least-squares method (2x2 system for gradients)
+//* - Van Albada slope limiter to the primitive variable gradients
+//* - 2-Stage Runge-Kutta time-stepping
+//*
+//********************************************************************************
+void EulerSolver2D::Solver::euler_solver_main(){
+
+   // //Local variables
+   // real(p2), dimension(4,3)              :: res_norm; //Residual norms(L1,L2,Linf)
+   // real(p2), dimension(:,:), allocatable :: u0;       //Saved solution
+   // real(p2) :: dt, time;    //Time step and actual time
+   // int i_time_step; //Number of time steps
+   // int i;
+
+   // // Allocate the temporary solution array needed for the Runge-Kutta method.
+   // allocate(u0(nnodes,4));
+
+   // // These parameters are set in main.f90. Here just print them on display.
+   // cout << " \n";
+   // cout << "Calling the Euler solver...";
+   // cout << " \n";
+   // cout << "                  M_inf = " <<  M_inf << " \n";
+   // cout << "                    CFL = " <<  CFL << " \n";
+   // cout << "             final time = " <<  t_final << " \n";
+   // cout << "          time_step_max = " <<  time_step_max << " \n";
+   // cout << "          inviscid_flux = " <<  trim(inviscid_flux) << " \n";
+   // cout << "           limiter_type = " <<  trim(limiter_type) << " \n";
+   // cout << " \n";
+
+   //--------------------------------------------------------------------------------
+   // First, make sure that normal mass flux is zero at all solid boundary nodes.
+   // NOTE: Necessary because initial solution may generate the normal component.
+   //--------------------------------------------------------------------------------
+
+}
+//********************************************************************************
+// End of program
+//********************************************************************************

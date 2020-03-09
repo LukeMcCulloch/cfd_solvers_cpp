@@ -224,32 +224,32 @@ EulerSolver2D::MainData2D::~MainData2D() {
    // delete face;
 }
 
-EulerSolver2D::Solver::Solver(){}
+// EulerSolver2D::Solver::Solver(){}
 
 
-EulerSolver2D::Solver::~Solver(){
-   printf("destruct Solver");
-}
+// EulerSolver2D::Solver::~Solver(){
+//    printf("destruct Solver");
+// }
 
 
-//********************************************************************************
-//********************************************************************************
-//********************************************************************************
-//* Euler solver: Node-Centered Finite-Volume Method (Edge-Based)
-//*
-//* - Node-centered finite-volume method for unstructured grids(quad/tri/mixed)
-//* - Roe flux with an entropy fix and Rotated-RHLL flux
-//* - Reconstruction by unweighted least-squares method (2x2 system for gradients)
-//* - Van Albada slope limiter to the primitive variable gradients
-//* - 2-Stage Runge-Kutta time-stepping
-//*
-//********************************************************************************
-void EulerSolver2D::Solver::euler_solver_main(){
+// //********************************************************************************
+// //********************************************************************************
+// //********************************************************************************
+// //* Euler solver: Node-Centered Finite-Volume Method (Edge-Based)
+// //*
+// //* - Node-centered finite-volume method for unstructured grids(quad/tri/mixed)
+// //* - Roe flux with an entropy fix and Rotated-RHLL flux
+// //* - Reconstruction by unweighted least-squares method (2x2 system for gradients)
+// //* - Van Albada slope limiter to the primitive variable gradients
+// //* - 2-Stage Runge-Kutta time-stepping
+// //*
+// //********************************************************************************
+// void EulerSolver2D::Solver::euler_solver_main(){
 
-}
-//********************************************************************************
-// End of program
-//********************************************************************************
+// }
+// //********************************************************************************
+// // End of program
+// //********************************************************************************
 
 //namespace EulerSolver2D{
 void program_2D_euler_rk2(){
