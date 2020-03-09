@@ -56,11 +56,11 @@ EulerSolver2D::Solver::~Solver(){
 void EulerSolver2D::Solver::euler_solver_main(){
 
    // //Local variables
-   // real(p2), dimension(4,3)              :: res_norm; //Residual norms(L1,L2,Linf)
+   Array2D<real> res_norm(4,3); //Residual norms(L1,L2,Linf)
    // real(p2), dimension(:,:), allocatable :: u0;       //Saved solution
    // real(p2) :: dt, time;    //Time step and actual time
-   // int i_time_step; //Number of time steps
-   // int i;
+   int i_time_step; //Number of time steps
+   int i;
 
    // // Allocate the temporary solution array needed for the Runge-Kutta method.
    // allocate(u0(nnodes,4));
