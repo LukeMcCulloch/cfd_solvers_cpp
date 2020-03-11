@@ -315,8 +315,8 @@ void program_2D_euler_rk2(){
    E2Ddata.write_tecplot_file(E2Ddata.datafile_tria_tec);
    E2Ddata.write_grid_file(E2Ddata.datafile_tria);
 // (4) Prepare LSQ gradients
-   E2Dsolver.compute_lsq_coeff_nc();
-   E2Dsolver.check_lsq_coeff_nc();
+   E2Dsolver.compute_lsq_coeff_nc(E2Ddata);
+   E2Dsolver.check_lsq_coeff_nc(E2Ddata);
 
 // // (5) Set initial solution for a shock diffraction problem
 // //     (Re-write or replace it by your own subroutine for other problems.)

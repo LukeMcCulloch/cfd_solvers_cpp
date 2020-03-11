@@ -1,4 +1,14 @@
 
+
+
+//======================================
+// my simple array class template (type)
+#include "../include/tests_array.hpp"
+#include "../include/array_template.hpp"
+#include "../include/arrayops.hpp"
+
+
+
 // //======================================
 // // 2D Euler sovler
 // 2D Eiuler approximate Riemann sovler
@@ -94,8 +104,27 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
 
 
 
-void EulerSolver2D::Solver::compute_lsq_coeff_nc() {
+void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata) {
 
+      int i, in, ell, ii, k;
+
+      cout << " \n";
+      cout << " " "Constructing LSQ coefficients...\n";
+
+      // 1. Coefficients for the linear LSQ gradients
+
+      cout << "---(1) Constructing Linear LSQ coefficients...\n";
+
+      // nnodes
+      for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+
+         //my_alloc_p2_ptr(node(i)%lsq2x2_cx,node(i)%nnghbrs)
+         E2Ddata.node[i].lsq2x2_cx = new Array2D<real>( E2Ddata.node[i].nnghbrs, 1 );
+         //my_alloc_p2_ptr(node(i)%lsq2x2_cy,node(i)%nnghbrs)
+         E2Ddata.node[i].lsq2x2_cy = new Array2D<real>( E2Ddata.node[i].nnghbrs, 1 );
+         //lsq01_2x2_coeff_nc(i);
+
+      }
 } //  end compute_lsq_coeff_nc
 
 // !********************************************************************************
@@ -107,7 +136,9 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc() {
 // !* Note: Here, we use only the first component of u=(u1,u2,u3), i.e., ivar=1.
 // !*
 // !********************************************************************************
-void EulerSolver2D::Solver::check_lsq_coeff_nc() {
+void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata) {
+
+
 
 }
 
@@ -234,3 +265,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc() {
 
 
 //} //  end check_lsq_coeff_nc
+
+
+
+

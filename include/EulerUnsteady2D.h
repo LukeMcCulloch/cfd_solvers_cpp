@@ -182,8 +182,8 @@ public:
     ~Solver();
 
     void euler_solver_main(EulerSolver2D::MainData2D& E2Ddata);
-    void compute_lsq_coeff_nc();
-    void check_lsq_coeff_nc();
+    void compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata);
+    void check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata);
 };
 
 
