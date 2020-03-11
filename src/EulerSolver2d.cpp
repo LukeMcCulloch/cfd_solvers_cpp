@@ -127,15 +127,15 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
       }
 } //  end compute_lsq_coeff_nc
 
-// !********************************************************************************
-// !* This subroutine verifies the implementation of LSQ gradients.
-// !*
-// !* 1. Check if the linear LSQ gradients are exact for linear functions.
-// !* 2. Check if the quadratic LSQ gradients are exact for quadratic functions.
-// !*
-// !* Note: Here, we use only the first component of u=(u1,u2,u3), i.e., ivar=1.
-// !*
-// !********************************************************************************
+// //********************************************************************************
+// //* This subroutine verifies the implementation of LSQ gradients.
+// //*
+// //* 1. Check if the linear LSQ gradients are exact for linear functions.
+// //* 2. Check if the quadratic LSQ gradients are exact for quadratic functions.
+// //*
+// //* Note: Here, we use only the first component of u=(u1,u2,u3), i.e., ivar=1.
+// //*
+// //********************************************************************************
 void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata) {
 
 
@@ -154,19 +154,19 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //   ix = 1
 //   iy = 2
 
-// ! We only use w(1) for this test.
+// // We only use w(1) for this test.
 //   ivar = 1
  
-// !---------------------------------------------------------------------
-// ! 1. Check linear LSQ gradients
-// !---------------------------------------------------------------------
+// //---------------------------------------------------------------------
+// // 1. Check linear LSQ gradients
+// //---------------------------------------------------------------------
 //   write(*,*)
 //   write(*,*) "---------------------------------------------------------"
 //   write(*,*) "---------------------------------------------------------"
 //   write(*,*) "- Checking Linear LSQ gradients..."
 
-// !  (1). Store a linear function in w(ivar) = x + 2*y.
-// !       So the exact gradient is grad(w(ivar)) = (1,2).
+// //  (1). Store a linear function in w(ivar) = x + 2*y.
+// //       So the exact gradient is grad(w(ivar)) = (1,2).
 
 //    write(*,*) "- Storing a linear function values..."
 //    do i = 1, nnodes
@@ -175,13 +175,13 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //     node(i)%w(ivar) = one*x + two*y
 //    end do
 
-// !  (2). Compute the gradient by linear LSQ
+// //  (2). Compute the gradient by linear LSQ
 
 //    write(*,*) "- Computing linear LSQ gradients.."
 //    grad_type_temp = 'linear'
 //    call compute_gradient_nc(ivar,grad_type_temp)
 
-// !  (3). Compute the relative errors (L_infinity)
+// //  (3). Compute the relative errors (L_infinity)
 
 //    write(*,*) "- Computing the relative errors (L_infinity).."
 //    error_max_wx = -one
@@ -197,16 +197,16 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //   write(*,*) "---------------------------------------------------------"
 
 
-// !---------------------------------------------------------------------
-// ! 2. Check quadratic LSQ gradients
-// !---------------------------------------------------------------------
+// //---------------------------------------------------------------------
+// // 2. Check quadratic LSQ gradients
+// //---------------------------------------------------------------------
 //   write(*,*)
 //   write(*,*) "---------------------------------------------------------"
 //   write(*,*) "---------------------------------------------------------"
 //   write(*,*) "- Checking Quadratic LSQ gradients..."
 
-// !  (1). Store a quadratic function in w(ivar) = a0 + a1*x + a2*y + a3*x**2 + a4*x*y + a5*y**2
-// !       So the exact gradient is grad(w(ivar)) = (a1+2*a3*x+a4*y, a2+2*a5*y+a4*x)
+// //  (1). Store a quadratic function in w(ivar) = a0 + a1*x + a2*y + a3*x**2 + a4*x*y + a5*y**2
+// //       So the exact gradient is grad(w(ivar)) = (a1+2*a3*x+a4*y, a2+2*a5*y+a4*x)
 
 //    a0 =    21.122_p2
 //    a1 =     1.000_p2
@@ -222,13 +222,13 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //     node(i)%w(ivar) = a0 + a1*x + a2*y + a3*x**2 + a4*x*y + a5*y**2
 //    end do
 
-// !  (2). Compute the gradient by linear LSQ
+// //  (2). Compute the gradient by linear LSQ
 
 //    write(*,*) "- Computing quadratic LSQ gradients.."
 //    grad_type_temp = 'quadratic2'
 //    call compute_gradient_nc(ivar,grad_type_temp)
 
-// !  (3). Compute the relative errors (L_infinity)
+// //  (3). Compute the relative errors (L_infinity)
 
 //    write(*,*) "- Computing the relative errors (L_infinity).."
 //    error_max_wx = -one
@@ -268,4 +268,83 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 
 
 
+
+
+
+
+//********************************************************************************
+//* --- LSQ Coefficients for 2x2 Linear Least-Squares Gradient Reconstruction ---
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:  inode = node number at which the gradient is computed.
+//*
+//* Output:  node(inode)%lsq2x2_cx(:)
+//*          node(inode)%lsq2x2_cx(:)
+//* ------------------------------------------------------------------------------
+//*
+//********************************************************************************
+//   lsq01_2x2_coeff_nc(inode)
+
+//  use edu2d_my_main_data           , only : node
+//  use edu2d_constants              , only : p2, zero
+
+//  implicit none
+
+//  integer, intent(in) :: inode
+// //Local variables
+//  real(p2) :: a(2,2), dx, dy, det, w2, w2dvar
+//  integer  :: k, inghbr, ix=1,iy=2
+//  real(p2), dimension(2,2) :: local_lsq_inverse
+
+//    a = zero
+
+// //  Loop over the neighbor nodes.
+//    do k = 1, node(inode)%nnghbrs
+//     inghbr = node(inode)%nghbr(k)
+
+//       dx = node(inghbr)%x - node(inode)%x
+//       dy = node(inghbr)%y - node(inode)%y
+
+//       w2 = lsq_weight(dx, dy)**2
+
+//       a(1,1) = a(1,1) + w2 * dx*dx
+//       a(1,2) = a(1,2) + w2 * dx*dy
+
+//       a(2,1) = a(2,1) + w2 * dx*dy
+//       a(2,2) = a(2,2) + w2 * dy*dy
+
+//    end do
+
+//     det = a(1,1)*a(2,2) - a(1,2)*a(2,1)
+//     if (abs(det) < 1.0e-14) write(*,*) " Singular: LSQ det = ", det, " i=",inode
+
+// // OK, invert and store the inverse matrix:
+
+//      local_lsq_inverse(1,1) =  a(2,2)/det
+//      local_lsq_inverse(1,2) = -a(2,1)/det
+//      local_lsq_inverse(2,1) = -a(1,2)/det
+//      local_lsq_inverse(2,2) =  a(1,1)/det
+
+// //  Now compute the coefficients for neighbors.
+
+//      nghbr : do k = 1, node(inode)%nnghbrs
+//        inghbr = node(inode)%nghbr(k)
+
+//         dx = node(inghbr)%x - node(inode)%x
+//         dy = node(inghbr)%y - node(inode)%y
+
+//       w2dvar = lsq_weight(dx, dy)**2
+
+//       node(inode)%lsq2x2_cx(k)  = local_lsq_inverse(ix,1)*w2dvar*dx &
+//                                 + local_lsq_inverse(ix,2)*w2dvar*dy
+
+//       node(inode)%lsq2x2_cy(k)  = local_lsq_inverse(iy,1)*w2dvar*dx &
+//                                 + local_lsq_inverse(iy,2)*w2dvar*dy
+
+//      end do nghbr
+
+ //lsq01_2x2_coeff_nc
+//********************************************************************************
+//*
+//********************************************************************************
 
