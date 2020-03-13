@@ -1,7 +1,7 @@
 //=================================
 // include guard
-#ifndef STRINGOPS_INCLUDED__
-#define STRINGOPS_INCLUDED__
+#ifndef __STRINGOPS_INCLUDED__
+#define __STRINGOPS_INCLUDED__
 
 // #include <algorithm> 
 // #include <cctype>
@@ -50,33 +50,33 @@
 
 // modifies input string, returns input
 
-std::string& trim_left_in_place(std::string& str) {
+inline std::string& trim_left_in_place(std::string& str) {
     size_t i = 0;
     while(i < str.size() && isspace(str[i])) { ++i; };
     return str.erase(0, i);
 }
 
-std::string& trim_right_in_place(std::string& str) {
+inline std::string& trim_right_in_place(std::string& str) {
     size_t i = str.size();
     while(i > 0 && isspace(str[i - 1])) { --i; };
     return str.erase(i, str.size());
 }
 
-std::string& trim_in_place(std::string& str) {
+inline std::string& trim_in_place(std::string& str) {
     return trim_left_in_place(trim_right_in_place(str));
 }
 
 // returns newly created strings
 
-std::string trim_right(std::string str) {
+inline std::string trim_right(std::string str) {
     return trim_right_in_place(str);
 }
 
-std::string trim_left(std::string str) {
+inline std::string trim_left(std::string str) {
     return trim_left_in_place(str);
 }
 
-std::string trim(std::string str) {
+inline std::string trim(std::string str) {
     return trim_left_in_place(trim_right_in_place(str));
 }
 

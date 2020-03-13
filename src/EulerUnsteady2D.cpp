@@ -173,18 +173,18 @@
 
 //======================================
 // my simple array class template (type)
-#include "../include/tests_array.hpp"
-#include "../include/array_template.hpp"
-#include "../include/arrayops.hpp"
+#include "tests_array.hpp"
+#include "array_template.hpp"
+#include "arrayops.hpp"
 
 //======================================
 // my simple vector class template 
-#include "../include/vector.h"
+#include "vector.h"
 
 //======================================
 // 2D Eiuler approximate Riemann sovler
-#include "../include/EulerUnsteady2D.h"
-#include "../include/EulerUnsteady2D_basic_package.h"
+#include "EulerUnsteady2D.h"
+#include "EulerUnsteady2D_basic_package.h"
 
 //======================================
 //using namespace std;

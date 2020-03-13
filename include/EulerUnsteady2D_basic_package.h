@@ -75,11 +75,17 @@ classes:
 using std::vector;
 //======================================
 // my simple array class template (type)
-#include "../include/tests_array.hpp"
-#include "../include/array_template.hpp"
-#include "../include/arrayops.hpp"
+#include "tests_array.hpp"
+#include "array_template.hpp"
+#include "arrayops.hpp"
 
+//======================================
+// math functions
 #include "MathGeometry.h"
+
+//======================================
+// string trimfunctions
+//#include "StringOps.h" 
 
 //#define REAL_IS_DOUBLE true
 #ifdef REAL_IS_DOUBLE

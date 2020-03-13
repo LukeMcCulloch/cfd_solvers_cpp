@@ -71,7 +71,7 @@
 
 //======================================
 // string trimfunctions
-#include "../include/StringOps.h" 
+#include "StringOps.h" 
 
 using std::cout;
 using std::endl;

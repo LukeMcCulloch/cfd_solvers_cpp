@@ -3,24 +3,24 @@
 
 //======================================
 // my simple array class template (type)
-#include "../include/tests_array.hpp"
-#include "../include/array_template.hpp"
-#include "../include/arrayops.hpp"
+#include "tests_array.hpp"
+#include "array_template.hpp"
+#include "arrayops.hpp"
 
 
 
 // //======================================
 // // 2D Euler sovler
 // 2D Eiuler approximate Riemann sovler
-#include "../include/EulerUnsteady2D.h"
+#include "EulerUnsteady2D.h"
 
 
 //======================================
-#include "../include/EulerUnsteady2D_basic_package.h"
+#include "EulerUnsteady2D_basic_package.h"
 
 //======================================
 // string trimfunctions
-//#include "../include/StringOps.h" 
+#include "StringOps.h"
 
 // EulerSolver2D::MainData2D::MainData2D() {
 
@@ -87,8 +87,8 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    cout << "                    CFL = " <<  E2Ddata.CFL << " \n";
    cout << "             final time = " <<  E2Ddata.t_final << " \n";
    cout << "          time_step_max = " <<  E2Ddata.time_step_max << " \n";
-   // cout << "          inviscid_flux = " <<  trim(E2Ddata.inviscid_flux) << " \n";
-   // cout << "           limiter_type = " <<  trim(E2Ddata.limiter_type) << " \n";
+   cout << "          inviscid_flux = " <<  trim(E2Ddata.inviscid_flux) << " \n";
+   cout << "           limiter_type = " <<  trim(E2Ddata.limiter_type) << " \n";
    cout << " \n";
 
    //--------------------------------------------------------------------------------
@@ -309,10 +309,15 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    for (size_t k = 0; k < E2Ddata.node[inode].nnghbrs; k++) {
       inghbr = (*E2Ddata.node[inode].nghbr)(k);
 
+      if (inghbr == inode) {
+         cout << "ERROR: nodes must differ!" << endl;
+         std::exit(0);
+      }
       dx = E2Ddata.node[inghbr].x - E2Ddata.node[inode].x;
       dy = E2Ddata.node[inghbr].y - E2Ddata.node[inode].y;
 
-      w2 = lsq_weight(dx, dy);
+      w2 = lsq_weight(E2Ddata, dx, dy);
+      //cout << "w2 = " << w2 << " dx = " << dx << " dy = " << dy << endl;
       w2 = w2 * w2;
 
       a(0,0) = a(0,0) + w2 * dx*dx;
@@ -321,17 +326,21 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       a(1,0) = a(1,0) + w2 * dx*dy;
       a(1,1) = a(1,1) + w2 * dy*dy;
 
+
    }//end do
 
-//     det = a(0,0)*a(1,1) - a(0,1)*a(1,0)
-//     if (abs(det) < 1.0e-14) cout << " Singular: LSQ det = ", det, " i=",inode
+   det = a(0,0)*a(1,1) - a(0,1)*a(1,0);
+   if (std::abs(det) < 1.0e-14) {
+      cout << " Singular: LSQ det = " <<  det <<  " i= " <<  inode;
+      std::exit(0);
+    }
 
-// // OK, invert and store the inverse matrix:
+// invert and store the inverse matrix:
 
-//      local_lsq_inverse(0,0) =  a(1,1)/det
-//      local_lsq_inverse(0,1) = -a(1,0)/det
-//      local_lsq_inverse(1,0) = -a(0,1)/det
-//      local_lsq_inverse(1,1) =  a(0,0)/det
+   local_lsq_inverse(0,0) =  a(1,1)/det;
+   local_lsq_inverse(0,1) = -a(1,0)/det;
+   local_lsq_inverse(1,0) = -a(0,1)/det;
+   local_lsq_inverse(1,1) =  a(0,0)/det;
 
 // //  Now compute the coefficients for neighbors.
 
@@ -540,29 +549,33 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(EulerSolver2D::MainData2D& E2Dda
 //*
 //* Note: The weight computed here is the square of the actual LSQ weight.
 //*****************************************************************************
-real EulerSolver2D::Solver::lsq_weight(real dx, real dy) {
+real EulerSolver2D::Solver::lsq_weight(EulerSolver2D::MainData2D& E2Ddata, real dx, real dy) {
 
-//  use edu2d_constants   , only : p2, one
-//  use edu2d_my_main_data, only : gradient_weight, gradient_weight_p
+   //  use edu2d_constants   , only : p2, one
+   //  use edu2d_my_main_data, only : gradient_weight, gradient_weight_p
 
-//  implicit none
+   //Output
+   real lsq_weight;
 
-// //Input
-//  real(p2), intent(in) :: dx, dy
-// //Output
-//  real(p2)             :: lsq_weight
-// //Local
-//  real(p2)             :: distance
+   //Local
+   real distance;
 
-//   if     (trim(gradient_weight) == "none"            ) then
+   if (trim(E2Ddata.gradient_weight) == "none") {
 
-//         lsq_weight = one
+      lsq_weight = one;
+   }
+   else if (trim(E2Ddata.gradient_weight) == "inverse_distance") {
 
-//   elseif (trim(gradient_weight) == "inverse_distance") then
+      distance = sqrt(dx*dx + dy*dy);
 
-//           distance = sqrt(dx*dx + dy*dy)
-//         lsq_weight = one / distance**gradient_weight_p
+      real val = pow(distance, E2Ddata.gradient_weight_p);
+      if (val < 1.e-6) {
+         cout << "ERROR: distance is 0" << endl;
+         std::exit(0);
+      }
 
-//   endif
-   return 0;
+      lsq_weight = one / val;
+
+   }
+   return lsq_weight;
 } //end lsq_weight
