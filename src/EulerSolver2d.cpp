@@ -303,7 +303,7 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    ix = 1;
    iy = 2;
 
-//    a = zero
+   a = zero;
 
 // //  Loop over the neighbor nodes.
 //    do k = 1, node(inode)%nnghbrs
