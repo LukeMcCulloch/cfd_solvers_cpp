@@ -122,7 +122,7 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
          E2Ddata.node[i].lsq2x2_cx = new Array2D<real>( E2Ddata.node[i].nnghbrs, 1 );
          //my_alloc_p2_ptr(node(i)%lsq2x2_cy,node(i)%nnghbrs)
          E2Ddata.node[i].lsq2x2_cy = new Array2D<real>( E2Ddata.node[i].nnghbrs, 1 );
-         //lsq01_2x2_coeff_nc(i);
+         lsq01_2x2_coeff_nc(E2Ddata, i);
 
       }
 } //  end compute_lsq_coeff_nc
@@ -283,7 +283,8 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //* ------------------------------------------------------------------------------
 //*
 //********************************************************************************
-//   lsq01_2x2_coeff_nc(inode)
+void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddata , int inode) {
+
 
 //  use edu2d_my_main_data           , only : node
 //  use edu2d_constants              , only : p2, zero
@@ -343,7 +344,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 
 //      end do nghbr
 
- //lsq01_2x2_coeff_nc
+}//lsq01_2x2_coeff_nc
 //********************************************************************************
 //*
 //********************************************************************************
