@@ -300,8 +300,8 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    Array2D<real> a(2,2), local_lsq_inverse(2,2);
    real dx, dy, det, w2, w2dvar;
    int k, inghbr, ix,iy;
-   ix = 1;
-   iy = 2;
+   ix = 0;
+   iy = 1;
 
    a = zero;
 
@@ -335,30 +335,29 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       std::exit(0);
     }
 
-// invert and store the inverse matrix:
-
-   local_lsq_inverse(0,0) =  a(1,1)/det;
-   local_lsq_inverse(0,1) = -a(1,0)/det;
+// invert andE2Ddatainverse(0,1) = -a(1,0)/det;
    local_lsq_inverse(1,0) = -a(0,1)/det;
    local_lsq_inverse(1,1) =  a(0,0)/det;
 
-// //  Now compute the coefficients for neighbors.
+//  Now compute the coefficients for neighbors.
 
-//      nghbr : do k = 1, node(inode).nnghbrs
-//        inghbr = node(inode).nghbr(k)
+   //nghbr : loop node(inode).nnghbrs
+   for (size_t k = 0; k < E2Ddata.node[inode].nnghbrs; k++) {
+      inghbr = (*E2Ddata.node[inode].nghbr)(k);
 
-//         dx = node(inghbr).x - node(inode).x
-//         dy = node(inghbr).y - node(inode).y
+      dx = E2Ddata.node[inghbr].x - E2Ddata.node[inode].x;
+      dy = E2Ddata.node[inghbr].y - E2Ddata.node[inode].y;
 
-//       w2dvar = lsq_weight(dx, dy)**2
+   w2dvar = lsq_weight(E2Ddata, dx, dy);
+   w2dvar = w2dvar * w2dvar;
 
-//       node(inode).lsq2x2_cx(k)  = local_lsq_inverse(ix,0)*w2dvar*dx &
-//                                 + local_lsq_inverse(ix,1)*w2dvar*dy
+   (*E2Ddata.node[inode].lsq2x2_cx)(k)  = local_lsq_inverse(ix,0)*w2dvar*dx \
+                              + local_lsq_inverse(ix,1)*w2dvar*dy;
 
-//       node(inode).lsq2x2_cy(k)  = local_lsq_inverse(iy,0)*w2dvar*dx &
-//                                 + local_lsq_inverse(iy,1)*w2dvar*dy
+   (*E2Ddata.node[inode].lsq2x2_cy)(k)  = local_lsq_inverse(iy,0)*w2dvar*dx \
+                              + local_lsq_inverse(iy,1)*w2dvar*dy;
 
-//      end do nghbr
+   } //end nghbr loop
 
 }//lsq01_2x2_coeff_nc
 //********************************************************************************
