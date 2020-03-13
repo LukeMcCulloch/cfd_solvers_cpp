@@ -1322,12 +1322,12 @@ cout << "DONE constructing the element-neighbor data " << endl;
       node[i].nnghbrs = 0;
    }
 
-   //dummy allocations:
+   //dummy allocations are bad!:
    for (size_t i = 0; i < nedges; i++) {
       n1 = edge[i].n1;
       n2 = edge[i].n2;
-      node[n1].nghbr = new Array2D<int>(1, 1);
-      node[n2].nghbr = new Array2D<int>(1, 1);
+      //node[n1].nghbr = new Array2D<int>(1, 1);
+      //node[n2].nghbr = new Array2D<int>(1, 1);
    }
 
 // Loop over edges and distribute the node numbers:
@@ -1341,21 +1341,31 @@ cout << "DONE constructing the element-neighbor data " << endl;
 
       // (1) Add n1 to the neighbor list of n2
       node[n1].nnghbrs = node[n1].nnghbrs + 1;
-      Array2D<int> save7 = (*node[n1].nghbr);
-      node[n1].nghbr = new Array2D<int>(node[n1].nnghbrs, 1);
-         for (size_t ra; ra < save7.storage_size; ra++) {
-            (*node[n1].nghbr).array[ra] = save7.array[ra];
-         }
+      if (node[n1].nnghbrs == 1) {
+         node[n1].nghbr = new Array2D<int>(1, 1);
+      }
+      else{
+         Array2D<int> save7 = (*node[n1].nghbr);
+         node[n1].nghbr = new Array2D<int>(node[n1].nnghbrs, 1);
+            for (size_t ra; ra < save7.storage_size; ra++) {
+               (*node[n1].nghbr).array[ra] = save7.array[ra];
+            }
+      }
       (*node[n1].nghbr)( node[n1].nnghbrs - 1 ) = n2; // more fence post trickery
 
 
       // (2) Add n2 to the neighbor list of n1
       node[n2].nnghbrs = node[n2].nnghbrs + 1;
-      Array2D<int> save8 = (*node[n2].nghbr);
-      node[n2].nghbr = new Array2D<int>(node[n2].nnghbrs, 1);
-         for (size_t ra; ra < save8.storage_size; ra++) {
-            (*node[n2].nghbr).array[ra] = save8.array[ra];
-         }
+      if (node[n2].nnghbrs == 1) {
+         node[n2].nghbr = new Array2D<int>(1, 1);
+      }
+      else{
+         Array2D<int> save8 = (*node[n2].nghbr);
+         node[n2].nghbr = new Array2D<int>(node[n2].nnghbrs, 1);
+            for (size_t ra; ra < save8.storage_size; ra++) {
+               (*node[n2].nghbr).array[ra] = save8.array[ra];
+            }
+      }
       (*node[n2].nghbr)( node[n2].nnghbrs - 1 ) = n1;
 
 
@@ -1512,7 +1522,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //     o-----*----------o
 //          /|  edge i
 //         / |
-//        /  o        Note: k-th neighbor is given by "node(j).nghbr(k)"
+//        /  o        Note: k-th neighbor is given by "(*node(j).nghbr)(k)"
 //       o
 //
 //  Consider the edge i
@@ -1528,8 +1538,8 @@ cout << "DONE constructing the element-neighbor data " << endl;
 //
 //   That is,  we have
 //
-//    n2 = node[n1].nghbr(edge[i].kth_nghbr_of_1)
-//    n1 = node[n2].nghbr(edge[i].kth_nghbr_of_2)
+//    n2 = (*node[n1].nghbr)(edge[i].kth_nghbr_of_1)
+//    n1 = (*node[n2].nghbr)(edge[i].kth_nghbr_of_2)
 //
 //   We make use of this data structure to access off-diagonal entries in Jacobian matrix.
 //
