@@ -289,13 +289,19 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //  use edu2d_my_main_data           , only : node
 //  use edu2d_constants              , only : p2, zero
 
-//  implicit none
 
 //  integer, intent(in) :: inode
+
 // //Local variables
 //  real(p2) :: a(2,2), dx, dy, det, w2, w2dvar
 //  integer  :: k, inghbr, ix=1,iy=2
 //  real(p2), dimension(2,2) :: local_lsq_inverse
+
+   Array2D<real> a(2,2), local_lsq_inverse(2,2);
+   real dx, dy, det, w2, w2dvar;
+   int k, inghbr, ix,iy;
+   ix = 1;
+   iy = 2;
 
 //    a = zero
 
