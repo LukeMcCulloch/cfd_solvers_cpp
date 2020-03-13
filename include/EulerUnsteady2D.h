@@ -176,8 +176,6 @@ class Solver{
 
 public:
 
-   int singcount = 0;
-
     //constructor
     Solver();
     // destructor
