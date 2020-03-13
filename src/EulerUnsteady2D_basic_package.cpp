@@ -620,9 +620,9 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       v1 = (*elm[i].vtx)(0,0);
       v2 = (*elm[i].vtx)(1,0);
       v3 = (*elm[i].vtx)(2,0);
-      node[v1].elm = new Array2D<int>(1, 1);
-      node[v2].elm = new Array2D<int>(1, 1);
-      node[v3].elm = new Array2D<int>(1, 1);
+      // node[v1].elm = new Array2D<int>(1, 1);
+      // node[v2].elm = new Array2D<int>(1, 1);
+      // node[v3].elm = new Array2D<int>(1, 1);
    }
 
    for ( int i = 0; i < nelms; ++i ) {
@@ -647,158 +647,54 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       */
 
 
-      // easy way:
-      // (*node[v1].elm)((*node[v1].elm).tracked_index, 0) = i;
-      // (*node[v1].elm).tracked_index += 1;
-
-      // original attempt:
-      //node[v1].nelms = node[v1].nelms + 1;
-      //node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      //(*node[v1].elm)(node[v1].nelms-1, 0) = i;
-
 
       // save and reallocate:
       node[v1].nelms = node[v1].nelms + 1;
-      Array2D<int> save1 =  (*node[v1].elm); // copy constructor
-      node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      for (size_t ra = 0; ra < save1.storage_size; ra++){
-         (*node[v1].elm).array[ra] = save1.array[ra];
+      if (node[v1].nelms == 1) {
+         node[v1].elm = new Array2D<int>(1, 1);
+      }
+      else {
+         Array2D<int> save1 =  (*node[v1].elm); // copy constructor
+         node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
+         for (size_t ra = 0; ra < save1.storage_size; ra++){
+            (*node[v1].elm).array[ra] = save1.array[ra];
+         }
       }
       (*node[v1].elm)(node[v1].nelms-1, 0) = i;
-
-      //print((*node[v1].elm));
-
-      // if (i == 160400) {
-      //    cout << "----------------------------------" << endl;
-      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-      //    cout << "ielm = " << ielm << endl;
-      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    cout << "----------------------------------" << endl;
-      // }
-      // if (i == 319201) {
-      //    cout << "----------------------------------" << endl;
-      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-      //    cout << "ielm = " << ielm << endl;
-      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    cout << "----------------------------------" << endl;
-      // }
-
-      // if (i == 80200) {
-      //    cout << "----------------------------------" << endl;
-      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-      //    cout << "ielm = " << ielm << endl;
-      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    cout << "----------------------------------" << endl;
-      // }
-
-
-      // if (i == 159201) {
-      //    cout << "----------------------------------" << endl;
-      //    cout << (*node[v1].elm)(node[v1].nelms-1) << " " << i << endl;
-      //    cout << "v1 = " << v1 << " <<  node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    ielm = (*node[v1].elm)(node[v1].nelms-1, 0);
-      //    cout << "ielm = " << ielm << endl; 
-      //    cout << "node[v1].nelms-1 = " << node[v1].nelms-1 << endl;
-      //    cout << "----------------------------------" << endl;
-      // }
-
-      // node[v2].nelms = node[v2].nelms + 1;
-      // // node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      // //
-      // // invoke the copy constructor:
-      // Array2D<int> save2( (*node[v2].elm) );
-      // // call resize copy?
-      // // node[v1].elm = new Array2D<int>(*node[v1].elm, node[v1].nelms, 0);
-      
-      // delete [] node[v2].elm;
-      // node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      // for (size_t ra = 0; ra < save2.storage_size; ra++){
-      //    (*node[v2].elm)(ra) = save2(ra);
-      // }
-      // (*node[v2].elm)(node[v2].nelms-1 , 0) = i;
-
-
-      // node[v3].nelms = node[v3].nelms + 1;
-      // // // node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      // // Array2D<int> save3 = Array2D<int>(node[v3].nelms, 1);
-      // // invoke the copy constructor:
-      // Array2D<int> save3( (*node[v3].elm) );
-      // delete [] node[v3].elm;
-      // node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      // for (size_t ra = 0; ra < save3.storage_size; ra++){
-      //    (*node[v3].elm)(ra) = save3(ra);
-      // }
-      // (*node[v3].elm)(node[v3].nelms-1 , 0) = i;
-
-
-      // simplest, but ineffective:
-      // node[v2].nelms = node[v2].nelms + 1;
-      // node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      // (*node[v2].elm)[node[v2].nelms-1][0] = i;
-
-      // node[v3].nelms = node[v3].nelms + 1;
-      // node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      // (*node[v3].elm)[node[v3].nelms-1][0] = i;
-
-
-
-
-      // working easy way:
-      // (*node[v2].elm)((*node[v2].elm).tracked_index, 0) = i;
-      // (*node[v2].elm).tracked_index +=1;
-
-      // (*node[v3].elm)((*node[v3].elm).tracked_index, 0) = i;
-      // (*node[v3].elm).tracked_index +=1;
-
 
 
 
       // save and reallocate:
       node[v2].nelms = node[v2].nelms + 1;
-      Array2D<int> save2 =  (*node[v2].elm); // copy constructor
-      node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      for (size_t ra = 0; ra < save2.storage_size; ra++){
-         (*node[v2].elm).array[ra] = save2.array[ra];
+      if (node[v2].nelms == 1) {
+         node[v2].elm = new Array2D<int>(1, 1);
+      }
+      else {
+         Array2D<int> save2 =  (*node[v2].elm); // copy constructor
+         node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
+         for (size_t ra = 0; ra < save2.storage_size; ra++){
+            (*node[v2].elm).array[ra] = save2.array[ra];
+         }
       }
       (*node[v2].elm)(node[v2].nelms-1, 0) = i;
-      // end save and reallocate:
 
 
 
       // // save and reallocate:
       node[v3].nelms = node[v3].nelms + 1;
-      Array2D<int> save3 =  (*node[v3].elm); // copy constructor
-      node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      for (size_t ra = 0; ra < save3.storage_size; ra++){
-         (*node[v3].elm).array[ra] = save3.array[ra];
+      if (node[v3].nelms == 1) {
+         node[v3].elm = new Array2D<int>(1, 1);
+      }
+      else {
+         Array2D<int> save3 =  (*node[v3].elm); // copy constructor
+         node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+         for (size_t ra = 0; ra < save3.storage_size; ra++){
+            (*node[v3].elm).array[ra] = save3.array[ra];
+         }
       }
       (*node[v3].elm)(node[v3].nelms-1, 0) = i;
       // end save and reallocate:
 
-
-         // for (size_t jw = 0; j < node[v1].nelms; jw++) {
-         //    jelm = (*node[v1].elm)(jw);
-            
-         //    //tlm issue seen here:
-         //    cout << "jelm = " << jelm << endl;
-         // }
-
-      // node[v2].elm = new Array2D<int>(node[v2].nelms+1, 1);
-      // (*node[v2].elm)[node[v2].nelms][0] = i;
-      // node[v2].nelms = node[v2].nelms + 1;
-
-      // node[v3].elm = new Array2D<int>(node[v3].nelms+1, 1);
-      // (*node[v3].elm)[node[v3].nelms][0] = i;
-      // node[v3].nelms = node[v3].nelms + 1;
-
-      //FIX here//
-      //(*node[v4].elm)[ node[v4].nelms ][0] = i;
 
       // Compute the cell center and cell volume.
       //tri_or_quad : if (elm(i).nvtx==3) then
@@ -891,6 +787,10 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          // node[v4].nelms = node[v4].nelms + 1;
 
       }//    endif tri_or_quad
+      else {
+         cout << "ERROR: not a tri or quad" << endl;
+         std:exit(0);
+      }
 
    }//   end do elements (i loop)
 
@@ -1028,8 +928,9 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       }
 
+      (*elm[   i].nghbr) = -1;
+
    }
-(*elm[   i].nghbr) = -1;
 int nbrprint = 2;
 // Begin constructing the element-neighbor data
    cout << "Begin constructing the element-neighbor data \n" << endl;
@@ -1038,14 +939,14 @@ int nbrprint = 2;
 
       //elm_vertex : do k = 1, elm(i).nvtx
       for (size_t k = 0; k < elm[i].nvtx; k++) {
-      //   Get the face of the element i:
-      //
-      //             vL      vR
-      //              o------o
-      //             /       |
-      //            /        |
-      //           o---------o
-      //
+         //   Get the face of the element i:
+         //
+         //             vL      vR
+         //              o------o
+         //             /       |
+         //            /        |
+         //           o---------o
+         //
          //TLM warning:  fixed step out of bounds
          if (k  < elm[i].nvtx-1) vL = (*elm[i].vtx)(k+1); //k+1 - 1.. nope, K goes from 0
          if (k == elm[i].nvtx-1) vL = (*elm[i].vtx)(0); //1-1
@@ -1058,7 +959,7 @@ int nbrprint = 2;
          for (size_t j = 0; j < node[vR].nelms; j++) {
             jelm = (*node[vR].elm)(j);
             
-            if (i < nbrprint) cout <<  " j = " << j << endl;
+            if (i < nbrprint) cout <<  " i = " << i <<  " j = " << j << endl;
             if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << (*node[vR].elm)(j) << endl;
             //if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
 
@@ -1816,7 +1717,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
          for (size_t k = 0; k < node[v1].nelms; k ++) {
             //k = node[v1].nelms-1;
 
-            ielm = (*node[v1].elm)(k); //[k][0];
+            ielm = (*node[v1].elm)(k);
 
 
             //cout << "v1, k, ielm  " << v1 << "    " << k << "    " << ielm << endl;
@@ -2083,10 +1984,13 @@ cout << "Generating CC scheme data......" << endl;
       elm[i].nvnghbrs = 0; //TLM set 0 here to speed up by avoiding loop below.
       //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
       //Array2D<int> save4 = (*elm[i].vnghbr);
-      elm[i].vnghbr = new Array2D<int>( 1,1);
+      
+      //elm[i].vnghbr = new Array2D<int>( 1,1);
+
       // for (size_t ra; ra < save4.storage_size; ra++) {
       //    (*elm[i].vnghbr).array[ra] = save4.array[ra];
       // }
+      //(*elm[i].vnghbr) = -2;  //intentional bad data for checking against
    }
 
    ave_nghbr = 0;
@@ -2114,13 +2018,17 @@ cout << "Generating CC scheme data......" << endl;
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
          if ( (*elm[i].nghbr)(k) > -1 ) {
             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-            //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs) //TLM TODO: redo with reallocation
-            Array2D<int> save5 = (*elm[i].vnghbr);
-            elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-            for (size_t ra; ra < save5.storage_size; ra++) {
-               (*elm[i].vnghbr).array[ra] = save5.array[ra];
+            if (elm[i].nvnghbrs == 1) {
+               elm[i].vnghbr = new Array2D<int>( 1, 1);
             }
-            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
+            else{
+               Array2D<int> save5 = (*elm[i].vnghbr); //saves garbage on first step
+               elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+               for (size_t ra; ra < save5.storage_size; ra++) {
+                  (*elm[i].vnghbr).array[ra] = save5.array[ra]; //writes in garbage on 1st step
+               }
+            }
+            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k); //eliminates garbage on 1st step
             if (i<10*maxprint) cout << "setting " << (*elm[i].nghbr)(k)<< endl;
             if (i<10*maxprint) cout << " to elm[i] vnghbr = " << elm[i].nvnghbrs-1 << endl;
          }
@@ -2147,7 +2055,7 @@ cout << "Generating CC scheme data......" << endl;
             found = false;
             //do ii = 1, elm[i].nvnghbrs
             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
-               if (i<10*maxprint) cout << "checking " << (*elm[i].vnghbr)(ii) << endl;
+               if (i<10*maxprint) cout << "checking elm " << i << " vnghbr(" << ii << ") = " <<(*elm[i].vnghbr)(ii) << endl;
                if ( e1 == (*elm[i].vnghbr)(ii) ) {
                   found = true;
                   if (i<10*maxprint) cout << "Found element match e1 = " << e1 << " " << (*elm[i].vnghbr)(ii) << endl;
@@ -2164,11 +2072,15 @@ cout << "Generating CC scheme data......" << endl;
                if (i<10*maxprint) cout << "NO element match e1 = " << e1 << endl;
                
                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-               //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs) //TLM TODO: redo with reallocation
-               Array2D<int> save6 = (*elm[i].vnghbr);
-               elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
-               for (size_t ra; ra < save6.storage_size; ra++) {
-                  (*elm[i].vnghbr).array[ra] = save6.array[ra];
+               if (elm[i].nvnghbrs == 1) {
+                  elm[i].vnghbr = new Array2D<int>( 1, 1);
+               }
+               else{
+                  Array2D<int> save6 = (*elm[i].vnghbr);
+                  elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
+                  for (size_t ra; ra < save6.storage_size; ra++) {
+                     (*elm[i].vnghbr).array[ra] = save6.array[ra];
+                  }
                }
                (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
             }
