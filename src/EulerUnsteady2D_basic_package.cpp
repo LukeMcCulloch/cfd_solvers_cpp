@@ -1236,9 +1236,9 @@ cout << "DONE constructing the element-neighbor data " << endl;
       n2 = edge[i].n2;
       e1 = edge[i].e1;
       e2 = edge[i].e2;
-      if (i < maxprint) {
-         cout << "edge[i] -> i, e1, e2 " << i << " " << e1 << " " << e2 << "\n";
-      }
+      // if (i < maxprint) {
+      //    cout << "edge[i] -> i, e1, e2 " << i << " " << e1 << " " << e2 << "\n";
+      // }
       // edge centroids:
       xm = half*( node[n1].x + node[n2].x );
       ym = half*( node[n1].y + node[n2].y );
