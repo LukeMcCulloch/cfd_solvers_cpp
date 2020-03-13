@@ -137,22 +137,17 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
 // //*
 // //********************************************************************************
 void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata) {
+   //  use edu2d_constants   , only : p2, one, two
+   //  use edu2d_my_main_data, only : nnodes, node
 
+   int       i, ix, iy, ivar;
+   std::string grad_type_temp;
+   real error_max_wx, error_max_wy, x, y;
+   real x_max_wx, y_max_wx, x_max_wy, y_max_wy, wx, wxe, wy, wye;
+   real a0, a1, a2, a3, a4, a5;
 
-
-}
-
-//  use edu2d_constants   , only : p2, one, two
-//  use edu2d_my_main_data, only : nnodes, node
-
-//  integer       :: i, ix, iy, ivar
-//  character(80) :: grad_type_temp
-//  real(p2)      :: error_max_wx, error_max_wy, x, y
-//  real(p2)      :: x_max_wx, y_max_wx, x_max_wy, y_max_wy, wx, wxe, wy, wye
-//  real(p2)      :: a0, a1, a2, a3, a4, a5
-
-//   ix = 1
-//   iy = 2
+   ix = 0;
+   iy = 1;
 
 // // We only use w(0) for this test.
 //   ivar = 1
@@ -255,16 +250,20 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 
 //    end do
 
-//   write(*,'(a,es20.3,a,2es12.5)') " Max relative error in wx = ", error_max_wx, " at (x,y) = ", x_max_wx, y_max_wx
-//   write(*,'(a,es20.10,a,es20.10)')  "   At this location, LSQ ux = ", wx, ": Exact ux = ", wxe
-//   write(*,'(a,es20.3,a,2es12.5)') " Max relative error in wy = ", error_max_wy, " at (x,y) = ", x_max_wy, y_max_wy
-//   write(*,'(a,es20.10,a,es20.10)')  "   At this location, LSQ uy = ", wy, ": Exact uy = ", wye
-//   cout << "---------------------------------------------------------"
-//   cout << "---------------------------------------------------------"
-//   write(*,*)
+//   cout << " Max relative error in wx = " <<  error_max_wx <<  " at (x,y) = " <<  x_max_wx <<  y_max_wx << "\n";
+//   cout << "   At this location, LSQ ux = " <<  wx <<  ": Exact ux = " <<  wxe << "\n";
+//   cout <<  " Max relative error in wy = " <<  error_max_wy <<  " at (x,y) = " <<  x_max_wy <<  y_max_wy << "\n";
+//   cout <<  "   At this location, LSQ uy = " <<  wy <<  ": Exact uy = " <<  wye << "\n";
+//   cout << "---------------------------------------------------------\n"
+//   cout << "---------------------------------------------------------\n"
+//   cout <<  " " << endl;
 
 
-//} //  end check_lsq_coeff_nc
+} //  end check_lsq_coeff_nc
+//********************************************************************************
+//*
+//********************************************************************************
+
 
 
 
@@ -290,11 +289,11 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //  use edu2d_constants              , only : p2, zero
 
 
-//  integer, intent(in) :: inode
+//  int, intent(in) :: inode
 
 // //Local variables
 //  real(p2) :: a(2,2), dx, dy, det, w2, w2dvar
-//  integer  :: k, inghbr, ix=1,iy=2
+//  int  :: k, inghbr, ix=1,iy=2
 //  real(p2), dimension(2,2) :: local_lsq_inverse
 
    Array2D<real> a(2,2), local_lsq_inverse(2,2);
@@ -317,7 +316,6 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       dy = E2Ddata.node[inghbr].y - E2Ddata.node[inode].y;
 
       w2 = lsq_weight(E2Ddata, dx, dy);
-      //cout << "w2 = " << w2 << " dx = " << dx << " dy = " << dy << endl;
       w2 = w2 * w2;
 
       a(0,0) = a(0,0) + w2 * dx*dx;
@@ -335,11 +333,11 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       std::exit(0);
     }
 
-// invert andE2Ddatainverse(0,1) = -a(1,0)/det;
+   // invert andE2Ddatainverse(0,1) = -a(1,0)/det;
    local_lsq_inverse(1,0) = -a(0,1)/det;
    local_lsq_inverse(1,1) =  a(0,0)/det;
 
-//  Now compute the coefficients for neighbors.
+   //  Now compute the coefficients for neighbors.
 
    //nghbr : loop node(inode).nnghbrs
    for (size_t k = 0; k < E2Ddata.node[inode].nnghbrs; k++) {
@@ -348,14 +346,14 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       dx = E2Ddata.node[inghbr].x - E2Ddata.node[inode].x;
       dy = E2Ddata.node[inghbr].y - E2Ddata.node[inode].y;
 
-   w2dvar = lsq_weight(E2Ddata, dx, dy);
-   w2dvar = w2dvar * w2dvar;
+      w2dvar = lsq_weight(E2Ddata, dx, dy);
+      w2dvar = w2dvar * w2dvar;
 
-   (*E2Ddata.node[inode].lsq2x2_cx)(k)  = local_lsq_inverse(ix,0)*w2dvar*dx \
-                              + local_lsq_inverse(ix,1)*w2dvar*dy;
+      (*E2Ddata.node[inode].lsq2x2_cx)(k)  = local_lsq_inverse(ix,0)*w2dvar*dx \
+                                 + local_lsq_inverse(ix,1)*w2dvar*dy;
 
-   (*E2Ddata.node[inode].lsq2x2_cy)(k)  = local_lsq_inverse(iy,0)*w2dvar*dx \
-                              + local_lsq_inverse(iy,1)*w2dvar*dy;
+      (*E2Ddata.node[inode].lsq2x2_cy)(k)  = local_lsq_inverse(iy,0)*w2dvar*dx \
+                                 + local_lsq_inverse(iy,1)*w2dvar*dy;
 
    } //end nghbr loop
 
@@ -394,9 +392,9 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(EulerSolver2D::MainData2D& E2Dda
 //  real(p2) :: a(5,5), ainv(5,5), dx, dy
 //  real(p2) :: dummy1(5), dummy2(5)
 //  real(p2) :: w2
-//  integer  :: istat, ix=1, iy=2
+//  int  :: istat, ix=1, iy=2
 
-//  integer :: i, k, ell, in, ii
+//  int :: i, k, ell, in, ii
 
 // // Step 1
 
