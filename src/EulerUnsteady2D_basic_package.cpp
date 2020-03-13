@@ -959,8 +959,8 @@ int nbrprint = 2;
          for (size_t j = 0; j < node[vR].nelms; j++) {
             jelm = (*node[vR].elm)(j);
             
-            if (i < nbrprint) cout <<  " i = " << i <<  " j = " << j << endl;
-            if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << (*node[vR].elm)(j) << endl;
+            // if (i < nbrprint) cout <<  " i = " << i <<  " j = " << j << endl;
+            // if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << (*node[vR].elm)(j) << endl;
             //if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
 
             //edge_matching
@@ -987,7 +987,7 @@ int nbrprint = 2;
                   if (im > (elm[jelm].nvtx-1)) { 
                      im = im - (elm[jelm].nvtx-0); 
                   }
-                  if (i < nbrprint)  cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
+                  // if (i < nbrprint)  cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   break; //exit edge_matching  |
                } //endif       
 
@@ -1011,11 +1011,11 @@ int nbrprint = 2;
       }
 
 
-      if (i < nbrprint) {
-         cout << " elm nghbrs...\n";
-         print((*elm[   i].nghbr));
-         cout << " ------------------\n";
-      }
+      // if (i < nbrprint) {
+      //    cout << " elm nghbrs...\n";
+      //    print((*elm[   i].nghbr));
+      //    cout << " ------------------\n";
+      // }
 
       }//    end do elm_vertex
 
@@ -1118,18 +1118,18 @@ cout << "DONE constructing the element-neighbor data " << endl;
       //tri_quad2 : 
       if (elm[i].nvtx==3) {
 
-         if (i<maxprint) {
-            cout << "printing edge vars to be set \n";
-            cout << "v1 = " << v1 << "\n";
-            cout << "v2 = " << v2 << "\n";
-            cout << "(*elm[i].nghbr)(0) = " << (*elm[i].nghbr)(0) << "\n";
-            cout << "(*elm[i].nghbr)(1) = " << (*elm[i].nghbr)(1) << "\n";
-            cout << "(*elm[i].nghbr)(2) = " << (*elm[i].nghbr)(2) << "\n";
-         }
+         // if (i<maxprint) {
+         //    cout << "printing edge vars to be set \n";
+         //    cout << "v1 = " << v1 << "\n";
+         //    cout << "v2 = " << v2 << "\n";
+         //    cout << "(*elm[i].nghbr)(0) = " << (*elm[i].nghbr)(0) << "\n";
+         //    cout << "(*elm[i].nghbr)(1) = " << (*elm[i].nghbr)(1) << "\n";
+         //    cout << "(*elm[i].nghbr)(2) = " << (*elm[i].nghbr)(2) << "\n";
+         // }
 
          if ( (*elm[i].nghbr)(2) > i  or (*elm[i].nghbr)(2)==-1 ) {
 
-            if (i<maxprint) cout << "set edge 1\n";
+            // if (i<maxprint) cout << "set edge 1\n";
             nedges = nedges + 1;
             edge[nedges].n1 = v1;
             edge[nedges].n2 = v2;
@@ -1139,7 +1139,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
          }
 
          if ( (*elm[i].nghbr)(0) > i or (*elm[i].nghbr)(0)==-1 ) {
-            if (i<maxprint) cout << "set edge 2\n";
+            // if (i<maxprint) cout << "set edge 2\n";
             nedges = nedges + 1;
             edge[nedges].n1 = v2;
             edge[nedges].n2 = v3;
@@ -1149,7 +1149,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
          }
 
          if ( (*elm[i].nghbr)(1) > i or (*elm[i].nghbr)(1)==-1 ) {
-            if (i<maxprint) cout << "set edge 3\n";
+            // if (i<maxprint) cout << "set edge 3\n";
             nedges = nedges + 1;
             edge[nedges].n1 = v3;
             edge[nedges].n2 = v1;
@@ -1253,9 +1253,9 @@ cout << "DONE constructing the element-neighbor data " << endl;
          yc = elm[e1].y;
          edge[i].dav(0) = -(ym-yc);
          edge[i].dav(1) =   xm-xc;
-         if (i<maxprint) {
-            cout << "elm(e1) = " <<  elm[e1].x << " " << elm[e1].y << "\n";
-         }
+         // if (i<maxprint) {
+         //    cout << "elm(e1) = " <<  elm[e1].x << " " << elm[e1].y << "\n";
+         // }
       }
 
       // Contribution from the right element
@@ -1264,9 +1264,9 @@ cout << "DONE constructing the element-neighbor data " << endl;
          yc = elm[e2].y;
          edge[i].dav(0) = edge[i].dav(0) -(yc-ym);
          edge[i].dav(1) = edge[i].dav(1) + xc-xm;
-         if (i<maxprint) {
-            cout << "elm(e2) = " <<  elm[e2].x << " " << elm[e2].y << "\n";
-         }
+         // if (i<maxprint) {
+         //    cout << "elm(e2) = " <<  elm[e2].x << " " << elm[e2].y << "\n";
+         // }
       }
 
       if (e1 < 0 and e2 < 0) {
@@ -2043,8 +2043,8 @@ cout << "Generating CC scheme data......" << endl;
                }
             }
             (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k); //eliminates garbage on 1st step
-            if (i<10*maxprint) cout << "setting " << (*elm[i].nghbr)(k)<< endl;
-            if (i<10*maxprint) cout << " to elm[i] vnghbr = " << elm[i].nvnghbrs-1 << endl;
+            //if (i<10*maxprint) cout << "setting " << (*elm[i].nghbr)(k)<< endl;
+            //if (i<10*maxprint) cout << " to elm[i] vnghbr = " << elm[i].nvnghbrs-1 << endl;
          }
       }
 
@@ -2058,10 +2058,10 @@ cout << "Generating CC scheme data......" << endl;
          //velms : doj = 1, node[v1).nelms
          for (size_t j = 0; j < node[v1].nelms; j++) {
 
-            if (i<10*maxprint) cout << " good start HIGH after break" << endl;
+            //if (i<10*maxprint) cout << " good start HIGH after break" << endl;
             e1 = (*node[v1].elm)(j);
             if (e1 == i)  {
-               if (i<10*maxprint) cout << " e1 == i = " << i << " " << e1 <<  endl;
+               //if (i<10*maxprint) cout << " e1 == i = " << i << " " << e1 <<  endl;
                continue; //velms;
             }
 
@@ -2069,21 +2069,21 @@ cout << "Generating CC scheme data......" << endl;
             found = false;
             //do ii = 1, elm[i].nvnghbrs
             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
-               if (i<10*maxprint) cout << " checking  elm " << i << "  vnghbr(  " << ii << "  ) = " <<(*elm[i].vnghbr)(ii) << endl;
+               //if (i<10*maxprint) cout << " checking  elm " << i << "  vnghbr(  " << ii << "  ) = " <<(*elm[i].vnghbr)(ii) << endl;
                if ( e1 == (*elm[i].vnghbr)(ii) ) {
                   found = true;
-                  if (i<10*maxprint) cout << "Found element match e1 = " << e1 << " " << (*elm[i].vnghbr)(ii) << endl;
-                  if (i<10*maxprint) cout << " break" << endl;
+                  // if (i<10*maxprint) cout << "Found element match e1 = " << e1 << " " << (*elm[i].vnghbr)(ii) << endl;
+                  // if (i<10*maxprint) cout << " break" << endl;
                   break;
                }
-               if (i<10*maxprint) cout << " skip after break" << endl;
+               //if (i<10*maxprint) cout << " skip after break" << endl;
             }
-            if (i<10*maxprint) cout << " good start LOW after break" << endl;
+            //if (i<10*maxprint) cout << " good start LOW after break" << endl;
 
    //       Add the element, e1, if not added yet.
             if (not found) {
                
-               if (i<10*maxprint) cout << "NO element match e1 = " << e1 << endl;
+               // if (i<10*maxprint) cout << "NO element match e1 = " << e1 << endl;
                
                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
                if (elm[i].nvnghbrs == 1) {
