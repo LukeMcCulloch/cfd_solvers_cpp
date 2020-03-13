@@ -1347,7 +1347,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
       else{
          Array2D<int> save7 = (*node[n1].nghbr);
          node[n1].nghbr = new Array2D<int>(node[n1].nnghbrs, 1);
-            for (size_t ra; ra < save7.storage_size; ra++) {
+            for (size_t ra = 0; ra < save7.storage_size; ra++) {
                (*node[n1].nghbr).array[ra] = save7.array[ra];
             }
       }
@@ -1362,7 +1362,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
       else{
          Array2D<int> save8 = (*node[n2].nghbr);
          node[n2].nghbr = new Array2D<int>(node[n2].nnghbrs, 1);
-            for (size_t ra; ra < save8.storage_size; ra++) {
+            for (size_t ra = 0; ra < save8.storage_size; ra++) {
                (*node[n2].nghbr).array[ra] = save8.array[ra];
             }
       }
@@ -1990,18 +1990,18 @@ cout << "Generating CC scheme data......" << endl;
    cout << " --- Vertex-neighbor (vertex of neighbor element) data:" << endl;
 
    //do i = 1, nelms
-   for (size_t i = 0; i < nelms; i++) {
-      elm[i].nvnghbrs = 0; //TLM set 0 here to speed up by avoiding loop below.
-      //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
-      //Array2D<int> save4 = (*elm[i].vnghbr);
+   // for (size_t i = 0; i < nelms; i++) {
+   //    elm[i].nvnghbrs = 1; //TLM set 0 here to speed up by avoiding loop below.
+   //    //call my_alloc_int_ptr(elm(i).vnghbr, 1) //TLM TODO: redo with reallocation
+   //    //Array2D<int> save4 = (*elm[i].vnghbr);
       
-      //elm[i].vnghbr = new Array2D<int>( 1,1);
+   //    //elm[i].vnghbr = new Array2D<int>( 1,1);
 
-      // for (size_t ra; ra < save4.storage_size; ra++) {
-      //    (*elm[i].vnghbr).array[ra] = save4.array[ra];
-      // }
-      //(*elm[i].vnghbr) = -2;  //intentional bad data for checking against
-   }
+   //    // for (size_t ra; ra < save4.storage_size; ra++) {
+   //    //    (*elm[i].vnghbr).array[ra] = save4.array[ra];
+   //    // }
+   //    //(*elm[i].vnghbr) = -2;  //intentional bad data for checking against
+   // }
 
    ave_nghbr = 0;
    min_nghbr = 10000;
@@ -2034,8 +2034,12 @@ cout << "Generating CC scheme data......" << endl;
             else{
                Array2D<int> save5 = (*elm[i].vnghbr); //saves garbage on first step
                elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-               for (size_t ra; ra < save5.storage_size; ra++) {
+               for (size_t ra = 0; ra < save5.storage_size; ra++) {
                   (*elm[i].vnghbr).array[ra] = save5.array[ra]; //writes in garbage on 1st step
+               }
+               if (save5.storage_size == (*elm[i].vnghbr).storage_size) {
+                  cout << "ERROR: at save 5 -- array size const ";
+                  std::exit(0);
                }
             }
             (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k); //eliminates garbage on 1st step
@@ -2065,7 +2069,7 @@ cout << "Generating CC scheme data......" << endl;
             found = false;
             //do ii = 1, elm[i].nvnghbrs
             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
-               if (i<10*maxprint) cout << "checking elm " << i << " vnghbr(" << ii << ") = " <<(*elm[i].vnghbr)(ii) << endl;
+               if (i<10*maxprint) cout << " checking  elm " << i << "  vnghbr(  " << ii << "  ) = " <<(*elm[i].vnghbr)(ii) << endl;
                if ( e1 == (*elm[i].vnghbr)(ii) ) {
                   found = true;
                   if (i<10*maxprint) cout << "Found element match e1 = " << e1 << " " << (*elm[i].vnghbr)(ii) << endl;
@@ -2088,8 +2092,12 @@ cout << "Generating CC scheme data......" << endl;
                else{
                   Array2D<int> save6 = (*elm[i].vnghbr);
                   elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
-                  for (size_t ra; ra < save6.storage_size; ra++) {
+                  for (size_t ra = 0; ra < save6.storage_size; ra++) {
                      (*elm[i].vnghbr).array[ra] = save6.array[ra];
+                  }
+                  if (save6.storage_size == (*elm[i].vnghbr).storage_size) {
+                     cout << "ERROR: at save 6 -- array size const ";
+                     std::exit(0);
                   }
                }
                (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
