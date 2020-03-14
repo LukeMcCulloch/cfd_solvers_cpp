@@ -1,5 +1,5 @@
 //
-/ /Specialization of std::vector to CFD unstructured uses
+// Specialization of std::vector to CFD unstructured uses
 //
 //=================================
 #ifndef _VECTOR1D_
@@ -7,10 +7,38 @@
 
 #include <vector>
 
+
+
+
+//bracket_proxy is parameterized with Vector1D
+template <typename ArrayClass, typename Result>
+class bracket_proxy_vec{
+    public:
+        bracket_proxy_vec(ArrayClass& A, int r): A(A), r(r){}
+
+        Result& operator[](int c){return A(r,c); }
+    private:
+        ArrayClass& A;
+        int r;
+};
+
+
+
 template <class T>
 class Vector1D{
 
 public:
+
+
+
+   // STORAGE --------------------------------------------------------------- 
+   typedef std::vector<T> ContainerType;
+   typedef typename ContainerType::iterator Iterator;
+   typedef typename ContainerType::const_iterator ConstIterator;
+   ContainerType array; // 1D dynamic array
+
+
+
    // CONSTRUCTORS ----------------------------------------------------------
    //Vector();                        // default init to zero
    Vector1D( void );                        // initializes all components to zero
@@ -21,15 +49,19 @@ public:
    ~Vector1D ();
 
    // append
-   push_back( T value);
+   void append( T value);
 
 
    // Operators -------------------------------------------------------------
    T& operator() (int i);
    const T&  operator() (int i) const;  
 
-   // STORAGE ---------------------------------------------------------------
-   std::vector<T> array; // 1D dynamic array
+
+   // array[][] access:
+   bracket_proxy_vec<Vector1D, T> operator[](int r){
+      return bracket_proxy_vec<Vector1D, T>(*this, r);
+   }
+
 
 };
 
@@ -42,7 +74,7 @@ Vector1D<T>::Vector1D( void ) {
 
 template <class T>
 Vector1D<T>::Vector1D(const  std::vector<T>& v ) {
-   arrayy = v;
+   array = v;
 }
 
 template<class T>
@@ -52,9 +84,8 @@ Vector1D<T>::~Vector1D() {
 // OPERATIONS ------------------------------------------------------------------
 
 template<class T>
-Vector1D<T>
-push_back(T value) {
-   array.push_back(value)
+void Vector1D<T>::append(T value) {
+   array.push_back(value);
 }
 
 template<class T>

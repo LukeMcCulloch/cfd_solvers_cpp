@@ -79,6 +79,8 @@ using std::vector;
 #include "array_template.hpp"
 #include "arrayops.hpp"
 
+#include "vector1D.h"
+
 //======================================
 // math functions
 #include "MathGeometry.h"
@@ -227,6 +229,7 @@ public:
 
     int nelms;                  //number of elements
     Array2D<int>*  elm;         //list of elements
+    Vector1D<int> elmV;
     //vector<int> elm;          //list of elements
 
     real vol;                   //dual-cell volume
