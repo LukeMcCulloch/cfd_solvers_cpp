@@ -185,6 +185,8 @@ public:
     void compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata);
     void check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddata);
 
+    void compute_gradient_nc(EulerSolver2D::MainData2D& E2Ddata, int ivar, std::string grad_type_temp);
+
     void lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddata, int inode);
     void lsq02_5x5_coeff2_nc(EulerSolver2D::MainData2D& E2Ddata, int inode);
 

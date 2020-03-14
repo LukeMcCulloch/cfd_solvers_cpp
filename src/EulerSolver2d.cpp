@@ -163,19 +163,19 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //  (1). Store a linear function in w(ivar) = x + 2*y.
 //       So the exact gradient is grad(w(ivar)) = (0,1).
 
-cout << "- Storing a linear function values... \n";
-// nnodes
-for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-   x = E2Ddata.node[i].x;
-   y = E2Ddata.node[i].y;
-   (*E2Ddata.node[i].w)(ivar) = one*x + two*y;
-}
+   cout << "- Storing a linear function values... \n";
+   // nnodes
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+      x = E2Ddata.node[i].x;
+      y = E2Ddata.node[i].y;
+      (*E2Ddata.node[i].w)(ivar) = one*x + two*y;
+   }
 
-// //  (2). Compute the gradient by linear LSQ
+//  (2). Compute the gradient by linear LSQ
 
-//    cout << "- Computing linear LSQ gradients.."
-//    grad_type_temp = 'linear'
-//    call compute_gradient_nc(ivar,grad_type_temp)
+   cout << "- Computing linear LSQ gradients..\n";
+   grad_type_temp = 'linear';
+   compute_gradient_nc(E2Ddata, ivar, grad_type_temp);
 
 // //  (3). Compute the relative errors (L_infinity)
 
@@ -268,6 +268,91 @@ for (size_t i = 0; i < E2Ddata.nnodes; i++) {
 
 
 
+//********************************************************************************
+//* This subroutine computes gradients at nodes for the variable u(ivar),
+//* where ivar = 1,2,3, ..., or nq.
+//*
+//* ------------------------------------------------------------------------------
+//*  Input: node(:).u(ivar)
+//*
+//* Output: node(i).gradu(ivar,1:2) = ( du(ivar)/dx, du(ivar)/dy )
+//* ------------------------------------------------------------------------------
+//********************************************************************************
+void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Ddata, 
+                                                   int ivar, std::string grad_type) {
+
+   //use edu2d_my_main_data, only : node, nnodes
+
+   //integer, intent(in) :: ivar
+
+   int i, k, in;
+   //character(80) :: grad_type
+
+  if (trim(grad_type) == "none") return;
+
+//-------------------------------------------------
+//  Two-step quadratic LSQ 5x5 system
+//  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at 
+//        http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
+
+   if (trim(grad_type) == "quadratic2") {
+
+//  Perform Step 1 as below (before actually compute the gradient).
+
+      //do i = 1, nnodes
+      for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+
+
+         //nghbr0 : do k = 1, node(i).nnghbrs;
+         for (size_t k = 0; k < E2Ddata.nnodes; k++) {
+                       in      = (*E2Ddata.node[i ].nghbr)(k);
+            (*E2Ddata.node[i].dx)(k)      = E2Ddata.node[in].x       - E2Ddata.node[i].x;
+            (*E2Ddata.node[i].dy)(k)      = E2Ddata.node[in].y       - E2Ddata.node[i].y;
+            (*E2Ddata.node[i].dw)(ivar,k) = (*E2Ddata.node[in].w)(ivar) - (*E2Ddata.node[i].w)(ivar);
+         } //end loop nghbr0
+      }//end loop
+
+   }
+//-------------------------------------------------
+
+//------------------------------------------------------------
+//------------------------------------------------------------
+//-- Compute LSQ Gradients at all nodes.
+//------------------------------------------------------------
+//------------------------------------------------------------
+
+   //nodes : loop i = 1, nnodes
+//    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+
+//       //-------------------------------------------------
+//       // Linear LSQ 2x2 system
+//       if (trim(grad_type) == "linear") {
+
+//          lsq_gradients_nc(i,ivar);
+//       }
+//   //-------------------------------------------------
+//   // Two-step quadratic LSQ 5x5 system
+//   //  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at 
+//   //        http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
+//    else if (trim(grad_type) == "quadratic2") {
+
+//       lsq_gradients2_nc(i,ivar);
+//    }
+//   //-------------------------------------------------
+//    else {
+
+//       cout << " Invalid input value -> " << trim(grad_type);
+//       std::exit(0); //stop
+
+//    } //endif
+//   //-------------------------------------------------
+
+//    end do nodes
+
+} // end compute_gradient_nc
+
+
+
 
 
 
@@ -310,7 +395,7 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       inghbr = (*E2Ddata.node[inode].nghbr)(k);
 
       if (inghbr == inode) {
-         cout << "ERROR: nodes must differ!" << endl;
+         cout << "ERROR: nodes must differ//" << endl;
          std::exit(0);
       }
       dx = E2Ddata.node[inghbr].x - E2Ddata.node[inode].x;
