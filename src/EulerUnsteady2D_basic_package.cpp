@@ -655,53 +655,52 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       // save and reallocate:
       node[v1].nelms = node[v1].nelms + 1;
-      if (node[v1].nelms == 1) {
-         node[v1].elm = new Array2D<int>(1, 1);
-      }
-      else {
-         Array2D<int> save1 =  (*node[v1].elm); // copy constructor
-         node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-         for (size_t ra = 0; ra < save1.storage_size; ra++){
-            (*node[v1].elm).array[ra] = save1.array[ra];
-         }
-      }
-      (*node[v1].elm)(node[v1].nelms-1, 0) = i;
+      // if (node[v1].nelms == 1) {
+      //    node[v1].elm = new Array2D<int>(1, 1);
+      // }
+      // else {
+      //    Array2D<int> save1 =  (*node[v1].elm); // copy constructor
+      //    node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
+      //    for (size_t ra = 0; ra < save1.storage_size; ra++){
+      //       (*node[v1].elm).array[ra] = save1.array[ra];
+      //    }
+      // }
+      // (*node[v1].elm)(node[v1].nelms-1, 0) = i;
       node[v1].elmV.append(i);
 
 
 
       // save and reallocate:
       node[v2].nelms = node[v2].nelms + 1;
-      if (node[v2].nelms == 1) {
-         node[v2].elm = new Array2D<int>(1, 1);
-      }
-      else {
-         Array2D<int> save2 =  (*node[v2].elm); // copy constructor
-         node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-         for (size_t ra = 0; ra < save2.storage_size; ra++){
-            (*node[v2].elm).array[ra] = save2.array[ra];
-         }
-      }
-      (*node[v2].elm)(node[v2].nelms-1, 0) = i;
+      // if (node[v2].nelms == 1) {
+      //    node[v2].elm = new Array2D<int>(1, 1);
+      // }
+      // else {
+      //    Array2D<int> save2 =  (*node[v2].elm); // copy constructor
+      //    node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
+      //    for (size_t ra = 0; ra < save2.storage_size; ra++){
+      //       (*node[v2].elm).array[ra] = save2.array[ra];
+      //    }
+      // }
+      // (*node[v2].elm)(node[v2].nelms-1, 0) = i;
       node[v2].elmV.append(i);
 
 
 
-      // // save and reallocate:
+      // save and reallocate:
       node[v3].nelms = node[v3].nelms + 1;
-      if (node[v3].nelms == 1) {
-         node[v3].elm = new Array2D<int>(1, 1);
-      }
-      else {
-         Array2D<int> save3 =  (*node[v3].elm); // copy constructor
-         node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-         for (size_t ra = 0; ra < save3.storage_size; ra++){
-            (*node[v3].elm).array[ra] = save3.array[ra];
-         }
-      }
-      (*node[v3].elm)(node[v3].nelms-1, 0) = i;
+      // if (node[v3].nelms == 1) {
+      //    node[v3].elm = new Array2D<int>(1, 1);
+      // }
+      // else {
+      //    Array2D<int> save3 =  (*node[v3].elm); // copy constructor
+      //    node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
+      //    for (size_t ra = 0; ra < save3.storage_size; ra++){
+      //       (*node[v3].elm).array[ra] = save3.array[ra];
+      //    }
+      // }
+      // (*node[v3].elm)(node[v3].nelms-1, 0) = i;
       node[v3].elmV.append(i);
-      // end save and reallocate:
 
 
       // Compute the cell center and cell volume.
@@ -782,17 +781,8 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          }
 
       //  Distribution of element number to the 4th node of the quadrilateral
-         // node[v4].nelms = node[v4].nelms + 1;
-         // node[v4].elm = new Array2D<int>(node[v4].nelms, 1);
-         // (*node[v4].elm)[ node[v4].nelms-1 ][0] = i;
-
-         // easier way TODO: fixme for quads
-         (*node[v4].elm)((*node[v4].elm).tracked_index, 0) = i;
-         (*node[v4].elm).tracked_index +=1;
-
-         // node[v4].elm = new Array2D<int>(node[v4].nelms+1, 1);
-         // (*node[v4].elm)( node[v4].nelms , 0) = i;
-         // node[v4].nelms = node[v4].nelms + 1;
+         node[v4].nelms = node[v3].nelms + 1;
+         node[v4].elmV.append(i);
 
       }//    endif tri_or_quad
       else {
@@ -965,7 +955,8 @@ int nbrprint = 2;
          found = false;
          //elms_around_vR
          for (size_t j = 0; j < node[vR].nelms; j++) {
-            jelm = (*node[vR].elm)(j);
+            //jelm = (*node[vR].elm)(j);
+            jelm = node[vR].elmV(j);
             
             // if (i < nbrprint) cout <<  " i = " << i <<  " j = " << j << endl;
             // if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << (*node[vR].elm)(j) << endl;
@@ -1735,8 +1726,8 @@ cout << "DONE constructing the element-neighbor data " << endl;
          for (size_t k = 0; k < node[v1].nelms; k ++) {
             //k = node[v1].nelms-1;
 
-            ielm = (*node[v1].elm)(k);
-
+            //ielm = (*node[v1].elm)(k);
+            ielm = node[v1].elmV(k);
 
             //cout << "v1, k, ielm  " << v1 << "    " << k << "    " << ielm << endl;
             //do ii = 1, elm[ielm].nvtx;
@@ -2067,7 +2058,8 @@ cout << "Generating CC scheme data......" << endl;
          for (size_t j = 0; j < node[v1].nelms; j++) {
 
             //if (i<10*maxprint) cout << " good start HIGH after break" << endl;
-            e1 = (*node[v1].elm)(j);
+            //e1 = (*node[v1].elm)(j);
+            e1 = node[v1].elmV(j);
             if (e1 == i)  {
                //if (i<10*maxprint) cout << " e1 == i = " << i << " " << e1 <<  endl;
                continue; //velms;
@@ -2724,7 +2716,8 @@ void EulerSolver2D::MainData2D::compute_ar() {
       node[i].ar = zero;
       //do k = 1, node[i].nelms
       for (size_t k = 0; k < node[i].nelms; k++) {
-         node[i].ar = node[i].ar + elm[ (*node[i].elm)(k) ].ar;
+         //node[i].ar = node[i].ar + elm[ (*node[i].elm)(k) ].ar;
+         node[i].ar = node[i].ar + elm[ node[i].elmV(k) ].ar;
       } //end do
 
       node[i].ar = node[i].ar / real(node[i].nelms);

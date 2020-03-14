@@ -11,16 +11,16 @@
 
 
 //bracket_proxy is parameterized with Vector1D
-template <typename ArrayClass, typename Result>
-class bracket_proxy_vec{
-    public:
-        bracket_proxy_vec(ArrayClass& A, int r): A(A), r(r){}
+// template <typename ArrayClass, typename Result>
+// class bracket_proxy_vec{
+//     public:
+//         bracket_proxy_vec(ArrayClass& A, int r): A(A), r(r){}
 
-        Result& operator[](int c){return A(r,c); }
-    private:
-        ArrayClass& A;
-        int r;
-};
+//         Result& operator[](int c){return A(r,c); }
+//     private:
+//         ArrayClass& A;
+//         int r;
+// };
 
 
 
@@ -56,11 +56,15 @@ public:
    T& operator() (int i);
    const T&  operator() (int i) const;  
 
+   T& operator[] (int i);
+   const T&  operator[] (int i) const;  
 
-   // array[][] access:
-   bracket_proxy_vec<Vector1D, T> operator[](int r){
-      return bracket_proxy_vec<Vector1D, T>(*this, r);
-   }
+
+   // array[][] access (not needed 1D):
+   // bracket_proxy_vec<Vector1D, T> operator[](int r){
+   //    return bracket_proxy_vec<Vector1D, T>(*this, r);
+   // }
+
 
 
 };
@@ -87,6 +91,20 @@ template<class T>
 void Vector1D<T>::append(T value) {
    array.push_back(value);
 }
+
+
+
+template<class T>
+T& Vector1D<T>::operator[] (int i) {
+   return array[i];
+}
+
+template<class T>
+const T& Vector1D<T>::operator[] (int i) const {
+   return array[i];
+}
+
+
 
 template<class T>
 T& Vector1D<T>::operator() (int i) {
