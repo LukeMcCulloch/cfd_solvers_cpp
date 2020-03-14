@@ -292,6 +292,7 @@ public:
       //  to be constructed in the code
       int nnghbrs;                //number of neighbors
       Array2D<int>*  nghbr;       //list of neighbors
+      //Vector1D<int>  nghbr;       //list of neighbors
       real x, y;                  //cell center coordinates
       real vol;                   //cell volume
 
