@@ -196,7 +196,6 @@ public:
     ~node_type(){
 
       delete nghbr;
-      delete elm;
       delete lsq2x2_cx;
       delete lsq2x2_cy;
       delete lsq5x5_cx;
@@ -228,9 +227,8 @@ public:
     Array2D<int>*  nghbr;       //list of neighbors
 
     int nelms;                  //number of elements
-    Array2D<int>*  elm;         //list of elements
-    Vector1D<int> elmV;
-    //vector<int> elm;          //list of elements
+    Vector1D<int> elm;          //dynamic vector of elements
+    //vector<int> elm;          //dynamic vector of elements
 
     real vol;                   //dual-cell volume
     int bmark;                  //Boundary mark
@@ -284,7 +282,7 @@ public:
         delete uexact;
         delete gradu;
         delete res;
-        delete vnghbr;
+        //delete vnghbr;
         delete lsq2x2_cx;
         delete lsq2x2_cy;
       }
@@ -307,7 +305,8 @@ public:
       real wsn;                    //??
       int bmark;                   //Boundary mark
       int nvnghbrs;                //number of vertex neighbors
-      Array2D<int>* vnghbr;        //list of vertex neighbors
+      //Array2D<int>* vnghbr;        //list of vertex neighbors
+      Vector1D<int> vnghbr;          //dynamic vector of elements
       real ar;                     //Element volume aspect ratio
       Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
       Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy

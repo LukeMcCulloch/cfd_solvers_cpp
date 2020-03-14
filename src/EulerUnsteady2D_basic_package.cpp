@@ -647,60 +647,25 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
    // Distribute the element index to nodes.
 
       /*
-      * DESIGN CHOICE HERE -- use std<vector> or similar?
-      * should use containers
+      * DESIGN CHOICE HERE -- use std<vector>
+      * should use std::containers
       */
-
-
 
       // save and reallocate:
       node[v1].nelms = node[v1].nelms + 1;
-      // if (node[v1].nelms == 1) {
-      //    node[v1].elm = new Array2D<int>(1, 1);
-      // }
-      // else {
-      //    Array2D<int> save1 =  (*node[v1].elm); // copy constructor
-      //    node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-      //    for (size_t ra = 0; ra < save1.storage_size; ra++){
-      //       (*node[v1].elm).array[ra] = save1.array[ra];
-      //    }
-      // }
-      // (*node[v1].elm)(node[v1].nelms-1, 0) = i;
-      node[v1].elmV.append(i);
+      node[v1].elm.append(i);
 
 
 
       // save and reallocate:
       node[v2].nelms = node[v2].nelms + 1;
-      // if (node[v2].nelms == 1) {
-      //    node[v2].elm = new Array2D<int>(1, 1);
-      // }
-      // else {
-      //    Array2D<int> save2 =  (*node[v2].elm); // copy constructor
-      //    node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-      //    for (size_t ra = 0; ra < save2.storage_size; ra++){
-      //       (*node[v2].elm).array[ra] = save2.array[ra];
-      //    }
-      // }
-      // (*node[v2].elm)(node[v2].nelms-1, 0) = i;
-      node[v2].elmV.append(i);
+      node[v2].elm.append(i);
 
 
 
       // save and reallocate:
       node[v3].nelms = node[v3].nelms + 1;
-      // if (node[v3].nelms == 1) {
-      //    node[v3].elm = new Array2D<int>(1, 1);
-      // }
-      // else {
-      //    Array2D<int> save3 =  (*node[v3].elm); // copy constructor
-      //    node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-      //    for (size_t ra = 0; ra < save3.storage_size; ra++){
-      //       (*node[v3].elm).array[ra] = save3.array[ra];
-      //    }
-      // }
-      // (*node[v3].elm)(node[v3].nelms-1, 0) = i;
-      node[v3].elmV.append(i);
+      node[v3].elm.append(i);
 
 
       // Compute the cell center and cell volume.
@@ -782,7 +747,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       //  Distribution of element number to the 4th node of the quadrilateral
          node[v4].nelms = node[v3].nelms + 1;
-         node[v4].elmV.append(i);
+         node[v4].elm.append(i);
 
       }//    endif tri_or_quad
       else {
@@ -955,11 +920,10 @@ int nbrprint = 2;
          found = false;
          //elms_around_vR
          for (size_t j = 0; j < node[vR].nelms; j++) {
-            //jelm = (*node[vR].elm)(j);
-            jelm = node[vR].elmV(j);
+            jelm = node[vR].elm(j);
             
             // if (i < nbrprint) cout <<  " i = " << i <<  " j = " << j << endl;
-            // if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << (*node[vR].elm)(j) << endl;
+            // if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << node[vR].elm(j) << endl;
             //if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
 
             //edge_matching
@@ -1726,8 +1690,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
          for (size_t k = 0; k < node[v1].nelms; k ++) {
             //k = node[v1].nelms-1;
 
-            //ielm = (*node[v1].elm)(k);
-            ielm = node[v1].elmV(k);
+            ielm = node[v1].elm(k);
 
             //cout << "v1, k, ielm  " << v1 << "    " << k << "    " << ielm << endl;
             //do ii = 1, elm[ielm].nvtx;
@@ -2027,21 +1990,23 @@ cout << "Generating CC scheme data......" << endl;
       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
          if ( (*elm[i].nghbr)(k) > -1 ) {
             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-            if (elm[i].nvnghbrs == 1) {
-               elm[i].vnghbr = new Array2D<int>( 1, 1);
-            }
-            else{
-               Array2D<int> save5 = (*elm[i].vnghbr); //saves garbage on first step
-               elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-               for (size_t ra = 0; ra < save5.storage_size; ra++) {
-                  (*elm[i].vnghbr).array[ra] = save5.array[ra]; //writes in garbage on 1st step
-               }
-               if (save5.storage_size == (*elm[i].vnghbr).storage_size) {
-                  cout << "ERROR: at save 5 -- array size const ";
-                  std::exit(0);
-               }
-            }
-            (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k); //eliminates garbage on 1st step
+
+            // if (elm[i].nvnghbrs == 1) {
+            //    elm[i].vnghbr = new Array2D<int>( 1, 1);
+            // }
+            // else{
+            //    Array2D<int> save5 = (*elm[i].vnghbr); //saves garbage on first step
+            //    elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
+            //    for (size_t ra = 0; ra < save5.storage_size; ra++) {
+            //       (*elm[i].vnghbr).array[ra] = save5.array[ra]; //writes in garbage on 1st step
+            //    }
+            //    if (save5.storage_size == (*elm[i].vnghbr).storage_size) {
+            //       cout << "ERROR: at save 5 -- array size const ";
+            //       std::exit(0);
+            //    }
+            // }
+            elm[i].vnghbr.append( (*elm[i].nghbr)(k) );
+            //(*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k); //eliminates garbage on 1st step
             //if (i<10*maxprint) cout << "setting " << (*elm[i].nghbr)(k)<< endl;
             //if (i<10*maxprint) cout << " to elm[i] vnghbr = " << elm[i].nvnghbrs-1 << endl;
          }
@@ -2058,8 +2023,7 @@ cout << "Generating CC scheme data......" << endl;
          for (size_t j = 0; j < node[v1].nelms; j++) {
 
             //if (i<10*maxprint) cout << " good start HIGH after break" << endl;
-            //e1 = (*node[v1].elm)(j);
-            e1 = node[v1].elmV(j);
+            e1 = node[v1].elm(j);
             if (e1 == i)  {
                //if (i<10*maxprint) cout << " e1 == i = " << i << " " << e1 <<  endl;
                continue; //velms;
@@ -2070,7 +2034,8 @@ cout << "Generating CC scheme data......" << endl;
             //do ii = 1, elm[i].nvnghbrs
             for (size_t ii = 0; ii < elm[i].nvnghbrs; ii++) {
                //if (i<10*maxprint) cout << " checking  elm " << i << "  vnghbr(  " << ii << "  ) = " <<(*elm[i].vnghbr)(ii) << endl;
-               if ( e1 == (*elm[i].vnghbr)(ii) ) {
+               //if ( e1 == (*elm[i].vnghbr)(ii) ) {
+               if ( e1 == elm[i].vnghbr(ii) ) {
                   found = true;
                   // if (i<10*maxprint) cout << "Found element match e1 = " << e1 << " " << (*elm[i].vnghbr)(ii) << endl;
                   // if (i<10*maxprint) cout << " break" << endl;
@@ -2086,21 +2051,22 @@ cout << "Generating CC scheme data......" << endl;
                // if (i<10*maxprint) cout << "NO element match e1 = " << e1 << endl;
                
                elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-               if (elm[i].nvnghbrs == 1) {
-                  elm[i].vnghbr = new Array2D<int>( 1, 1);
-               }
-               else{
-                  Array2D<int> save6 = (*elm[i].vnghbr);
-                  elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
-                  for (size_t ra = 0; ra < save6.storage_size; ra++) {
-                     (*elm[i].vnghbr).array[ra] = save6.array[ra];
-                  }
-                  if (save6.storage_size == (*elm[i].vnghbr).storage_size) {
-                     cout << "ERROR: at save 6 -- array size const ";
-                     std::exit(0);
-                  }
-               }
-               (*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
+               // if (elm[i].nvnghbrs == 1) {
+               //    elm[i].vnghbr = new Array2D<int>( 1, 1);
+               // }
+               // else{
+               //    Array2D<int> save6 = (*elm[i].vnghbr);
+               //    elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs, 1);
+               //    for (size_t ra = 0; ra < save6.storage_size; ra++) {
+               //       (*elm[i].vnghbr).array[ra] = save6.array[ra];
+               //    }
+               //    if (save6.storage_size == (*elm[i].vnghbr).storage_size) {
+               //       cout << "ERROR: at save 6 -- array size const ";
+               //       std::exit(0);
+               //    }
+               // }
+               //(*elm[i].vnghbr)(elm[i].nvnghbrs-1) = e1;
+               elm[i].vnghbr.append( e1 );
             }
          }//velms loop
 
@@ -2149,112 +2115,6 @@ cout << "Generating CC scheme data......" << endl;
       //    cout << "Found freestream condition " << endl;
       // }
    }// end do bc_loop
-
-//--------------------------------------------------------------------------------
-
-
-
-// //--------------------------------------------------------------------------------
-// // Collect vertex-neighbors (alt attempt)
-// //
-// //  
-//    //elements7 : do i = 1, nelms
-//    for (size_t i = 0; i < nelms; i++) {
-//    // (1)Add face-neighbors
-//       //do k = 1, elm(i).nnghbrs
-//       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
-//          if ( (*elm[i].nghbr)(k) > 0 ) {
-//             elm[i].nvnghbrs = elm[i].nvnghbrs + 1;
-
-//             //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-//             //elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-//             //(*elm[i].vnghbr)(elm[i].nvnghbrs-1) = (*elm[i].nghbr)(k);
-//          }
-//       }
-//    } // end elements 7 loop here
-
-//    for (size_t i = 0; i < nelms; i++) {
-//       //TLM loops to avoid realloc:
-//       if ( elm[i].nvnghbrs > 0 ) {
-//             elm[i].vnghbr = new Array2D<int>(elm[i].nvnghbrs,1);
-//          }
-//    } // end elements 7 loop here
-
-//    //elements7
-//    for (size_t i = 0; i < nelms; i++) {
-//       for (size_t k = 0; k < elm[i].nnghbrs; k++) {
-//          if ( (*elm[i].nghbr)(k) > 0 ) {
-//             (*elm[i].vnghbr)(elm[i].tracked_index) = (*elm[i].nghbr)(k);
-//             elm[i].tracked_index += 1;
-//          }
-//       }
-
-
-
-
-//    // (2)Add vertex-neighbors
-//       //do k = 1, elm[i].nvtx
-//       for (size_t k = 0; k < elm[i].nvtx; k++) {
-//          v1 = (*elm[i].vtx)(k);
-
-//          //velms : do j = 1, node[v1).nelms
-//          for (size_t j =0; j < node[v1].nelms; j++) {
-//             e1 = (*node[v1].elm)(j);
-//             if (e1 == i) continue; //velms;
-
-//       //    Check if the element is already added.
-//             found = false;
-//             //do ii = 1, elm[i].nvnghbrs
-//             for (size_t ii = 0; ii < elm[i].tracked_index; ii++) {
-//                if ( e1 == (*elm[i].vnghbr)(ii) ) {
-//                   found = true;
-//                   break;
-//                }
-//             }
-
-//    //       Add the element, e1, if not added yet.
-//             if (not found) {
-//                elm[i].tracked_index = elm[i].tracked_index + 1;
-//                //call my_alloc_int_ptr(elm[i].vnghbr, elm[i].nvnghbrs)
-//                elm[i].vnghbr = new Array2D<int>(elm[i].tracked_index, 1);
-//                (*elm[i].vnghbr)(elm[i].tracked_index-1) = e1;
-//             }
-//          }//velms loop
-
-//          }//end elm[i].nvtx loop
-
-//       ave_nghbr = ave_nghbr + elm[i].tracked_index;
-//       if (elm[i].tracked_index < min_nghbr) imin = i;
-//       if (elm[i].tracked_index > max_nghbr) imax = i;
-//       min_nghbr = std::min(min_nghbr, elm[i].tracked_index);
-//       max_nghbr = std::max(max_nghbr, elm[i].tracked_index);
-//       if (elm[i].tracked_index < 3) {
-//          cout << "--- Not enough neighbors: elm = " << i << 
-//                   "elm[i].nvnghbrs= " << elm[i].tracked_index << endl;
-//       }
-
-//    }// elements7 loop
-
-//    cout << "      ave_nghbr = " << ave_nghbr/nelms << endl;
-//    cout << "      min_nghbr = " << min_nghbr << " elm = " << imin << endl;
-//    cout << "      max_nghbr = " << max_nghbr << " elm = " << imax << endl;
-//    cout << " "  << endl;
-
-
-//    //do i = 1, nelms
-//    for ( int i = 0; i < nelms; ++i ) {
-//       elm[i].bmark = 0;
-//    }
-
-//    //bc_loop : do i = 1, nbound
-//    for ( int i = 0; i < nbound; ++i ) {
-//       if ( bound[i].bc_type == "dirichlet") {
-//          //do j = 1, bound[i].nbfaces
-//          for (size_t i = 0; i < bound[i].nbfaces; i++) {
-//             elm[ (*bound[i].belm)(j) ].bmark = 1;
-//          }//end do
-//       }
-//    }// end do bc_loop
 
 //--------------------------------------------------------------------------------
 
@@ -2716,8 +2576,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
       node[i].ar = zero;
       //do k = 1, node[i].nelms
       for (size_t k = 0; k < node[i].nelms; k++) {
-         //node[i].ar = node[i].ar + elm[ (*node[i].elm)(k) ].ar;
-         node[i].ar = node[i].ar + elm[ node[i].elmV(k) ].ar;
+         node[i].ar = node[i].ar + elm[ node[i].elm(k) ].ar;
       } //end do
 
       node[i].ar = node[i].ar / real(node[i].nelms);
