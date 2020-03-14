@@ -149,26 +149,27 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    ix = 0;
    iy = 1;
 
-// // We only use w(0) for this test.
-//   ivar = 1
+// We only use w(0) for this test.
+  ivar = 1;
  
-// //---------------------------------------------------------------------
-// // 1. Check linear LSQ gradients
-// //---------------------------------------------------------------------
-//   write(*,*)
-//   cout << "---------------------------------------------------------"
-//   cout << "---------------------------------------------------------"
-//   cout << "- Checking Linear LSQ gradients..."
+//---------------------------------------------------------------------
+// 1. Check linear LSQ gradients
+//---------------------------------------------------------------------
+  cout << " \n";
+  cout << "---------------------------------------------------------\n";
+  cout << "---------------------------------------------------------\n";
+  cout << "- Checking Linear LSQ gradients..." << endl;
 
-// //  (1). Store a linear function in w(ivar) = x + 2*y.
-// //       So the exact gradient is grad(w(ivar)) = (0,1).
+//  (1). Store a linear function in w(ivar) = x + 2*y.
+//       So the exact gradient is grad(w(ivar)) = (0,1).
 
-//    cout << "- Storing a linear function values..."
-//    do i = 1, nnodes
-//     x = node(i).x
-//     y = node(i).y
-//     node(i).w(ivar) = one*x + two*y
-//    end do
+cout << "- Storing a linear function values... \n";
+// nnodes
+for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+   x = E2Ddata.node[i].x;
+   y = E2Ddata.node[i].y;
+   (*E2Ddata.node[i].w)(ivar) = one*x + two*y;
+}
 
 // //  (2). Compute the gradient by linear LSQ
 
