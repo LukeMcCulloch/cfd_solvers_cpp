@@ -126,7 +126,7 @@ class Array2D{
         // resize! constructor
         Array2D(const Array2D& A, int nrows, int ncols);
 
-            
+        
 
         //methods:
         void build();

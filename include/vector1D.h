@@ -23,6 +23,11 @@ public:
    // append
    push_back( T value);
 
+
+   // Operators -------------------------------------------------------------
+   T& operator() (int i);
+   const T&  operator() (int i) const;  
+
    // STORAGE ---------------------------------------------------------------
    std::vector<T> array; // 1D dynamic array
 
@@ -50,6 +55,16 @@ template<class T>
 Vector1D<T>
 push_back(T value) {
    array.push_back(value)
+}
+
+template<class T>
+T& Vector1D<T>::operator() (int i) {
+   return array[i];
+}
+
+template<class T>
+const T& Vector1D<T>::operator() (int i) const {
+   return array[i];
 }
 
 #endif
