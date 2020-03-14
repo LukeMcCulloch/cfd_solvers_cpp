@@ -305,8 +305,7 @@ public:
       real wsn;                    //??
       int bmark;                   //Boundary mark
       int nvnghbrs;                //number of vertex neighbors
-      //Array2D<int>* vnghbr;        //list of vertex neighbors
-      Vector1D<int> vnghbr;          //dynamic vector of elements
+      Vector1D<int> vnghbr;        //dynamic vector of elements
       real ar;                     //Element volume aspect ratio
       Array2D<real>* lsq2x2_cx;    //Linear LSQ coefficient for ux
       Array2D<real>* lsq2x2_cy;    //Linear LSQ coefficient for uy
