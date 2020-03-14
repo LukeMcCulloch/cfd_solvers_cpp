@@ -666,6 +666,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          }
       }
       (*node[v1].elm)(node[v1].nelms-1, 0) = i;
+      node[v1].elmV.append(i);
 
 
 
@@ -682,6 +683,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          }
       }
       (*node[v2].elm)(node[v2].nelms-1, 0) = i;
+      node[v2].elmV.append(i);
 
 
 
@@ -698,6 +700,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          }
       }
       (*node[v3].elm)(node[v3].nelms-1, 0) = i;
+      node[v3].elmV.append(i);
       // end save and reallocate:
 
 
