@@ -321,7 +321,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 //------------------------------------------------------------
 //------------------------------------------------------------
 
-   //nodes : loop i = 1, nnodes
+   //nodes : loop nnodes
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
 
       //-------------------------------------------------
@@ -344,7 +344,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
          cout << " Invalid input value -> " << trim(grad_type);
          std::exit(0); //stop
 
-      } //endif
+      }
       //-------------------------------------------------
 
    } //end loop nodes
