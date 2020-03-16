@@ -642,58 +642,61 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 
       } //end do nghbr2
 
-// //   Fill symmetric part
+      //   Fill symmetric part
 
-//       a(1,0) = a(0,1);
-//       a(2,0) = a(0,2);  a(2,1) = a(1,2);
-//       a(3,0) = a(0,3);  a(3,1) = a(1,3); a(3,2) = a(2,3);
-//       a(4,0) = a(0,4);  a(4,1) = a(1,4); a(4,2) = a(2,4); a(4,3) = a(3,4);
+      a(1,0) = a(0,1);
+      a(2,0) = a(0,2);  a(2,1) = a(1,2);
+      a(3,0) = a(0,3);  a(3,1) = a(1,3); a(3,2) = a(2,3);
+      a(4,0) = a(0,4);  a(4,1) = a(1,4); a(4,2) = a(2,4); a(4,3) = a(3,4);
 
-// //   Invert the matrix
+      //   Invert the matrix
 
-//      dummy1 = zero;
-//      dummy2 = zero;
-//      call gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
+      dummy1 = zero;
+      dummy2 = zero;
+      //gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
 
-//      if (istat/=0) cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix\n";
+      if (istat/=0) cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
 
-// //  Now compute the coefficients for neighbors.
+      //  Now compute the coefficients for neighbors.
 
-//       ii = 0;
+      ii = 0;
 
-//      nghbr3 : do k = 1, E2Ddata.node[i].nnghbrs
-//                 in = E2Ddata.node[i].nghbr(k);
+      //nghbr3 : do k = 1, E2Ddata.node[i].nnghbrs
+      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
+         in = (*E2Ddata.node[i].nghbr)(k);
 
-//       nghbr_nghbr2 : do ell = 1, E2Ddata.node[in].nnghbrs
+         //nghbr_nghbr2 : do ell = 1, E2Ddata.node[in].nnghbrs
+         for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
 
-//        dx = E2Ddata.node[in].x - E2Ddata.node[i].x + E2Ddata.node[in].dx(ell);
-//        dy = E2Ddata.node[in].y - E2Ddata.node[i].y + E2Ddata.node[in].dy(ell);
+            dx = E2Ddata.node[in].x - E2Ddata.node[i].x + (*E2Ddata.node[in].dx)(ell);
+            dy = E2Ddata.node[in].y - E2Ddata.node[i].y + (*E2Ddata.node[in].dy)(ell);
 
-//        if ( E2Ddata.node[in].nghbr(ell) == i )  {
-//         dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
-//         dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
-//        }
+            if ( (*E2Ddata.node[in].nghbr)(ell) == i )  {
+               dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
+               dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
+            }
 
-//        ii = ii + 1
-       
-//        w2 = lsq_weight(dx, dy)**2
+            ii = ii + 1;
+            
+            w2 = lsq_weight(E2Ddata, dx, dy);
+            w2 = w2 * w2;
 
-//  //  Multiply the inverse LSQ matrix to get the coefficients: cx(:) and cy(:):
+ //  Multiply the inverse LSQ matrix to get the coefficients: cx(:) and cy(:):
 
-//       E2Ddata.node[i].lsq5x5_cx(ii)  =  ainv(ix,0)*w2*dx             &
-//                               + ainv(ix,1)*w2*dy             &
-//                               + ainv(ix,2)*w2*dx*dx * half   &
-//                               + ainv(ix,3)*w2*dx*dy          &
-//                               + ainv(ix,4)*w2*dy*dy * half
+            (*E2Ddata.node[i].lsq5x5_cx)(ii)  =  ainv(ix,0)*w2*dx  \
+                                    + ainv(ix,1)*w2*dy             \
+                                    + ainv(ix,2)*w2*dx*dx * half   \
+                                    + ainv(ix,3)*w2*dx*dy          \
+                                    + ainv(ix,4)*w2*dy*dy * half;
 
-//       E2Ddata.node[i].lsq5x5_cy(ii)  =  ainv(iy,0)*w2*dx             &
-//                               + ainv(iy,1)*w2*dy             &
-//                               + ainv(iy,2)*w2*dx*dx * half   &
-//                               + ainv(iy,3)*w2*dx*dy          &
-//                               + ainv(iy,4)*w2*dy*dy * half
-//       end do nghbr_nghbr2
+            (*E2Ddata.node[i].lsq5x5_cy)(ii)  =  ainv(iy,0)*w2*dx  \
+                                    + ainv(iy,1)*w2*dy             \
+                                    + ainv(iy,2)*w2*dx*dx * half   \
+                                    + ainv(iy,3)*w2*dx*dy          \
+                                    + ainv(iy,4)*w2*dy*dy * half;
+         }//end do nghbr_nghbr2
 
-//      end do nghbr3
+      }//end do nghbr3
 
    }//   end do node2
 
