@@ -145,14 +145,19 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
       }//nghbr
 
    //   call my_alloc_p2_ptr(node(i)%lsq5x5_cx, ii)
+      E2Ddata.node[i].lsq5x5_cx = new Array2D<real>(ii,1);
    //   call my_alloc_p2_ptr(node(i)%lsq5x5_cy, ii)
+      E2Ddata.node[i].lsq5x5_cy = new Array2D<real>(ii,1);
    //   call my_alloc_p2_ptr(node(i)%dx,node(i)%nnghbrs)
+      E2Ddata.node[i].dx = new Array2D<real>(E2Ddata.node[i].nnghbrs,1);
    //   call my_alloc_p2_ptr(node(i)%dy,node(i)%nnghbrs)
+      E2Ddata.node[i].dy = new Array2D<real>(E2Ddata.node[i].nnghbrs,1);
    //   call my_alloc_p2_matrix_ptr(node(i)%dw, nq,node(i)%nnghbrs)
+      E2Ddata.node[i].dw = new Array2D<real>(E2Ddata.nq, E2Ddata.node[i].nnghbrs);
 
    }//end do
 
-   //lsq02_5x5_coeff2_nc();
+   //lsq02_5x5_coeff2_nc(E2Ddata);
 
 
 
@@ -563,7 +568,7 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //*
 //********************************************************************************
 void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
-   EulerSolver2D::MainData2D& E2Ddata, int inode) {
+   EulerSolver2D::MainData2D& E2Ddata ) {
 
 //  use edu2d_my_main_data           , only : node, nnodes
 //  use edu2d_constants              , only : p2, zero, half
@@ -591,7 +596,7 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
    //   node1 : do i = 1, nnodes
    //    nghbr : do k = 1, node[i].nnghbrs
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-      for (size_t k = 0; k < E2Ddata.node[inode].nnghbrs; k++) {
+      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
 
          in   = (*E2Ddata.node[i].nghbr)(k);
          (*E2Ddata.node[i].dx)(k)   = E2Ddata.node[in].x - E2Ddata.node[i].x;
@@ -610,7 +615,7 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       //  Get dx, dy, and dw
 
       //nghbr2 loop k ,E2Ddata.node[i].nnghbrs
-      for (size_t k = 0; k < E2Ddata.node[inode].nnghbrs; k++) {
+      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
 
          in = (*E2Ddata.node[i].nghbr)(k);
 

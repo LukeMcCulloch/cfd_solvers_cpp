@@ -191,7 +191,7 @@ public:
 
     
     void lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddata, int inode);
-    void lsq02_5x5_coeff2_nc(EulerSolver2D::MainData2D& E2Ddata, int inode);
+    void lsq02_5x5_coeff2_nc(EulerSolver2D::MainData2D& E2Ddata);
 
     real lsq_weight(EulerSolver2D::MainData2D& E2Ddata, real dx, real dy);
 
