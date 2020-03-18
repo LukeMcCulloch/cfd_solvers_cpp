@@ -654,8 +654,9 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       dummy1 = zero;
       dummy2 = zero;
       //gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
+      ainv = GSinv(a,dummy1,dummy2);
 
-      if (istat/=0) cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
+      if (istat!=0) cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
 
       //  Now compute the coefficients for neighbors.
 
@@ -797,3 +798,15 @@ void EulerSolver2D::Solver::lsq_gradients_nc(EulerSolver2D::MainData2D& E2Ddata,
 }// end lsq_gradients_nc
 //--------------------------------------------------------------------------------
 
+
+
+//****************************************************************************
+//* ---------------------------- GAUSS Seidel -------------------------------
+//*
+//*  This computes the inverse of an (Nm)x(Nm) matrix "ai".
+//*
+//*****************************************************************************
+Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a, 
+                                    Array2D<real>& m, const Array2D<real>& b) {
+   return GaussSeidelInv(a,m,b);
+}

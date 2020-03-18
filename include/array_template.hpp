@@ -57,6 +57,7 @@ class bracket_proxy{
         bracket_proxy(ArrayClass& A, int r): A(A), r(r){}
 
         Result& operator[](int c){return A(r,c); }
+        //const Result& operator[](int c){return const A(r,c); }
     private:
         ArrayClass& A;
         int r;

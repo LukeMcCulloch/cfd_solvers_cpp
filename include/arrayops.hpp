@@ -192,6 +192,24 @@ Dot(const Array2D<T>& a, const Array2D<T>& b) {
     return c;
 }
 
+
+template <class T>
+T Dotscalar(const Array2D<T>& a, const Array2D<T>& b) {
+	assert(a.ncols == 1);
+	assert(b.ncols == 1);
+	assert(a.nrows == b.nrows);
+
+    T c;
+    c = 0.;
+    for( size_t i=0; i<a.nrows; ++i ) {
+        for( size_t k=0; k<b.nrows; ++k ) {
+            c += a(i,0) * b(k),0;
+        }
+    }
+    return c;
+}
+
+
 // Cross two 1D Array2Ds
 // this matmul creates a new 1D Array2D, c.
 template <class T>
@@ -236,7 +254,55 @@ abs( Array2D<T>& A ) {
 
 
 
+// inverse
 
+
+// Gauss Siedel Solve Am = b
+/**
+*    a m = b
+*    n = inv(a)*b
+* 
+*/
+template <class T>
+Array2D<T> 
+GaussSeidelInv(const Array2D<T>& a, Array2D<T>& m, const Array2D<T>& b) {
+    
+	assert(a.ncols == b.nrows);
+    assert(a.nrows == m.nrows);
+	assert(b.ncols == m.ncols);
+
+    int p = a.nrows; // a = pxp matrix
+
+
+    Array2D<T> n = m;
+    n = 0;
+    Array2D<T> np1 = n;
+
+    int q = 100;
+    T convg = 0.;
+    T tol = 1.0;
+
+
+    while (q > 0 & convg > tol) {
+        for (size_t i = 0; i < p; i++) {
+            //np1 = m;
+            n(i) = b(i) / a(i,i);
+            for (size_t j = 0; j < p; j++) {
+                if (j == i){
+                    continue;
+                }
+                np1(i) = -m(i);
+                  n(i) =  n(i) - ( ( a(i,j) / a(i,i) ) * m(j) );
+                  m(i) =  n(i);
+            }
+            //cout<<"x"<<i + 1 << "="<<n[i]<<" ";
+        }
+        //cout << "\n";
+        convg = Dotscalar(n,np1);
+        q--;
+    }
+    return n;
+}
 
 
 #endif //__ARRAYOPS_TEMPLATE_INCLUDED__

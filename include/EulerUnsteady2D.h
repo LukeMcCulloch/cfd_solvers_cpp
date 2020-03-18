@@ -194,6 +194,8 @@ public:
     void lsq02_5x5_coeff2_nc(EulerSolver2D::MainData2D& E2Ddata, int inode);
 
     real lsq_weight(EulerSolver2D::MainData2D& E2Ddata, real dx, real dy);
+
+    Array2D<real> GSinv(const Array2D<real>& a, Array2D<real>& m, const Array2D<real>& b);
 };
 
 
