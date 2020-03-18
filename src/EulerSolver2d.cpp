@@ -184,8 +184,8 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    error_max_wy = -one;
    //loop nnodes
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-      error_max_wx = max( abs( (*E2Ddata.node[i].gradw)(ivar,ix) - one )/one, error_max_wx );
-      error_max_wy = max( abs( (*E2Ddata.node[i].gradw)(ivar,iy) - two )/two, error_max_wy );
+      error_max_wx = max( std::abs( (*E2Ddata.node[i].gradw)(ivar,ix) - one )/one, error_max_wx );
+      error_max_wy = max( std::abs( (*E2Ddata.node[i].gradw)(ivar,iy) - two )/two, error_max_wy );
    }
 
    cout << " Max relative error in wx =  " << error_max_wx;
@@ -194,71 +194,73 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    cout << "---------------------------------------------------------\n";
 
 
-// //---------------------------------------------------------------------
-// // 2. Check quadratic LSQ gradients
-// //---------------------------------------------------------------------
-//   write(*,*)
-//   cout << "---------------------------------------------------------"
-//   cout << "---------------------------------------------------------"
-//   cout << "- Checking Quadratic LSQ gradients..."
+//---------------------------------------------------------------------
+// 2. Check quadratic LSQ gradients
+//---------------------------------------------------------------------
+   cout << "\n";
+   cout << "---------------------------------------------------------\n";
+   cout << "---------------------------------------------------------\n";
+   cout << "- Checking Quadratic LSQ gradients...\n";
 
-// //  (1). Store a quadratic function in w(ivar) = a0 + a1*x + a2*y + a3*x**2 + a4*x*y + a5*y**2
-// //       So the exact gradient is grad(w(ivar)) = (a1+2*a3*x+a4*y, a2+2*a5*y+a4*x)
+//  (1). Store a quadratic function in w(ivar) = a0 + a1*x + a2*y + a3*x**2 + a4*x*y + a5*y**2
+//       So the exact gradient is grad(w(ivar)) = (a1+2*a3*x+a4*y, a2+2*a5*y+a4*x)
 
-//    a0 =    21.122_p2
-//    a1 =     1.000_p2
-//    a2 = -   1.970_p2
-//    a3 =   280.400_p2
-//    a4 = -2129.710_p2
-//    a5 =   170.999_p2
+   a0 =    21.122;
+   a1 =     1.000;
+   a2 = -   1.970;
+   a3 =   280.400;
+   a4 = -2129.710;
+   a5 =   170.999;
 
-//    cout << "- Storing a quadratic function values..."
-//    do i = 1, nnodes
-//     x = E2Ddata.node[i].x
-//     y = E2Ddata.node[i].y
-//     E2Ddata.node[i].w(ivar) = a0 + a1*x + a2*y + a3*x**2 + a4*x*y + a5*y**2
-//    end do
+   cout << "- Storing a quadratic function values...\n";
+   // loop nnodes
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+      x = E2Ddata.node[i].x;
+      y = E2Ddata.node[i].y;
+      (*E2Ddata.node[i].w)(ivar) = a0 + a1*x + a2*y + a3*x*x + a4*x*y + a5*y*y;
+   }
 
-// //  (2). Compute the gradient by linear LSQ
+//  (2). Compute the gradient by linear LSQ
 
-//    cout << "- Computing quadratic LSQ gradients.."
-//    grad_type_temp = 'quadratic2'
-//    call compute_gradient_nc(ivar,grad_type_temp)
+   cout << "- Computing quadratic LSQ gradients..\n";
+   grad_type_temp = 'quadratic2';
+   compute_gradient_nc(E2Ddata,ivar,grad_type_temp);
 
-// //  (3). Compute the relative errors (L_infinity)
+//  (3). Compute the relative errors (L_infinity)
 
-//    cout << "- Computing the relative errors (L_infinity).."
-//    error_max_wx = -one
-//    error_max_wy = -one
-//    do i = 1, nnodes
-//     x = E2Ddata.node[i].x
-//     y = E2Ddata.node[i].y
+   cout << "- Computing the relative errors (L_infinity)..\n";
+   error_max_wx = -one;
+   error_max_wy = -one;
+   //loop nnodes
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+      x = E2Ddata.node[i].x;
+      y = E2Ddata.node[i].y;
 
-//     if ( abs( E2Ddata.node[i].gradw(ivar,ix) - (a1+2.0_p2*a3*x+a4*y) )/(a1+2.0_p2*a3*x+a4*y) >  error_max_wx )  {
-//       wx  = E2Ddata.node[i].gradw(ivar,ix)
-//       wxe = a1+2.0_p2*a3*x+a4*y
-//       error_max_wx = abs( wx - wxe )/wxe
-//       x_max_wx = x
-//       y_max_wx = y
-//     }
+      if ( std::abs( (*E2Ddata.node[i].gradw)(ivar,ix) - (a1+2.0*a3*x+a4*y) )/(a1+2.0*a3*x+a4*y) >  error_max_wx )  {
+         wx  = (*E2Ddata.node[i].gradw)(ivar,ix);
+         wxe = a1+2.0*a3*x+a4*y;
+         error_max_wx = std::abs( wx - wxe )/wxe;
+         x_max_wx = x;
+         y_max_wx = y;
+      }
 
-//     if ( abs( E2Ddata.node[i].gradw(ivar,iy) - (a2+2.0_p2*a5*y+a4*x) )/(a2+2.0_p2*a5*y+a4*x) >  error_max_wy )  {
-//       wy  = E2Ddata.node[i].gradw(ivar,iy)
-//       wye = a2+2.0_p2*a5*y+a4*x
-//       error_max_wy = abs( wy - wye )/wye
-//       x_max_wy = x
-//       y_max_wy = y
-//     }
+      if ( std::abs( (*E2Ddata.node[i].gradw)(ivar,iy) - (a2+2.0*a5*y+a4*x) )/(a2+2.0*a5*y+a4*x) >  error_max_wy )  {
+         wy  = (*E2Ddata.node[i].gradw)(ivar,iy);
+         wye = a2+2.0*a5*y+a4*x;
+         error_max_wy = std::abs( wy - wye )/wye;
+         x_max_wy = x;
+         y_max_wy = y;
+      }
 
-//    end do
+   }//end do
 
-//   cout << " Max relative error in wx = " <<  error_max_wx <<  " at (x,y) = " <<  x_max_wx <<  y_max_wx << "\n";
-//   cout << "   At this location, LSQ ux = " <<  wx <<  ": Exact ux = " <<  wxe << "\n";
-//   cout <<  " Max relative error in wy = " <<  error_max_wy <<  " at (x,y) = " <<  x_max_wy <<  y_max_wy << "\n";
-//   cout <<  "   At this location, LSQ uy = " <<  wy <<  ": Exact uy = " <<  wye << "\n";
-//   cout << "---------------------------------------------------------\n"
-//   cout << "---------------------------------------------------------\n"
-//   cout <<  " " << endl;
+  cout << " Max relative error in wx = " <<  error_max_wx <<  " at (x,y) = " <<  x_max_wx <<  y_max_wx << "\n";
+  cout << "   At this location, LSQ ux = " <<  wx <<  ": Exact ux = " <<  wxe << "\n";
+  cout << " Max relative error in wy = " <<  error_max_wy <<  " at (x,y) = " <<  x_max_wy <<  y_max_wy << "\n";
+  cout << "   At this location, LSQ uy = " <<  wy <<  ": Exact uy = " <<  wye << "\n";
+  cout << "---------------------------------------------------------\n";
+  cout << "---------------------------------------------------------\n";
+  cout << " " << endl;
 
 
 } //  end check_lsq_coeff_nc
