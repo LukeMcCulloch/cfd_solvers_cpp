@@ -301,6 +301,7 @@ GaussSeidelInv(const Array2D<T>& a, Array2D<T>& m, const Array2D<T>& b) {
         convg = Dotscalar(n,np1);
         q--;
     }
+    if (q==0) n.istat = 1;
     return n;
 }
 

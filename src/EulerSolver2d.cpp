@@ -656,7 +656,10 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       //gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
       ainv = GSinv(a,dummy1,dummy2);
 
-      if (istat!=0) cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
+      if (ainv.istat>=0) {
+         cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
+         std::exit(0);
+      }
 
       //  Now compute the coefficients for neighbors.
 

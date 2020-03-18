@@ -96,6 +96,7 @@ class Array2D{
         int nrows, ncols;
         int storage_size;
         int tracked_index;
+        int istat = 0;
         bool allocated;
 
         // malloc host memory
