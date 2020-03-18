@@ -125,6 +125,37 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
          lsq01_2x2_coeff_nc(E2Ddata, i);
 
       }
+
+
+// 2. Coefficients for the quadratic LSQ gradients (two-step method)
+
+   cout << "---(2) Constructing Quadratic LSQ coefficients...\n";
+
+   //loop nnodes
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+
+      ii = 0;
+      //loop node[i].nnghbrs;
+      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; i++) {
+         in = (*E2Ddata.node[i].nghbr)(k);
+         //loop E2Ddata.node[in].nnghbrs;
+         for (size_t i = 0; i < E2Ddata.node[in].nnghbrs; i++) {
+            ii = ii + 1;
+         }//nghbr_nghbr
+      }//nghbr
+
+   //   call my_alloc_p2_ptr(node(i)%lsq5x5_cx, ii)
+   //   call my_alloc_p2_ptr(node(i)%lsq5x5_cy, ii)
+   //   call my_alloc_p2_ptr(node(i)%dx,node(i)%nnghbrs)
+   //   call my_alloc_p2_ptr(node(i)%dy,node(i)%nnghbrs)
+   //   call my_alloc_p2_matrix_ptr(node(i)%dw, nq,node(i)%nnghbrs)
+
+   }//end do
+
+   //lsq02_5x5_coeff2_nc();
+
+
+
 } //  end compute_lsq_coeff_nc
 
 // //********************************************************************************
@@ -293,10 +324,10 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 
   if (trim(grad_type) == "none") return;
 
-//-------------------------------------------------
-//  Two-step quadratic LSQ 5x5 system
-//  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at 
-//        http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
+   //-------------------------------------------------
+   //  Two-step quadratic LSQ 5x5 system
+   //  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at 
+   //        http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
 
    if (trim(grad_type) == "quadratic2") {
 
@@ -307,7 +338,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 
 
          //nghbr0 : do k = 1, node[i].nnghbrs;
-         for (size_t k = 0; k < E2Ddata.nnodes; k++) {
+         for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
                        in      = (*E2Ddata.node[i ].nghbr)(k);
             (*E2Ddata.node[i].dx)(k)      = E2Ddata.node[in].x       - E2Ddata.node[i].x;
             (*E2Ddata.node[i].dy)(k)      = E2Ddata.node[in].y       - E2Ddata.node[i].y;
