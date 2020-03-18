@@ -787,19 +787,19 @@ void EulerSolver2D::Solver::lsq_gradients_nc(EulerSolver2D::MainData2D& E2Ddata,
 
 //   Loop over neighbors
 
-   //loop in = 1, E2Ddata.node[inode].nnghbrs
-//   for (size_t in = 0; in < E2Ddata.node[inode].nnghrbs; in ++) {
-//     inghbr = E2Ddata.node[inode].nghbr(in);
+   // loop in = 1, E2Ddata.node[inode].nnghbrs
+   for (size_t in = 0; in < E2Ddata.node[inode].nnghbrs; in ++) {
+      inghbr = (*E2Ddata.node[inode].nghbr)(in);
 
-//        da = E2Ddata.node[inghbr).w(ivar) - E2Ddata.node[inode].w(ivar);
+      da = (*E2Ddata.node[inghbr].w)(ivar) - (*E2Ddata.node[inode].w)(ivar);
 
-//    ax = ax + E2Ddata.node[inode].lsq2x2_cx(in)*da;
-//    ay = ay + E2Ddata.node[inode].lsq2x2_cy(in)*da;
+      ax = ax + (*E2Ddata.node[inode].lsq2x2_cx)(in)*da;
+      ay = ay + (*E2Ddata.node[inode].lsq2x2_cy)(in)*da;
 
-//    }
+   }
 
-//    E2Ddata.node[inode].gradw(ivar,ix) = ax;  //<-- du(ivar)/dx
-//    E2Ddata.node[inode].gradw(ivar,iy) = ay;  //<-- du(ivar)/dy
+   (*E2Ddata.node[inode].gradw)(ivar,ix) = ax;  //<-- du(ivar)/dx
+   (*E2Ddata.node[inode].gradw)(ivar,iy) = ay;  //<-- du(ivar)/dy
 
 }// end lsq_gradients_nc
 //--------------------------------------------------------------------------------
