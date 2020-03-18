@@ -177,20 +177,21 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    grad_type_temp = 'linear';
    compute_gradient_nc(E2Ddata, ivar, grad_type_temp);
 
-// //  (3). Compute the relative errors (L_infinity)
+//  (3). Compute the relative errors (L_infinity)
 
-//    cout << "- Computing the relative errors (L_infinity).."
-//    error_max_wx = -one
-//    error_max_wy = -one
-//    do i = 1, nnodes
-//     error_max_wx = max( abs( E2Ddata.node[i].gradw(ivar,ix) - one )/one, error_max_wx )
-//     error_max_wy = max( abs( E2Ddata.node[i].gradw(ivar,iy) - two )/two, error_max_wy )
-//    end do
+   cout << "- Computing the relative errors (L_infinity)..\n";
+   error_max_wx = -one;
+   error_max_wy = -one;
+   //loop nnodes
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+      error_max_wx = max( abs( (*E2Ddata.node[i].gradw)(ivar,ix) - one )/one, error_max_wx );
+      error_max_wy = max( abs( (*E2Ddata.node[i].gradw)(ivar,iy) - two )/two, error_max_wy );
+   }
 
-//   cout << " Max relative error in wx =  " << error_max_wx
-//   cout << " Max relative error in wy =  " << error_max_wy
-//   cout << "---------------------------------------------------------"
-//   cout << "---------------------------------------------------------"
+   cout << " Max relative error in wx =  " << error_max_wx;
+   cout << " Max relative error in wy =  " << error_max_wy;
+   cout << "---------------------------------------------------------\n";
+   cout << "---------------------------------------------------------\n";
 
 
 // //---------------------------------------------------------------------
