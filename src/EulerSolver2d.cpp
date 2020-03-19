@@ -157,7 +157,7 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
 
    }//end do
 
-   //lsq02_5x5_coeff2_nc(E2Ddata);
+   lsq02_5x5_coeff2_nc(E2Ddata);
 
 
 
@@ -187,7 +187,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 
 // We only use w(0) for this test.
   ivar = 1;
- 
+
 //---------------------------------------------------------------------
 // 1. Check linear LSQ gradients
 //---------------------------------------------------------------------
@@ -317,7 +317,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //* Output: node[i].gradu(ivar,1:2) = ( du(ivar)/dx, du(ivar)/dy )
 //* ------------------------------------------------------------------------------
 //********************************************************************************
-void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Ddata, 
+void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Ddata,
                                                    int ivar, std::string grad_type) {
 
    //use edu2d_my_main_data, only : node, nnodes
@@ -327,11 +327,13 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 
    int i, k, in;
 
+   cout << "computing gradient nc type " << grad_type << endl;
+
   if (trim(grad_type) == "none") return;
 
    //-------------------------------------------------
    //  Two-step quadratic LSQ 5x5 system
-   //  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at 
+   //  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at
    //        http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
 
    if (trim(grad_type) == "quadratic2") {
@@ -344,7 +346,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 
          //nghbr0 : do k = 1, node[i].nnghbrs;
          for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
-                       in      = (*E2Ddata.node[i ].nghbr)(k);
+                       in      = (*E2Ddata.node[i].nghbr)(k);
             (*E2Ddata.node[i].dx)(k)      = E2Ddata.node[in].x       - E2Ddata.node[i].x;
             (*E2Ddata.node[i].dy)(k)      = E2Ddata.node[in].y       - E2Ddata.node[i].y;
             (*E2Ddata.node[i].dw)(ivar,k) = (*E2Ddata.node[in].w)(ivar) - (*E2Ddata.node[i].w)(ivar);
@@ -371,7 +373,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
       }
       //-------------------------------------------------
       // Two-step quadratic LSQ 5x5 system
-      //  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at 
+      //  Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at
       //        http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
       else if (trim(grad_type) == "quadratic2") {
 
@@ -553,7 +555,7 @@ void EulerSolver2D::Solver::lsq01_2x2_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //********************************************************************************
 //* --- LSQ Coefficients for 5x5 Quadratic Least-Squares Gradient Reconstruction ---
 //*
-//* Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at 
+//* Note: See Nishikawa, JCP2014v273pp287-309 for details, which is available at
 //*
 //* http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
 //*
@@ -597,10 +599,15 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
    //    nghbr : do k = 1, node[i].nnghbrs
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
       for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
-
-         in   = (*E2Ddata.node[i].nghbr)(k);
-         (*E2Ddata.node[i].dx)(k)   = E2Ddata.node[in].x - E2Ddata.node[i].x;
-         (*E2Ddata.node[i].dy)(k)   = E2Ddata.node[in].y - E2Ddata.node[i].y;
+         //in      = (*E2Ddata.node[i].nghbr)(k);
+         //in      = (*E2Ddata.node[i].nghbr)(k);
+         // if (in >= E2Ddata.node[i].nnghbrs) {
+         //    cout << "ERROR: in >= nnghbrs " << in << " " << E2Ddata.node[i].nnghbrs << endl;
+         //    std::exit(0);
+         // }
+         //(*E2Ddata.node[i].dx)(k)      = E2Ddata.node[in].x       - E2Ddata.node[i].x;
+         // (*E2Ddata.node[i].dx)(k)   = 0.;//E2Ddata.node[in].x - E2Ddata.node[i].x;
+         // (*E2Ddata.node[i].dy)(k)   = 0.;//E2Ddata.node[in].y - E2Ddata.node[i].y;
 
       }//    end loop nghbr
    }//   end loop node1
@@ -608,140 +615,140 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
    // Step 2
 
    //   node2 : loop nnodes
-   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+//    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
 
-     a = zero;
+//      a = zero;
 
-      //  Get dx, dy, and dw
+//       //  Get dx, dy, and dw
 
-      //nghbr2 loop k ,E2Ddata.node[i].nnghbrs
-      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
+//       //nghbr2 loop k ,E2Ddata.node[i].nnghbrs
+//       for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
 
-         in = (*E2Ddata.node[i].nghbr)(k);
+//          in = (*E2Ddata.node[i].nghbr)(k);
 
-         //nghbr_nghbr : do ell = 1, E2Ddata.node[in].nnghbrs
-         for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
+//          //nghbr_nghbr : do ell = 1, E2Ddata.node[in].nnghbrs
+//          for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
 
-            dx = E2Ddata.node[in].x - E2Ddata.node[i].x + (*E2Ddata.node[in].dx)(ell);
-            dy = E2Ddata.node[in].y - E2Ddata.node[i].y + (*E2Ddata.node[in].dy)(ell);
+//             dx = E2Ddata.node[in].x - E2Ddata.node[i].x + (*E2Ddata.node[in].dx)(ell);
+//             dy = E2Ddata.node[in].y - E2Ddata.node[i].y + (*E2Ddata.node[in].dy)(ell);
 
-            if ( (*E2Ddata.node[in].nghbr)(ell) == i ) {
+//             if ( (*E2Ddata.node[in].nghbr)(ell) == i ) {
 
-               dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
-               dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
+//                dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
+//                dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
 
-               if ( std::abs(dx) + std::abs(dy) < 1.0e-13 ) {
-                  cout << " Zero distance found at lsq02_5x5_coeff2_nc...\n";
-                  cout << "    dx = " << dx << " \n";
-                  cout << "    dy = " << dy << " \n";
-                  cout << "- Centered node = " << i << "\n";
-                  cout << "          (x,y) = " << E2Ddata.node[in].x << E2Ddata.node[in].y << "\n";
-                  cout << "- Neighbor node = " << in << "\n";
-                  cout << "          (x,y) = " << E2Ddata.node[in].x << E2Ddata.node[in].y << "\n";
-                  std::exit(0);
-               }
+//                if ( std::abs(dx) + std::abs(dy) < 1.0e-13 ) {
+//                   cout << " Zero distance found at lsq02_5x5_coeff2_nc...\n";
+//                   cout << "    dx = " << dx << " \n";
+//                   cout << "    dy = " << dy << " \n";
+//                   cout << "- Centered node = " << i << "\n";
+//                   cout << "          (x,y) = " << E2Ddata.node[in].x << E2Ddata.node[in].y << "\n";
+//                   cout << "- Neighbor node = " << in << "\n";
+//                   cout << "          (x,y) = " << E2Ddata.node[in].x << E2Ddata.node[in].y << "\n";
+//                   std::exit(0);
+//                }
 
-            }
+//             }
 
 
-            w2 = lsq_weight(E2Ddata, dx, dy);
-            w2 = w2*w2;
+//             w2 = lsq_weight(E2Ddata, dx, dy);
+//             w2 = w2*w2;
 
-            a(0,0) = a(0,0) + w2 * dx         *dx;
-            a(0,1) = a(0,1) + w2 * dx         *dy;
-            a(0,2) = a(0,2) + w2 * dx         *dx*dx * half;
-            a(0,3) = a(0,3) + w2 * dx         *dx*dy;
-            a(0,4) = a(0,4) + w2 * dx         *dy*dy * half;
+//             a(0,0) = a(0,0) + w2 * dx         *dx;
+//             a(0,1) = a(0,1) + w2 * dx         *dy;
+//             a(0,2) = a(0,2) + w2 * dx         *dx*dx * half;
+//             a(0,3) = a(0,3) + w2 * dx         *dx*dy;
+//             a(0,4) = a(0,4) + w2 * dx         *dy*dy * half;
 
-            //     a(1,0) = a(1,0) + w2 * dy         *dx;
-            a(1,1) = a(1,1) + w2 * dy         *dy;
-            a(1,2) = a(1,2) + w2 * dy         *dx*dx * half;
-            a(1,3) = a(1,3) + w2 * dy         *dx*dy;
-            a(1,4) = a(1,4) + w2 * dy         *dy*dy * half;
+//             //     a(1,0) = a(1,0) + w2 * dy         *dx;
+//             a(1,1) = a(1,1) + w2 * dy         *dy;
+//             a(1,2) = a(1,2) + w2 * dy         *dx*dx * half;
+//             a(1,3) = a(1,3) + w2 * dy         *dx*dy;
+//             a(1,4) = a(1,4) + w2 * dy         *dy*dy * half;
 
-            //     a(2,0) = a(2,0) + w2 * half*dx*dx *dx;
-            //     a(2,1) = a(2,1) + w2 * half*dx*dx *dy;
-            a(2,2) = a(2,2) + w2 * half*dx*dx *dx*dx * half;
-            a(2,3) = a(2,3) + w2 * half*dx*dx *dx*dy;
-            a(2,4) = a(2,4) + w2 * half*dx*dx *dy*dy * half;
+//             //     a(2,0) = a(2,0) + w2 * half*dx*dx *dx;
+//             //     a(2,1) = a(2,1) + w2 * half*dx*dx *dy;
+//             a(2,2) = a(2,2) + w2 * half*dx*dx *dx*dx * half;
+//             a(2,3) = a(2,3) + w2 * half*dx*dx *dx*dy;
+//             a(2,4) = a(2,4) + w2 * half*dx*dx *dy*dy * half;
 
-            //     a(3,0) = a(3,0) + w2 *      dx*dy *dx;
-            //     a(3,1) = a(3,1) + w2 *      dx*dy *dy;
-            //     a(3,2) = a(3,2) + w2 *      dx*dy *dx*dx * half;
-            a(3,3) = a(3,3) + w2 *      dx*dy *dx*dy;
-            a(3,4) = a(3,4) + w2 *      dx*dy *dy*dy * half;
+//             //     a(3,0) = a(3,0) + w2 *      dx*dy *dx;
+//             //     a(3,1) = a(3,1) + w2 *      dx*dy *dy;
+//             //     a(3,2) = a(3,2) + w2 *      dx*dy *dx*dx * half;
+//             a(3,3) = a(3,3) + w2 *      dx*dy *dx*dy;
+//             a(3,4) = a(3,4) + w2 *      dx*dy *dy*dy * half;
 
-            //     a(4,0) = a(4,0) + w2 * half*dy*dy *dx;
-            //     a(4,1) = a(4,1) + w2 * half*dy*dy *dy;
-            //     a(4,2) = a(4,2) + w2 * half*dy*dy *dx*dx * half;
-            //     a(4,3) = a(4,3) + w2 * half*dy*dy *dx*dy;
-            a(4,4) = a(4,4) + w2 * half*dy*dy *dy*dy * half;
+//             //     a(4,0) = a(4,0) + w2 * half*dy*dy *dx;
+//             //     a(4,1) = a(4,1) + w2 * half*dy*dy *dy;
+//             //     a(4,2) = a(4,2) + w2 * half*dy*dy *dx*dx * half;
+//             //     a(4,3) = a(4,3) + w2 * half*dy*dy *dx*dy;
+//             a(4,4) = a(4,4) + w2 * half*dy*dy *dy*dy * half;
 
-         } //end do nghbr_nghbr
+//          } //end do nghbr_nghbr
 
-      } //end do nghbr2
+//       } //end do nghbr2
 
-      //   Fill symmetric part
+//       //   Fill symmetric part
 
-      a(1,0) = a(0,1);
-      a(2,0) = a(0,2);  a(2,1) = a(1,2);
-      a(3,0) = a(0,3);  a(3,1) = a(1,3); a(3,2) = a(2,3);
-      a(4,0) = a(0,4);  a(4,1) = a(1,4); a(4,2) = a(2,4); a(4,3) = a(3,4);
+//       a(1,0) = a(0,1);
+//       a(2,0) = a(0,2);  a(2,1) = a(1,2);
+//       a(3,0) = a(0,3);  a(3,1) = a(1,3); a(3,2) = a(2,3);
+//       a(4,0) = a(0,4);  a(4,1) = a(1,4); a(4,2) = a(2,4); a(4,3) = a(3,4);
 
-      //   Invert the matrix
+//       //   Invert the matrix
 
-      dummy1 = zero;
-      dummy2 = zero;
-      //gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
-      ainv = GSinv(a,dummy1,dummy2);
+//       dummy1 = zero;
+//       dummy2 = zero;
+//       //gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
+//       ainv = 0.;// GSinv(a,dummy1,dummy2);
 
-      if (ainv.istat>=0) {
-         cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
-         std::exit(0);
-      }
+//       if (ainv.istat>=0) {
+//          cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
+//          std::exit(0);
+//       }
 
-      //  Now compute the coefficients for neighbors.
+//       //  Now compute the coefficients for neighbors.
 
-      ii = 0;
+//       ii = 0;
 
-      //nghbr3 : do k = 1, E2Ddata.node[i].nnghbrs
-      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
-         in = (*E2Ddata.node[i].nghbr)(k);
+//       //nghbr3 : do k = 1, E2Ddata.node[i].nnghbrs
+//       for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
+//          in = (*E2Ddata.node[i].nghbr)(k);
 
-         //nghbr_nghbr2 : do ell = 1, E2Ddata.node[in].nnghbrs
-         for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
+//          //nghbr_nghbr2 : do ell = 1, E2Ddata.node[in].nnghbrs
+//          for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
 
-            dx = E2Ddata.node[in].x - E2Ddata.node[i].x + (*E2Ddata.node[in].dx)(ell);
-            dy = E2Ddata.node[in].y - E2Ddata.node[i].y + (*E2Ddata.node[in].dy)(ell);
+//             dx = E2Ddata.node[in].x - E2Ddata.node[i].x + (*E2Ddata.node[in].dx)(ell);
+//             dy = E2Ddata.node[in].y - E2Ddata.node[i].y + (*E2Ddata.node[in].dy)(ell);
 
-            if ( (*E2Ddata.node[in].nghbr)(ell) == i )  {
-               dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
-               dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
-            }
+//             if ( (*E2Ddata.node[in].nghbr)(ell) == i )  {
+//                dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
+//                dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
+//             }
 
-            ii = ii + 1;
-            
-            w2 = lsq_weight(E2Ddata, dx, dy);
-            w2 = w2 * w2;
+//             ii = ii + 1;
 
- //  Multiply the inverse LSQ matrix to get the coefficients: cx(:) and cy(:):
+//             w2 = lsq_weight(E2Ddata, dx, dy);
+//             w2 = w2 * w2;
 
-            (*E2Ddata.node[i].lsq5x5_cx)(ii)  =  ainv(ix,0)*w2*dx  \
-                                    + ainv(ix,1)*w2*dy             \
-                                    + ainv(ix,2)*w2*dx*dx * half   \
-                                    + ainv(ix,3)*w2*dx*dy          \
-                                    + ainv(ix,4)*w2*dy*dy * half;
+//  //  Multiply the inverse LSQ matrix to get the coefficients: cx(:) and cy(:):
 
-            (*E2Ddata.node[i].lsq5x5_cy)(ii)  =  ainv(iy,0)*w2*dx  \
-                                    + ainv(iy,1)*w2*dy             \
-                                    + ainv(iy,2)*w2*dx*dx * half   \
-                                    + ainv(iy,3)*w2*dx*dy          \
-                                    + ainv(iy,4)*w2*dy*dy * half;
-         }//end do nghbr_nghbr2
+//             (*E2Ddata.node[i].lsq5x5_cx)(ii)  =  ainv(ix,0)*w2*dx  \
+//                                     + ainv(ix,1)*w2*dy             \
+//                                     + ainv(ix,2)*w2*dx*dx * half   \
+//                                     + ainv(ix,3)*w2*dx*dy          \
+//                                     + ainv(ix,4)*w2*dy*dy * half;
 
-      }//end do nghbr3
+//             (*E2Ddata.node[i].lsq5x5_cy)(ii)  =  ainv(iy,0)*w2*dx  \
+//                                     + ainv(iy,1)*w2*dy             \
+//                                     + ainv(iy,2)*w2*dx*dx * half   \
+//                                     + ainv(iy,3)*w2*dx*dy          \
+//                                     + ainv(iy,4)*w2*dy*dy * half;
+//          }//end do nghbr_nghbr2
 
-   }//   end do node2
+//       }//end do nghbr3
+
+//    }//   end do node2
 
 } //end  lsq02_5x5_coeff2_nc
 //********************************************************************************
@@ -848,7 +855,7 @@ void EulerSolver2D::Solver::lsq_gradients_nc(EulerSolver2D::MainData2D& E2Ddata,
 //*  This computes the inverse of an (Nm)x(Nm) matrix "ai".
 //*
 //*****************************************************************************
-Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a, 
+Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
                                     Array2D<real>& m, const Array2D<real>& b) {
    return GaussSeidelInv(a,m,b);
 }

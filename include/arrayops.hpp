@@ -265,7 +265,9 @@ abs( Array2D<T>& A ) {
 */
 template <class T>
 Array2D<T> 
-GaussSeidelInv(const Array2D<T>& a, Array2D<T>& m, const Array2D<T>& b) {
+GaussSeidelInv(const Array2D<T>& a, 
+                        Array2D<T>& m, 
+                        const Array2D<T>& b) {
     
 	assert(a.ncols == b.nrows);
     assert(a.nrows == m.nrows);
