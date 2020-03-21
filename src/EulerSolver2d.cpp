@@ -149,11 +149,14 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
    //   call my_alloc_p2_ptr(node(i)%lsq5x5_cy, ii)
       E2Ddata.node[i].lsq5x5_cy = new Array2D<real>(ii,1);
    //   call my_alloc_p2_ptr(node(i)%dx,node(i)%nnghbrs)
-      E2Ddata.node[i].dx = new Array2D<real>(E2Ddata.node[i].nnghbrs+1,1);
+      //E2Ddata.node[i].dx = new Array2D<real>(E2Ddata.node[i].nnghbrs+1,1);
+      E2Ddata.node[i].dx = new Array2D<real>(E2Ddata.node[i].nnghbrs,1);
    //   call my_alloc_p2_ptr(node(i)%dy,node(i)%nnghbrs)
-      E2Ddata.node[i].dy = new Array2D<real>(E2Ddata.node[i].nnghbrs+1,1);
+      //E2Ddata.node[i].dy = new Array2D<real>(E2Ddata.node[i].nnghbrs+1,1);
+      E2Ddata.node[i].dy = new Array2D<real>(E2Ddata.node[i].nnghbrs,1);
    //   call my_alloc_p2_matrix_ptr(node(i)%dw, nq,node(i)%nnghbrs)
-      E2Ddata.node[i].dw = new Array2D<real>(E2Ddata.nq, E2Ddata.node[i].nnghbrs+1);
+      //E2Ddata.node[i].dw = new Array2D<real>(E2Ddata.nq, E2Ddata.node[i].nnghbrs+1);
+      E2Ddata.node[i].dw = new Array2D<real>(E2Ddata.nq, E2Ddata.node[i].nnghbrs);
 
    }//end do
 
