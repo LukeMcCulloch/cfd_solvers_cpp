@@ -149,11 +149,11 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
    //   call my_alloc_p2_ptr(node(i)%lsq5x5_cy, ii)
       E2Ddata.node[i].lsq5x5_cy = new Array2D<real>(ii,1);
    //   call my_alloc_p2_ptr(node(i)%dx,node(i)%nnghbrs)
-      E2Ddata.node[i].dx = new Array2D<real>(E2Ddata.node[i].nnghbrs,1);
+      E2Ddata.node[i].dx = new Array2D<real>(E2Ddata.node[i].nnghbrs+1,1);
    //   call my_alloc_p2_ptr(node(i)%dy,node(i)%nnghbrs)
-      E2Ddata.node[i].dy = new Array2D<real>(E2Ddata.node[i].nnghbrs,1);
+      E2Ddata.node[i].dy = new Array2D<real>(E2Ddata.node[i].nnghbrs+1,1);
    //   call my_alloc_p2_matrix_ptr(node(i)%dw, nq,node(i)%nnghbrs)
-      E2Ddata.node[i].dw = new Array2D<real>(E2Ddata.nq, E2Ddata.node[i].nnghbrs);
+      E2Ddata.node[i].dw = new Array2D<real>(E2Ddata.nq, E2Ddata.node[i].nnghbrs+1);
 
    }//end do
 
@@ -590,6 +590,7 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
    int ix = 0;
    int iy = 1;
 
+   cout << "     lsq02_5x5_coeff2_nc " << endl;
    // Step 1
 
    a = zero;
@@ -598,15 +599,17 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
    //    nghbr : do k = 1, node[i].nnghbrs
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
       for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
-         //in      = (*E2Ddata.node[i].nghbr)(k);
-         //in      = (*E2Ddata.node[i].nghbr)(k);
+         in      = (*E2Ddata.node[i].nghbr)(k);
+         in      = (*E2Ddata.node[i].nghbr)(k);
          // if (in >= E2Ddata.node[i].nnghbrs) {
          //    cout << "ERROR: in >= nnghbrs " << in << " " << E2Ddata.node[i].nnghbrs << endl;
          //    std::exit(0);
          // }
          //(*E2Ddata.node[i].dx)(k)      = E2Ddata.node[in].x       - E2Ddata.node[i].x;
-         // (*E2Ddata.node[i].dx)(k)   = 0.;//E2Ddata.node[in].x - E2Ddata.node[i].x;
-         // (*E2Ddata.node[i].dy)(k)   = 0.;//E2Ddata.node[in].y - E2Ddata.node[i].y;
+         cout << " i = " << i << " k = " << k << endl;
+         (*E2Ddata.node[i].dx)(k)   = 0.;//E2Ddata.node[in].x - E2Ddata.node[i].x;
+         (*E2Ddata.node[i].dy)(k)   = 0.;//E2Ddata.node[in].y - E2Ddata.node[i].y;
+
 
       }//    end loop nghbr
    }//   end loop node1
