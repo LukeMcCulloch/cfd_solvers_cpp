@@ -598,8 +598,8 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 
    a = zero;
 
-   //   node1 : do i = 1, nnodes
-   //    nghbr : do k = 1, node[i].nnghbrs
+   //   node1 : loop nnodes
+   //    nghbr : loop node[i].nnghbrs
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
       for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
          in      = (*E2Ddata.node[i].nghbr)(k);
