@@ -214,7 +214,8 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //  (2). Compute the gradient by linear LSQ
 
    cout << "- Computing linear LSQ gradients..\n";
-   grad_type_temp = 'linear';
+   grad_type_temp = "linear";
+   //cout << " grad_type_temp =  " << grad_type_temp << endl;
    compute_gradient_nc(E2Ddata, ivar, grad_type_temp);
 
 //  (3). Compute the relative errors (L_infinity)
@@ -228,8 +229,8 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       error_max_wy = max( std::abs( (*E2Ddata.node[i].gradw)(ivar,iy) - two )/two, error_max_wy );
    }
 
-   cout << " Max relative error in wx =  " << error_max_wx;
-   cout << " Max relative error in wy =  " << error_max_wy;
+   cout << " Max relative error in wx =  " << error_max_wx << "\n";
+   cout << " Max relative error in wy =  " << error_max_wy << "\n";
    cout << "---------------------------------------------------------\n";
    cout << "---------------------------------------------------------\n";
 
@@ -263,7 +264,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //  (2). Compute the gradient by linear LSQ
 
    cout << "- Computing quadratic LSQ gradients..\n";
-   grad_type_temp = 'quadratic2';
+   grad_type_temp = "quadratic2";
    compute_gradient_nc(E2Ddata,ivar,grad_type_temp);
 
 //  (3). Compute the relative errors (L_infinity)
@@ -333,7 +334,13 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 
    cout << "computing gradient nc type " << grad_type << endl;
 
-  if (trim(grad_type) == "none") return;
+  if (trim(grad_type) == "none") {
+     cout << "trim(grad_type) == none, return " << endl;
+     return;
+  }
+   //   else {
+   //      cout << "trim(grad_type) == " << trim(grad_type) << " full =  " << grad_type << endl;
+   //   }
 
    //-------------------------------------------------
    //  Two-step quadratic LSQ 5x5 system
