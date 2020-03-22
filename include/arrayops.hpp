@@ -193,6 +193,22 @@ Dot(const Array2D<T>& a, const Array2D<T>& b) {
 }
 
 
+// Makes a m x m matrix with all diagonal elements to 1, and other elements
+// to 0.
+// template <class T>
+// Array2D<T> 
+// makeIdentity(size_t m) {
+//     Array2D<T> c(m,m);
+//     c = 0.;
+//     for(size_t i = 0; i < c.nrows; ++i ) {
+//         c(i,i) = 1.0;
+//     }
+//     return c;
+// }
+
+
+
+
 template <class T>
 T Dotscalar(const Array2D<T>& a, const Array2D<T>& b) {
 	assert(a.ncols == 1);
@@ -276,7 +292,7 @@ GaussSeidelInv(const Array2D<T>& a,
     int p = a.nrows; // a = pxp matrix
 
 
-    Array2D<T> n = m;
+    Array2D<T> n = m; // bad sizing.  The ans size = size(a)
     n = 0;
     Array2D<T> np1 = n;
 
@@ -305,6 +321,73 @@ GaussSeidelInv(const Array2D<T>& a,
     }
     if (q==0) n.istat = 1;
     return n;
+}
+
+
+template <typename T>
+Array2D<T> Array2D<T>::invert() {
+    //JET_ASSERT(isSquare());
+    if (not isSquare()) {
+        cout << "ERROR, trying to directly invert nonsquare matrix " << endl;
+        std::exit(0);
+    }
+
+    // Computes inverse matrix using Gaussian elimination method.
+    // https://martin-thoma.com/solving-linear-equations-with-gaussian-elimination/
+    size_t n = getnrows();
+    Array2D& a = *this;
+    //Array2D<T> rhs = makeIdentity(n);
+    // Array2D<T> rhs(n,n); 
+    // rhs = makeIdentity(n);
+    Array2D<T> rhs(true, n, n);
+
+    for (size_t i = 0; i < n; ++i) {
+        // Search for maximum in this column
+        T maxEl = std::fabs(a(i, i));
+        size_t maxRow = i;
+        for (size_t k = i + 1; k < n; ++k) {
+            if (std::fabs(a(k, i)) > maxEl) {
+                maxEl = std::fabs(a(k, i));
+                maxRow = k;
+            }
+        }
+
+        // Swap maximum row with current row (column by column)
+        if (maxRow != i) {
+            for (size_t k = i; k < n; ++k) {
+                std::swap(a(maxRow, k), a(i, k));
+                std::swap(rhs(maxRow, k), rhs(i, k));
+            }
+        }
+
+        // Make all rows except this one 0 in current column
+        for (size_t k = 0; k < n; ++k) {
+            if (k == i) {
+                continue;
+            }
+            T c = -a(k, i) / a(i, i);
+            for (size_t j = 0; j < n; ++j) {
+                rhs(k, j) += c * rhs(i, j);
+                if (i == j) {
+                    a(k, j) = 0;
+                } else if (i < j) {
+                    a(k, j) += c * a(i, j);
+                }
+            }
+        }
+
+        // Scale
+        for (size_t k = 0; k < n; ++k) {
+            T c = 1 / a(k, k);
+            for (size_t j = 0; j < n; ++j) {
+                a(k, j) *= c;
+                rhs(k, j) *= c;
+            }
+        }
+    }
+
+    //set(rhs);
+    return rhs;
 }
 
 

@@ -1,6 +1,3 @@
-
-
-
 //======================================
 // my simple array class template (type)
 #include "tests_array.hpp"
@@ -21,6 +18,10 @@
 //======================================
 // string trimfunctions
 #include "StringOps.h"
+
+
+//using Eigen::Dynamic;
+
 
 // EulerSolver2D::MainData2D::MainData2D() {
 
@@ -704,7 +705,8 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       dummy2 = zero;
       //gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
       //ainv = 0.;// 
-      GSinv(a,dummy1,dummy2);
+      //cout << " invert i = " << i << endl;
+      ainv = a.invert(); //GSinv(a,dummy1,dummy2);
 
       // if (ainv.istat>=0) {
       //    cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";

@@ -1,8 +1,9 @@
-
 //=================================
 // include guard
 #ifndef __ARRAY_TEMPLATE_INCLUDED__
 #define __ARRAY_TEMPLATE_INCLUDED__
+
+
 
 //=================================
 // array class
@@ -10,6 +11,8 @@
 #include <iostream>
 #include <limits>
 #include <string.h>
+
+
 
 
 //=================================
@@ -20,6 +23,8 @@ using std::endl;
 using std::numeric_limits;
 using std::ofstream;
 using std::max;
+
+
 
 
 
@@ -98,6 +103,7 @@ class Array2D{
         int tracked_index;
         int istat = 0;
         bool allocated;
+        bool makeidentidy;
 
         // malloc host memory
         T* array;
@@ -116,6 +122,7 @@ class Array2D{
         }
             
         Array2D();
+        Array2D(bool makeidentidy, size_t m, size_t n);
         
         //copy constructor 
         Array2D(const Array2D& A);
@@ -136,6 +143,7 @@ class Array2D{
         //void initialize();
         void setonce( T data);
         void print();
+        Array2D<T>  invert();
 
        
         void cache() const {}
@@ -146,6 +154,10 @@ class Array2D{
         Array2D<T> val() const {
             return *this;
         }
+
+
+        // Returns true if this matrix is a square matrix.
+        bool isSquare() const;
 
         //
         size_t getnrows() const {
@@ -196,6 +208,20 @@ Array2D<T>::Array2D(){
     //memset(array, 0, nBytes);
 }
 
+//
+// initialize as an identity matrix
+template <class T>
+Array2D<T>::Array2D(bool makeidentidy,  size_t m, size_t n){
+    nrows = n;
+    ncols = n;
+    build();
+    if (makeidentidy) {
+        assert(m == n);
+        for(size_t i = 0; i < nrows; i++) {
+            array[i*ncols + i] = 1.0;
+        }
+    }
+}
 
 
 
@@ -261,6 +287,7 @@ Array2D<T>::Array2D(const Array2D& other, int nrows, int ncols)
 }
 
 
+
 template <class T>
 T& Array2D<T>::operator()(int i, int j) {
 	check_indices(i,j);
@@ -285,6 +312,7 @@ const T& Array2D<T>::operator()(int i) const {
 }
 
 
+
 template <class T>
 Array2D<T> Array2D<T>::operator=(const Array2D& that) {
     /*not using this check  allows delayed allocation 
@@ -305,6 +333,13 @@ Array2D<T> Array2D<T>::operator=(const T a) {
     	array[i] = a;
     }
     return *this;
+}
+
+
+
+template <typename T>
+bool Array2D<T>::isSquare() const {
+    return getnrows() == getncols();
 }
 
 

@@ -73,6 +73,8 @@ classes:
 //stl
 #include <vector> 
 using std::vector;
+
+
 //======================================
 // my simple array class template (type)
 #include "tests_array.hpp"
@@ -95,6 +97,27 @@ using std::vector;
 #else
   typedef float real;
 #endif
+
+
+//======================================
+//Eigen
+//--------------------
+// Linux:
+//#ifdef __linux__ 
+  // #include <eigen/Eigen/Dense>
+  // #include  <eigen/Eigen/Core>
+//--------------------
+// Windows:
+// #elif _WIN32
+//   #include <Eigen\Dense>
+//   #include  <Eigen\Core>
+// //--------------------
+// // OSX (not correct yet)
+// #elif __APPLE__ 
+//   #include <eigen/Eigen/Dense>
+//   #include  <eigen/Eigen/Core>
+// #else
+// #endif
 //
 //********************************************************************************
 //
