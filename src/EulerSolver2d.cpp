@@ -136,10 +136,10 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
 
       ii = 0;
       //loop node[i].nnghbrs;
-      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; i++) {
+      for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
          in = (*E2Ddata.node[i].nghbr)(k);
          //loop E2Ddata.node[in].nnghbrs;
-         for (size_t i = 0; i < E2Ddata.node[in].nnghbrs; i++) {
+         for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
             ii = ii + 1;
          }//nghbr_nghbr
       }//nghbr
@@ -603,15 +603,13 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
       for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
          in      = (*E2Ddata.node[i].nghbr)(k);
-         in      = (*E2Ddata.node[i].nghbr)(k);
          // if (in >= E2Ddata.node[i].nnghbrs) {
          //    cout << "ERROR: in >= nnghbrs " << in << " " << E2Ddata.node[i].nnghbrs << endl;
          //    std::exit(0);
          // }
-         //(*E2Ddata.node[i].dx)(k)      = E2Ddata.node[in].x       - E2Ddata.node[i].x;
-         cout << " i = " << i << " k = " << k << endl;
-         (*E2Ddata.node[i].dx)(k)   = 0.;//E2Ddata.node[in].x - E2Ddata.node[i].x;
-         (*E2Ddata.node[i].dy)(k)   = 0.;//E2Ddata.node[in].y - E2Ddata.node[i].y;
+         //cout << " i = " << i << " k = " << k << endl;
+         (*E2Ddata.node[i].dx)(k)   = E2Ddata.node[in].x - E2Ddata.node[i].x;
+         (*E2Ddata.node[i].dy)(k)   = E2Ddata.node[in].y - E2Ddata.node[i].y;
 
 
       }//    end loop nghbr
