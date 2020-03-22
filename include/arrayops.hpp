@@ -296,9 +296,9 @@ GaussSeidelInv(const Array2D<T>& a,
     n = 0;
     Array2D<T> np1 = n;
 
-    int q = 100;
-    T convg = 0.;
-    T tol = 1.0;
+    int q   = 100;
+    T convg = 10.;
+    T tol   = 1.0;
 
 
     while (q > 0 & convg > tol) {
