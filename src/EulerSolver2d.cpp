@@ -334,10 +334,10 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 
    cout << "computing gradient nc type " << grad_type << endl;
 
-  if (trim(grad_type) == "none") {
-     cout << "trim(grad_type) == none, return " << endl;
-     return;
-  }
+   if (trim(grad_type) == "none") {
+      cout << "trim(grad_type) == none, return " << endl;
+      return;
+   }
    //   else {
    //      cout << "trim(grad_type) == " << trim(grad_type) << " full =  " << grad_type << endl;
    //   }
@@ -353,11 +353,9 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 
       //do i = 1, nnodes
       for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-
-
          //nghbr0 : do k = 1, node[i].nnghbrs;
          for (size_t k = 0; k < E2Ddata.node[i].nnghbrs; k++) {
-                       in      = (*E2Ddata.node[i].nghbr)(k);
+            in      = (*E2Ddata.node[i].nghbr)(k);
             (*E2Ddata.node[i].dx)(k)      = E2Ddata.node[in].x       - E2Ddata.node[i].x;
             (*E2Ddata.node[i].dy)(k)      = E2Ddata.node[in].y       - E2Ddata.node[i].y;
             (*E2Ddata.node[i].dw)(ivar,k) = (*E2Ddata.node[in].w)(ivar) - (*E2Ddata.node[i].w)(ivar);
@@ -370,6 +368,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
 //------------------------------------------------------------
 //------------------------------------------------------------
 //-- Compute LSQ Gradients at all nodes.
+cout << "Compute LSQ Gradients at all nodes. " << endl;
 //------------------------------------------------------------
 //------------------------------------------------------------
 
@@ -388,6 +387,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Dda
       //        http://www.hiroakinishikawa.com/My_papers/nishikawa_jcp2014v273pp287-309_preprint.pdf.
       else if (trim(grad_type) == "quadratic2") {
 
+         //cout << "(trim(grad_type) == quadratic2) " << endl;
          lsq_gradients2_nc(E2Ddata, i, ivar);
       }
       //-------------------------------------------------
@@ -434,12 +434,12 @@ void EulerSolver2D::Solver::lsq_gradients2_nc(
 
 //   Loop over neighbors
 
-   ii = 0;
+   ii = -1;
 
    //nghbr : loop node[inode].nnghbrs
    for (size_t k = 0; k < E2Ddata.node[inode].nnghbrs; k++) {
-            //in = node[inode].nghbr(k)
-            in = (*E2Ddata.node[inode].nghbr)(k);
+      //in = node[inode].nghbr(k)
+      in = (*E2Ddata.node[inode].nghbr)(k);
 
       //nghbr_nghbr : do ell = 1, node[in].nnghbrs
       for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++ ) {
