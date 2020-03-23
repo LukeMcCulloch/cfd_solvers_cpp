@@ -282,30 +282,30 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       x = E2Ddata.node[i].x;
       y = E2Ddata.node[i].y;
 
-      if ( std::abs( (*E2Ddata.node[i].gradw)(ivar,ix) - 
+      if ( std::fabs( (*E2Ddata.node[i].gradw)(ivar,ix) - 
             (a1+2.0*a3*x+a4*y) )/(a1+2.0*a3*x+a4*y) > error_max_wx )  {
          wx  = (*E2Ddata.node[i].gradw)(ivar,ix);
          wxe = a1 + 2.0*a3*x + a4*y;
-         error_max_wx = std::abs( wx - wxe )/wxe;
+         error_max_wx = std::fabs( wx - wxe )/wxe;
          x_max_wx = x;
          y_max_wx = y;
       }
 
-      if ( std::abs( (*E2Ddata.node[i].gradw)(ivar,iy) - 
+      if ( std::fabs( (*E2Ddata.node[i].gradw)(ivar,iy) - 
             (a2+2.0*a5*y+a4*x) )/(a2+2.0*a5*y+a4*x) > error_max_wy )  {
          wy  = (*E2Ddata.node[i].gradw)(ivar,iy);
          wye = a2 + 2.0*a5*y + a4*x;
-         error_max_wy = std::abs( wy - wye )/wye;
+         error_max_wy = std::fabs( wy - wye )/wye;
          x_max_wy = x;
          y_max_wy = y;
       }
 
    }//end do
 
-  cout << " Max relative error in wx = " <<  error_max_wx <<  " at (x,y) = (" \
+  cout << " Max relative error in wx = " <<  error_max_wx <<  " at (x,y) = (" 
                                           <<  x_max_wx << " , " << y_max_wx << ")\n";
   cout << "   At this location, LSQ ux = " <<  wx <<  ": Exact ux = " <<  wxe << "\n";
-  cout << " Max relative error in wy = " <<  error_max_wy <<  " at (x,y) = (" \
+  cout << " Max relative error in wy = " <<  error_max_wy <<  " at (x,y) = (" 
                                           <<  x_max_wy << " , " << y_max_wy << ")\n";
   cout << "   At this location, LSQ uy = " <<  wy <<  ": Exact uy = " <<  wye << "\n";
   cout << "---------------------------------------------------------\n";
@@ -465,6 +465,9 @@ void EulerSolver2D::Solver::lsq_gradients2_nc(
          ax = ax + (*E2Ddata.node[inode].lsq5x5_cx)(ii) * da;
          ay = ay + (*E2Ddata.node[inode].lsq5x5_cy)(ii) * da;
 
+         // cout << "(*E2Ddata.node[inode].lsq5x5_cx)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cx)(ii) << endl;
+         // cout << "(*E2Ddata.node[inode].lsq5x5_cy)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cy)(ii) << endl;
+
       } // end loop nghbr_nghbr
 
    } // end loop nghbr
@@ -621,9 +624,10 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
    int iy = 1;
 
    cout << "     lsq02_5x5_coeff2_nc " << endl;
+   cout << "gradient_weight  = " << trim(E2Ddata.gradient_weight) << endl;
+   
+   
    // Step 1
-
-   a = zero;
 
    //   node1 : loop nnodes
    //    nghbr : loop node[i].nnghbrs
@@ -641,6 +645,7 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 
       }//    end loop nghbr
    }//   end loop node1
+
 
    // Step 2
 
@@ -684,6 +689,13 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
             w2 = lsq_weight(E2Ddata, dx, dy);
             w2 = w2*w2;
 
+
+            if (i < E2Ddata.maxit-1) {
+               cout << " dx = " << dx << endl;
+               cout << " dy = " << dy << endl;
+               cout << " w2 = " << w2 << endl;
+               cout << " half = " << half << endl;
+            }
             a(0,0) = a(0,0) + w2 * dx         *dx;
             a(0,1) = a(0,1) + w2 * dx         *dy;
             a(0,2) = a(0,2) + w2 * dx         *dx*dx * half;
@@ -734,6 +746,19 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       //cout << " invert i = " << i << endl;
       ainv = a.invert(); //GSinv(a,dummy1,dummy2);
 
+      // if (i < E2Ddata.maxit-1) {
+      //    cout << " dx = " << dx << endl;
+      //    cout << " dy = " << dy << endl;
+      //    cout << " w2 = " << w2 << endl;
+      // }
+
+
+      if (i < E2Ddata.maxit-1) {
+         cout << " a = " << endl;
+         print(a);
+         cout << "inv a = " << endl;
+         print(ainv);
+      }
       // if (ainv.istat>=0) {
       //    cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
       //    std::exit(0);
@@ -762,6 +787,8 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 
             w2 = lsq_weight(E2Ddata, dx, dy);
             w2 = w2 * w2;
+
+            
 
  //  Multiply the inverse LSQ matrix to get the coefficients: cx(:) and cy(:):
 
@@ -793,7 +820,8 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 //*
 //* Note: The weight computed here is the square of the actual LSQ weight.
 //*****************************************************************************
-real EulerSolver2D::Solver::lsq_weight(EulerSolver2D::MainData2D& E2Ddata, real dx, real dy) {
+real EulerSolver2D::Solver::lsq_weight(
+   EulerSolver2D::MainData2D& E2Ddata, real dx, real dy) {
 
    //  use edu2d_constants   , only : p2, one
    //  use edu2d_my_main_data, only : gradient_weight, gradient_weight_p
@@ -809,6 +837,10 @@ real EulerSolver2D::Solver::lsq_weight(EulerSolver2D::MainData2D& E2Ddata, real 
       lsq_weight = one;
    }
    else if (trim(E2Ddata.gradient_weight) == "inverse_distance") {
+
+      // cout << "INVERSE DISTANCE  = " << endl;
+      // std::exit(0);
+
 
       distance = std::sqrt(dx*dx + dy*dy);
 

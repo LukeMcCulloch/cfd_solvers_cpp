@@ -530,6 +530,9 @@ namespace EulerSolver2D{
     int                               nfaces; //total number of cell-faces
     face_type*  face;   //array of cell-faces
 
+    //debug
+    int maxit = 2;
+
   };
   
 }// end namespace  module EulerSolver2D
