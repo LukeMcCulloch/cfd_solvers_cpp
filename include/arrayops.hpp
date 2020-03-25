@@ -343,11 +343,11 @@ Array2D<T> Array2D<T>::invert() {
 
     for (size_t i = 0; i < n; ++i) {
         // Search for maximum in this column
-        T maxEl = std::fabs(a(i, i));
+        T maxEl = std::abs(a(i, i));
         size_t maxRow = i;
         for (size_t k = i + 1; k < n; ++k) {
-            if (std::fabs(a(k, i)) > maxEl) {
-                maxEl = std::fabs(a(k, i));
+            if (std::abs(a(k, i)) > maxEl) {
+                maxEl = std::abs(a(k, i));
                 maxRow = k;
             }
         }

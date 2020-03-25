@@ -163,8 +163,6 @@ void EulerSolver2D::Solver::compute_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Dd
 
    lsq02_5x5_coeff2_nc(E2Ddata);
 
-
-
 } //  end compute_lsq_coeff_nc
 
 // //********************************************************************************
@@ -282,11 +280,11 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
       x = E2Ddata.node[i].x;
       y = E2Ddata.node[i].y;
 
-      if ( std::fabs( (*E2Ddata.node[i].gradw)(ivar,ix) - 
+      if ( std::abs( (*E2Ddata.node[i].gradw)(ivar,ix) - 
             (a1+2.0*a3*x+a4*y) )/(a1+2.0*a3*x+a4*y) > error_max_wx )  {
          wx  = (*E2Ddata.node[i].gradw)(ivar,ix);
          wxe = a1 + 2.0*a3*x + a4*y;
-         error_max_wx = std::fabs( wx - wxe )/wxe;
+         error_max_wx = std::abs( wx - wxe )/wxe;
          x_max_wx = x;
          y_max_wx = y;
       }
@@ -295,7 +293,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
             (a2+2.0*a5*y+a4*x) )/(a2+2.0*a5*y+a4*x) > error_max_wy )  {
          wy  = (*E2Ddata.node[i].gradw)(ivar,iy);
          wye = a2 + 2.0*a5*y + a4*x;
-         error_max_wy = std::fabs( wy - wye )/wye;
+         error_max_wy = std::abs( wy - wye )/wye;
          x_max_wy = x;
          y_max_wy = y;
       }
@@ -331,15 +329,16 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
 //* Output: node[i].gradu(ivar,1:2) = ( du(ivar)/dx, du(ivar)/dy )
 //* ------------------------------------------------------------------------------
 //********************************************************************************
-void EulerSolver2D::Solver::compute_gradient_nc(EulerSolver2D::MainData2D& E2Ddata,
-                                                   int ivar, std::string grad_type) {
+void EulerSolver2D::Solver::compute_gradient_nc(
+                              EulerSolver2D::MainData2D& E2Ddata,
+                              int ivar, std::string grad_type) {
 
    //use edu2d_my_main_data, only : node, nnodes
 
    //integer, intent(in) :: ivar
    //std::string grad_type
 
-   int i, k, in;
+   int in;
 
    cout << "computing gradient nc type " << grad_type << endl;
 
