@@ -664,13 +664,21 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
          //nghbr_nghbr : do ell = 1, E2Ddata.node[in].nnghbrs
          for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
 
+
             dx = E2Ddata.node[in].x - E2Ddata.node[i].x + (*E2Ddata.node[in].dx)(ell);
             dy = E2Ddata.node[in].y - E2Ddata.node[i].y + (*E2Ddata.node[in].dy)(ell);
 
             if ( (*E2Ddata.node[in].nghbr)(ell) == i ) {
-
+               
                dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
                dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
+               if (i < E2Ddata.maxit-1 & ell < E2Ddata.maxit-1) {
+                  cout << " --------------E2Ddata.node[in].nghbr)(ell) == i " << endl;
+                  cout << " (*E2Ddata.node[in].nghbr)(ell) = " << (*E2Ddata.node[in].nghbr)(ell) << " i = " << i << endl;
+                  cout << " dx = " << dx << endl;
+                  cout << " dy = " << dy << endl;
+                  cout << "  "<< endl;
+               }
 
                if ( std::abs(dx) + std::abs(dy) < 1.0e-13 ) {
                   cout << " Zero distance found at lsq02_5x5_coeff2_nc...\n";
@@ -685,16 +693,28 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 
             }
 
+            if (i < E2Ddata.maxit-1 & ell < E2Ddata.maxit-1) {
+               cout << " ---------TOP---------- " << endl;
+               cout << " E2Ddata.node[in].x = " << E2Ddata.node[in].x << endl;
+               cout << " E2Ddata.node[in].y = " << E2Ddata.node[in].y << endl;
+               cout << " E2Ddata.node[i].x = " << E2Ddata.node[i].x << endl;
+               cout << " E2Ddata.node[i].y = " << E2Ddata.node[i].y << endl;
+               cout << " dx = " << dx << endl;
+               cout << " dy = " << dy << endl;
+               cout << "  "<< endl;
+            }
 
             w2 = lsq_weight(E2Ddata, dx, dy);
             w2 = w2*w2;
 
 
             if (i < E2Ddata.maxit-1) {
+               cout << " ---------MIDDLE---------- " << endl;
                cout << " dx = " << dx << endl;
                cout << " dy = " << dy << endl;
                cout << " w2 = " << w2 << endl;
-               cout << " half = " << half << endl;
+               //cout << " half = " << half << endl;
+               cout << "  "<< endl;
             }
             a(0,0) = a(0,0) + w2 * dx         *dx;
             a(0,1) = a(0,1) + w2 * dx         *dy;
@@ -739,19 +759,25 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 
       //   Invert the matrix
 
+      if (i < E2Ddata.maxit-1) {
+         cout << " a = " << endl;
+         print(a);
+      }
+
       dummy1 = zero;
       dummy2 = zero;
       //gewp_solve(a,dummy1,dummy2,ainv,istat, 5);
       //ainv = 0.;// 
       //cout << " invert i = " << i << endl;
-      ainv = a.invert(); //GSinv(a,dummy1,dummy2);
+      Array2D ca = a;
+      ainv = ca.invert(); // destructive solve //GSinv(a,dummy1,dummy2);
 
-      // if (i < E2Ddata.maxit-1) {
-      //    cout << " dx = " << dx << endl;
-      //    cout << " dy = " << dy << endl;
-      //    cout << " w2 = " << w2 << endl;
-      // }
-
+      if (i < E2Ddata.maxit-1) {
+         cout << " ---------BOTTOM---------- " << endl;
+         cout << " dx = " << dx << endl;
+         cout << " dy = " << dy << endl;
+         cout << " w2 = " << w2 << endl;
+      }
 
       if (i < E2Ddata.maxit-1) {
          cout << " a = " << endl;
