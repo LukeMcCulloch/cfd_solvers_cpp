@@ -25,8 +25,8 @@
 #include "StringOps.h"
 
 
-
-using Eigen::Dynamic;
+//using Eigen::Dynamic;
+using Eigen::MatrixXd;
 
 // EulerSolver2D::MainData2D::MainData2D() {
 
@@ -774,8 +774,21 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       //ainv = 0.;// 
       //cout << " invert i = " << i << endl;
       Array2D ca = a;
-      ainv = a.invert(); // destructive solve //GSinv(a,dummy1,dummy2);
+      MatrixXd me(5,5),ime(5,5);
+      for (size_t ie = 0; ie < 5; ie++) {
+         for (size_t je = 0; je < 5; je++) {
+            me(ie,je) = a(ie,je);
+         }
+      }
+      ime = me.inverse();
+      //ainv = a.invert(); // destructive solve //GSinv(a,dummy1,dummy2);
       //ainv = a.inverse();
+
+      for (size_t ie = 0; ie < 5; ie++) {
+         for (size_t je = 0; je < 5; je++) {
+            ainv(ie,je) = ime(ie,je);
+         }
+      }
 
       if (i < E2Ddata.maxit-1) {
          cout << " ---------BOTTOM---------- " << endl;
