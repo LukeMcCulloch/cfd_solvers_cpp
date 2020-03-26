@@ -1705,17 +1705,6 @@ cout << "DONE constructing the element-neighbor data " << endl;
                vt2 = (*elm[ielm].vtx)(im); //TLM these are bad
 
 
-               // vt1 = (*elm[ielm].vtx)(ii);
-               // //cout << ii << endl;
-               // if (ii  < elm[ielm].nvtx-1) { 
-               //    vt2 = (*elm[ielm].vtx)(ii+1); 
-               // }
-               // else { 
-               //    vt2 = (*elm[ielm].vtx)(0); 
-               // } //TLM fix: array bounds overrun fixed here
-               
-
-
                // if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;
                // if (j < 2) cout << "    " << ielm << "    " << im << "    " << in << endl;
                if (vt1 == v1 and vt2 == v2) {
