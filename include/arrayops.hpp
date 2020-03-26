@@ -336,9 +336,7 @@ Array2D<T> Array2D<T>::invert() {
     // https://martin-thoma.com/solving-linear-equations-with-gaussian-elimination/
     size_t n = getnrows();
     Array2D& a = *this;
-    //Array2D<T> rhs = makeIdentity(n);
-    // Array2D<T> rhs(n,n); 
-    // rhs = makeIdentity(n);
+    
     Array2D<T> rhs(true, n, n);
     //cout << "this is the identity: \n";
     //rhs.print();
