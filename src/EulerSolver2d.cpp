@@ -769,7 +769,8 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       //ainv = 0.;// 
       //cout << " invert i = " << i << endl;
       Array2D ca = a;
-      ainv = ca.invert(); // destructive solve //GSinv(a,dummy1,dummy2);
+      ainv = a.invert(); // destructive solve //GSinv(a,dummy1,dummy2);
+      //ainv = a.inverse();
 
       if (i < E2Ddata.maxit-1) {
          cout << " ---------BOTTOM---------- " << endl;
@@ -781,8 +782,14 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       if (i < E2Ddata.maxit-1) {
          cout << " a = " << endl;
          print(a);
-         cout << "inv a = " << endl;
+         cout << "ainv = " << endl;
          print(ainv);
+         ainv.print();
+      }
+      if (i < E2Ddata.maxit-1) {
+         Array2D cka = matmul(ca, ainv);
+         cout << "ainv * a = " << endl;
+         print (cka);
       }
       // if (ainv.istat>=0) {
       //    cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";

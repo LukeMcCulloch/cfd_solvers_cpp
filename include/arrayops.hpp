@@ -340,14 +340,17 @@ Array2D<T> Array2D<T>::invert() {
     // Array2D<T> rhs(n,n); 
     // rhs = makeIdentity(n);
     Array2D<T> rhs(true, n, n);
+    //cout << "this is the identity: \n";
+    //rhs.print();
 
+    // Partial pivoting
     for (size_t i = 0; i < n; ++i) {
         // Search for maximum in this column
-        T maxEl = std::abs(a(i, i));
+        T maxEl = std::fabs(a(i, i));
         size_t maxRow = i;
         for (size_t k = i + 1; k < n; ++k) {
-            if (std::abs(a(k, i)) > maxEl) {
-                maxEl = std::abs(a(k, i));
+            if (std::fabs(a(k, i)) > maxEl) {
+                maxEl = std::fabs(a(k, i));
                 maxRow = k;
             }
         }
@@ -389,6 +392,167 @@ Array2D<T> Array2D<T>::invert() {
     //set(rhs);
     return rhs;
 }
+
+
+
+template <typename T>
+Array2D<T> Array2D<T>::inverse() const {
+
+    //JET_ASSERT(isSquare());
+    if (not isSquare()) {
+        cout << "ERROR, trying to directly invert nonsquare matrix " << endl;
+        std::exit(0);
+    }
+
+    // Computes inverse matrix using Gaussian elimination method.
+    // https://martin-thoma.com/solving-linear-equations-with-gaussian-elimination/
+    size_t n = getnrows();
+    Array2D& a = *this;
+    //Array2D<T> rhs = makeIdentity(n);
+    // Array2D<T> rhs(n,n); 
+    // rhs = makeIdentity(n);
+    Array2D<T> rhs(true, n, n);
+    //cout << "is this the identity?: \n";
+    //print(rhs);
+
+    // Partial pivoting
+    for (size_t i = 0; i < n; ++i) {
+        // Search for maximum in this column
+        T maxEl = std::fabs(a(i, i));
+        size_t maxRow = i;
+        for (size_t k = i + 1; k < n; ++k) {
+            if (std::fabs(a(k, i)) > maxEl) {
+                maxEl = std::fabs(a(k, i));
+                maxRow = k;
+            }
+        }
+
+        // Swap maximum row with current row (column by column)
+        if (maxRow != i) {
+            for (size_t k = i; k < n; ++k) {
+                std::swap(a(maxRow, k), a(i, k));
+                std::swap(rhs(maxRow, k), rhs(i, k));
+            }
+        }
+
+        // Make all rows except this one 0 in current column
+        for (size_t k = 0; k < n; ++k) {
+            if (k == i) {
+                continue;
+            }
+            T c = -a(k, i) / a(i, i);
+            for (size_t j = 0; j < n; ++j) {
+                rhs(k, j) += c * rhs(i, j);
+                if (i == j) {
+                    a(k, j) = 0;
+                } else if (i < j) {
+                    a(k, j) += c * a(i, j);
+                }
+            }
+        }
+
+        // Scale
+        for (size_t k = 0; k < n; ++k) {
+            T c = 1 / a(k, k);
+            for (size_t j = 0; j < n; ++j) {
+                a(k, j) *= c;
+                rhs(k, j) *= c;
+            }
+        }
+    }
+
+    //set(rhs);
+    return rhs;
+}
+
+// template <typename T>
+// Array2D<T> Array2D<T>::inverse() const
+// {
+//     Array2D<T> mat(nrows,ncols);
+//     size_t row, column, step;
+//     size_t rows = nrows;
+//     T mult;
+
+//     size_t i = 0, j = 0, k = 0, n = 0;
+//     T d = 0.0;
+
+//     mat = 0.0;
+//     // Initializing Right-hand side to identity matrix
+//     for( i = 0; i < n; ++i)
+//     {
+//         // for(j = 0; j < 2*n; ++j)
+//         // {
+//         //     if(j == (i+n))
+//         //     {
+//         //         mat[i][j] = 1;
+//         //     }
+//         // }
+//         mat[i][i] = 1.0;
+//     }
+
+
+//     // Partial pivoting
+//     for(i = n; i > 1; --i)
+//     {
+//         if(mat[i-1][1] < mat[i][1])
+//         {
+//             for(j = 0; j < 2*n; ++j)
+//             {
+//                 d = mat[i][j];
+//                 mat[i][j] = mat[i-1][j];
+//                 mat[i-1][j] = d;
+//             }
+//         }
+//     }
+
+
+
+
+
+//     // Pivoted output
+//     //cout << "Pivoted output: " << endl;
+//     // for( i = 0; i < n; ++i)
+//     // {
+//     //     for(j = 0; j < 2*n; ++j)
+//     //     {
+//     //         cout << mat[i][j] << "\t";
+//     //     }
+//     //     cout << endl;
+//     // }
+//     // cout << endl;
+    
+//     // Reducing To Diagonal Matrix
+//     for(i = 0; i < n; ++i)
+//     {
+//         for(j = 0; j < 2*n; ++j)
+//         {
+//             if(j != i)
+//             {
+//                 d = mat[j][i] / mat[i][i];
+//                 for(k = 0; k < n*2; ++k)
+//                 {
+//                     mat[j][k] -= mat[i][k]*d;
+//                 }
+//             }
+//         }
+//     }
+
+
+
+//     // Reducing To Unit Matrix
+//     for(i = 0; i < n; ++i)
+//     {
+//         d = mat[i][i];
+//         for(j = 0; j < 2*n; ++j)
+//         {
+//             mat[i][j] = mat[i][j]/d;
+//         }
+//     }
+    
+
+//     return mat;
+// }
+
 
 
 #endif //__ARRAYOPS_TEMPLATE_INCLUDED__

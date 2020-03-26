@@ -189,6 +189,8 @@ class Array2D{
         bracket_proxy<Array2D, T> operator[](int r){
             return bracket_proxy<Array2D, T>(*this, r);
         }
+
+        Array2D inverse() const;
 };
 
 
@@ -356,7 +358,7 @@ void print (T const& c){
             std::cout << c(i,j) << ' ';
         }
     }
-    std::cout << "\nDone \n" << std::endl;
+    std::cout << " \n" << std::endl;
 }
 
 
@@ -384,9 +386,10 @@ void Array2D<T>::print(){
     int i,j;
     int oldp = cout.precision(numeric_limits<T>::digits10 + 1);
     for( i=0; i<nrows; i++) {
+        std::cout << '\n';
         for(j=0; j<ncols; j++) {
-            cout << i << " " << j << " " << &array[i*ncols + j] << endl;
-            cout << array[i*ncols + j] << endl;
+            //cout << i << " " << j << " " << &array[i*ncols + j] << endl;
+            cout << array[i*ncols + j] << ' ';
         }
     }
     cout << "\n" << endl;
