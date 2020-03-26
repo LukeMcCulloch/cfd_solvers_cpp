@@ -344,51 +344,72 @@ Array2D<T> Array2D<T>::invert() {
     // Partial pivoting
     for (size_t i = 0; i < n; ++i) {
         // Search for maximum in this column
-        T maxEl = std::fabs(a(i, i));
+        T maxEl = std::abs(a(i, i));
         size_t maxRow = i;
-        for (size_t k = i + 1; k < n; ++k) {
-            if (std::fabs(a(k, i)) > maxEl) {
-                maxEl = std::fabs(a(k, i));
+        for (size_t k = i+1; k < n; k++) {
+            if ( std::abs(a(k, i)) > maxEl ) {
+                maxEl = std::abs(a(k, i));
                 maxRow = k;
             }
         }
 
         // Swap maximum row with current row (column by column)
-        if (maxRow != i) {
-            for (size_t k = i; k < n; ++k) {
-                std::swap(a(maxRow, k), a(i, k));
-                std::swap(rhs(maxRow, k), rhs(i, k));
-            }
+        //if (maxRow != i) {
+        //for (size_t k = i; k < n; ++k) {
+        // // for (size_t k = i; k < n+1; ++k) {
+        for (size_t k = i+1; k < n; ++k) {
+            // std::swap(a(maxRow, k), a(i, k));
+            // std::swap(rhs(maxRow, k), rhs(i, k));
+            T tmp = a[maxRow][k];
+            a[maxRow][k] = a[i][k];
+            a[i][k] = tmp;
         }
+        //}
 
         // Make all rows except this one 0 in current column
-        for (size_t k = 0; k < n; ++k) {
-            if (k == i) {
-                continue;
-            }
+        // for (size_t k = 0; k < n; ++k) {
+        //     if (k == i) {
+        //         continue;
+        //     }
+        for (size_t k = i+1; k < n; k++) {
             T c = -a(k, i) / a(i, i);
-            for (size_t j = 0; j < n; ++j) {
-                rhs(k, j) += c * rhs(i, j);
+            //for (size_t j = 0; j < n; ++j) {
+            // // for (size_t j = i; j < n+1; j++) {
+            for (size_t j = i+1; j < n; j++) {
+                //rhs(k, j) += c * rhs(i, j);
                 if (i == j) {
                     a(k, j) = 0;
-                } else if (i < j) {
+                // } else if (i < j) {
+                //     a(k, j) += c * a(i, j);
+                // }
+                } else {
                     a(k, j) += c * a(i, j);
                 }
             }
         }
 
         // Scale
-        for (size_t k = 0; k < n; ++k) {
-            T c = 1 / a(k, k);
-            for (size_t j = 0; j < n; ++j) {
-                a(k, j) *= c;
-                rhs(k, j) *= c;
-            }
-        }
+        // for (size_t k = 0; k < n; ++k) {
+        //     T c = 1 / a(k, k);
+        //     for (size_t j = 0; j < n; ++j) {
+        //         a(k, j) *= c;
+        //         rhs(k, j) *= c;
+        //     }
+        // }
     }
 
+
+    // Solve equation Ax=b for an upper triangular matrix A
+    // Array2D<T> x(n,1);
+    // for (int i=n-1; i>=0; i--) {
+    //     x[i][0] = a[i][n]/a[i][i];
+    //     for (int k=i;k>=0; k--) {
+    //         a[k][n] = a[k][n] - ( x[i][0]* a[k][i] );
+    //     }
+    // }
+
     //set(rhs);
-    return rhs;
+    return a;
 }
 
 
@@ -459,7 +480,6 @@ Array2D<T> Array2D<T>::inverse() const {
         }
     }
 
-    //set(rhs);
     return rhs;
 }
 

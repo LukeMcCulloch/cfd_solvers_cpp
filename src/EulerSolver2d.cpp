@@ -1,3 +1,8 @@
+
+//======================================
+// eigen for fast matrix ops
+#include "GetEigen.h"
+
 //======================================
 // my simple array class template (type)
 #include "tests_array.hpp"
@@ -20,8 +25,8 @@
 #include "StringOps.h"
 
 
-//using Eigen::Dynamic;
 
+using Eigen::Dynamic;
 
 // EulerSolver2D::MainData2D::MainData2D() {
 
@@ -784,12 +789,19 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
          print(a);
          cout << "ainv = " << endl;
          print(ainv);
-         ainv.print();
+         //ainv.print();
       }
       if (i < E2Ddata.maxit-1) {
-         Array2D cka = matmul(ca, ainv);
+         cout << " check 1" << endl;
+         Array2D cka1 = matmul(ainv, ca);
          cout << "ainv * a = " << endl;
-         print (cka);
+         print (cka1);
+
+         Array2D cka = matmul(ainv, ca);
+         cout << " check 2" << endl;
+         Array2D cka2 = matmul(ca, ainv);
+         cout << "a * ainv = " << endl;
+         print (cka2);
       }
       // if (ainv.istat>=0) {
       //    cout << "Problem in solving the linear system//: Quadratic_LSJ_Matrix \n";
