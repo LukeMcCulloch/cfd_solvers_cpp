@@ -1,7 +1,7 @@
 
 //======================================
 // eigen for fast matrix ops
-#include "GetEigen.h"
+#include "GetEigen.h" //since you overload real in your code, you must include Eigen first
 
 //======================================
 // my simple array class template (type)
