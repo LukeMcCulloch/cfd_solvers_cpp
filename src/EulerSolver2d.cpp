@@ -783,7 +783,6 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       ime = me.inverse();
       //ainv = a.invert(); // destructive solve //GSinv(a,dummy1,dummy2);
       //ainv = a.inverse();
-
       for (size_t ie = 0; ie < 5; ie++) {
          for (size_t je = 0; je < 5; je++) {
             ainv(ie,je) = ime(ie,je);
