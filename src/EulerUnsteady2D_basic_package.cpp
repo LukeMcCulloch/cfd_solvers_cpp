@@ -2782,11 +2782,12 @@ void EulerSolver2D::MainData2D::write_grid_file(const std::string& datafile) {//
 // This subroutine writes a grid file to be read by a solver.
 // NOTE: Unlike the tecplot file, this files contains boundary info.
 //********************************************************************************
-void EulerSolver2D::MainData2D::write_diagnostic(const std::string& message) {//(char* datafile)
+void EulerSolver2D::MainData2D::write_diagnostic(  const std::string& message,
+                                                   const std::string& filename = "out.dat") {
     int i,j,os;
 //--------------------------------------------------------------------------------
     ofstream outfile;
-    outfile.open( diagnosticfile );
+    outfile.open( filename );
 
 
 
