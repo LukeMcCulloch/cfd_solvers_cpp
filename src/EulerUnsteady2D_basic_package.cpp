@@ -2776,3 +2776,37 @@ void EulerSolver2D::MainData2D::write_grid_file(const std::string& datafile) {//
 //********************************************************************************
 
 
+
+
+//********************************************************************************
+// This subroutine writes a grid file to be read by a solver.
+// NOTE: Unlike the tecplot file, this files contains boundary info.
+//********************************************************************************
+void EulerSolver2D::MainData2D::write_diagnostic(const std::string& message) {//(char* datafile)
+    int i,j,os;
+//--------------------------------------------------------------------------------
+    ofstream outfile;
+    outfile.open( diagnosticfile );
+
+
+
+// Number of boundary segments
+   outfile <<  message << "\n"; //5
+
+
+
+//    std::cout << " Boundary conditions:" << std::endl;
+   for (size_t i = 0; i < nbound; i++) {
+      //std::cout << " boundary" << i << "  bc_type = " << bound[i].bc_type << std::endl;
+      outfile << bound[i].nbnodes << "\n";
+   }
+
+    outfile << "\n";
+
+
+//--------------------------------------------------------------------------------
+    outfile.close();
+}
+//********************************************************************************
+
+

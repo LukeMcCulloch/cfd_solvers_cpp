@@ -280,6 +280,9 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
    cout << "- Computing the relative errors (L_infinity)..\n";
    error_max_wx = -one;
    error_max_wy = -one;
+   // find node i's of max grad error
+   size_t intmax_x = 0;
+   size_t intmax_y = 0;
    //loop nnodes
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
       x = E2Ddata.node[i].x;
@@ -292,6 +295,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
          error_max_wx = std::abs( wx - wxe )/wxe;
          x_max_wx = x;
          y_max_wx = y;
+         intmax_x = i;
       }
 
       if ( std::fabs( (*E2Ddata.node[i].gradw)(ivar,iy) - 
@@ -301,6 +305,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
          error_max_wy = std::abs( wy - wye )/wye;
          x_max_wy = x;
          y_max_wy = y;
+         intmax_y = i;
       }
 
    }//end do
@@ -469,8 +474,14 @@ void EulerSolver2D::Solver::lsq_gradients2_nc(
          ax = ax + (*E2Ddata.node[inode].lsq5x5_cx)(ii) * da;
          ay = ay + (*E2Ddata.node[inode].lsq5x5_cy)(ii) * da;
 
-         // cout << "(*E2Ddata.node[inode].lsq5x5_cx)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cx)(ii) << endl;
-         // cout << "(*E2Ddata.node[inode].lsq5x5_cy)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cy)(ii) << endl;
+         // if (inode<E2Ddata.maxit-1) {
+         //    cout << "(*E2Ddata.node[inode].lsq5x5_cx)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cx)(ii) << endl;
+         //    cout << "(*E2Ddata.node[inode].lsq5x5_cy)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cy)(ii) << endl;
+         // }
+         if (inode<E2Ddata.maxit-1) {
+            cout << " = " << ax << endl;
+            cout << " = " << ay << endl;
+         }
 
       } // end loop nghbr_nghbr
 

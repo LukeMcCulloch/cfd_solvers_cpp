@@ -475,6 +475,7 @@ namespace EulerSolver2D{
     //output
     void write_tecplot_file(const std::string& datafile);
     void write_grid_file(const std::string& datafile);
+    void write_diagnostic(const std::string& message);
 
     //Output - grid files (TLM)
     std::string  datafile_tria_tec = "TLM_tria_grid_tecplot.dat";
@@ -482,6 +483,8 @@ namespace EulerSolver2D{
     std::string  datafile_tria = "TLM_tria.grid";
     std::string  datafile_quad = "TLM_quad.grid";
     std::string  datafile_bcmap = "project.dat";
+
+    std::string  diagnosticfile = "out.dat";
 
     //  Parameters
 
