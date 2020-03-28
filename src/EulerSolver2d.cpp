@@ -810,9 +810,9 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
 
       if (i < E2Ddata.maxit-1) {
          std::ostringstream out;
-         out << " a = " << endl;
+         out << " a = \n" << endl;
          a.print(out);
-         out << "ainv = " << endl;
+         out << "\n ainv = \n" << endl;
          ainv.print(out);
          //ainv.print();
          E2Ddata.write_diagnostic(out, "log/out.dat");

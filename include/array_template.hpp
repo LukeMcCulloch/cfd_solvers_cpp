@@ -423,6 +423,9 @@ std::ostringstream& Array2D<T>::print(
             if (j==ncols-1){
                 out << array[i*ncols + j] << " \n";
             }
+            // else if (j==0){
+            //     out << "\n " << array[i*ncols + j] << " ";
+            // }
             else {
                 out << array[i*ncols + j] << " ";
             }
