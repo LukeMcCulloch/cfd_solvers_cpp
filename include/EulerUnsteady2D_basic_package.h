@@ -94,13 +94,14 @@ using std::vector;
 //#include "StringOps.h" 
 
 //#define REAL_IS_DOUBLE true
-#ifdef REAL_IS_DOUBLE
+// #ifdef REAL_IS_DOUBLE
+//   typedef double real;
+// #else
+//   typedef double real;
+// #endif
+
+
   typedef double real;
-#else
-  typedef float real;
-#endif
-
-
 //======================================
 //Eigen
 //--------------------

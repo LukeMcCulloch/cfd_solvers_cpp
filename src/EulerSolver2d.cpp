@@ -298,7 +298,7 @@ void EulerSolver2D::Solver::check_lsq_coeff_nc(EulerSolver2D::MainData2D& E2Ddat
          intmax_x = i;
       }
 
-      if ( std::fabs( (*E2Ddata.node[i].gradw)(ivar,iy) - 
+      if ( std::abs( (*E2Ddata.node[i].gradw)(ivar,iy) - 
             (a2+2.0*a5*y+a4*x) )/(a2+2.0*a5*y+a4*x) > error_max_wy )  {
          wy  = (*E2Ddata.node[i].gradw)(ivar,iy);
          wye = a2 + 2.0*a5*y + a4*x;
@@ -536,7 +536,7 @@ void EulerSolver2D::Solver::lsq_gradients2_nc(
          //    cout << "(*E2Ddata.node[inode].lsq5x5_cx)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cx)(ii) << endl;
          //    cout << "(*E2Ddata.node[inode].lsq5x5_cy)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cy)(ii) << endl;
          // }
-         if (inode<E2Ddata.maxit-1) {
+         if (inode<E2Ddata.maxit-0) {
             cout << " = " << ax << endl;
             cout << " = " << ay << endl;
          }

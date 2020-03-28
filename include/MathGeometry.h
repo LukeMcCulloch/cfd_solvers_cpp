@@ -5,11 +5,12 @@
 #define __MATHGEOMETRY_INCLUDED__
 
 //#define REAL_IS_DOUBLE true
-#ifdef REAL_IS_DOUBLE
+// #ifdef REAL_IS_DOUBLE
+//   typedef double real;
+// #else
+//   typedef float real;
+// #endif
   typedef double real;
-#else
-  typedef float real;
-#endif
 
 #include <cmath>
 
