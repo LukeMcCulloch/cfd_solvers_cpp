@@ -475,7 +475,7 @@ namespace EulerSolver2D{
     //output
     void write_tecplot_file(const std::string& datafile);
     void write_grid_file(const std::string& datafile);
-    void write_diagnostic(const std::string& message,
+    void write_diagnostic(std::ostringstream& message,
                           const std::string& filename);
 
     //Output - grid files (TLM)

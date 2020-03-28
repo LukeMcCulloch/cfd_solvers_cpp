@@ -805,6 +805,12 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
          cout << " dx = " << dx << endl;
          cout << " dy = " << dy << endl;
          cout << " w2 = " << w2 << endl;
+         std::ostringstream out;
+         out << " dx = " << dx << endl;
+         out << " dy = " << dy << endl;
+         out << " w2 = " << w2 << endl;
+
+         E2Ddata.write_diagnostic(out, "log/out.dat");
       }
 
       if (i < E2Ddata.maxit-1) {
