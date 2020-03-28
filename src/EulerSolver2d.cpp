@@ -426,6 +426,64 @@ void EulerSolver2D::Solver::compute_gradient_nc(
 
 
 //********************************************************************************
+//* Compute the gradient, (wx,wy), for the variable u by Linear LSQ.
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:            inode = Node number at which the gradient is computed.
+//*                     ivar =   Variable for which the gradient is computed.
+//*          node[:).w(ivar) = Solution at nearby nodes.
+//*
+//* Output:  node[inode].gradu = gradient of the requested variable
+//* ------------------------------------------------------------------------------
+//*
+//********************************************************************************
+void EulerSolver2D::Solver::lsq_gradients_nc(
+   EulerSolver2D::MainData2D& E2Ddata, int inode, int ivar) {
+
+   //  use edu2d_my_main_data           , only : node
+   //  use edu2d_constants              , only : p2, zero
+
+   //  implicit none
+
+   //  integer, intent(in) :: inode, ivar
+
+   //Local variables
+   int in, inghbr;
+   int ix, iy;
+   real da, ax, ay;
+
+   ix = 0;
+   iy = 1;
+   ax = zero;
+   ay = zero;
+
+//   Loop over neighbors
+
+   // loop in = 1, E2Ddata.node[inode].nnghbrs
+   for (size_t in = 0; in < E2Ddata.node[inode].nnghbrs; in ++) {
+      inghbr = (*E2Ddata.node[inode].nghbr)(in);
+
+      da = (*E2Ddata.node[inghbr].w)(ivar) - (*E2Ddata.node[inode].w)(ivar);
+
+      ax = ax + (*E2Ddata.node[inode].lsq2x2_cx)(in)*da;
+      ay = ay + (*E2Ddata.node[inode].lsq2x2_cy)(in)*da;
+
+      // cout << " (*E2Ddata.node[inode].lsq2x2_cx)(in) = "
+      //          << (*E2Ddata.node[inode].lsq2x2_cx)(in) << endl;
+      // cout << " (*E2Ddata.node[inode].lsq2x2_cy)(in) = "
+      //          << (*E2Ddata.node[inode].lsq2x2_cy)(in) << endl;
+
+   }
+
+   (*E2Ddata.node[inode].gradw)(ivar,ix) = ax;  //<-- du(ivar)/dx
+   (*E2Ddata.node[inode].gradw)(ivar,iy) = ay;  //<-- du(ivar)/dy
+
+}// end lsq_gradients_nc
+//--------------------------------------------------------------------------------
+
+
+
+//********************************************************************************
 //* Compute the gradient, (wx,wy), for the variable u by Quadratic LSQ.
 //*
 //* ------------------------------------------------------------------------------
@@ -931,64 +989,6 @@ real EulerSolver2D::Solver::lsq_weight(
 
 
 
-
-
-
-//********************************************************************************
-//* Compute the gradient, (wx,wy), for the variable u by Linear LSQ.
-//*
-//* ------------------------------------------------------------------------------
-//*  Input:            inode = Node number at which the gradient is computed.
-//*                     ivar =   Variable for which the gradient is computed.
-//*          node[:).w(ivar) = Solution at nearby nodes.
-//*
-//* Output:  node[inode].gradu = gradient of the requested variable
-//* ------------------------------------------------------------------------------
-//*
-//********************************************************************************
-void EulerSolver2D::Solver::lsq_gradients_nc(
-   EulerSolver2D::MainData2D& E2Ddata, int inode, int ivar) {
-
-   //  use edu2d_my_main_data           , only : node
-   //  use edu2d_constants              , only : p2, zero
-
-   //  implicit none
-
-   //  integer, intent(in) :: inode, ivar
-
-   //Local variables
-   int in, inghbr;
-   int ix, iy;
-   real da, ax, ay;
-
-   ix = 0;
-   iy = 1;
-   ax = zero;
-   ay = zero;
-
-//   Loop over neighbors
-
-   // loop in = 1, E2Ddata.node[inode].nnghbrs
-   for (size_t in = 0; in < E2Ddata.node[inode].nnghbrs; in ++) {
-      inghbr = (*E2Ddata.node[inode].nghbr)(in);
-
-      da = (*E2Ddata.node[inghbr].w)(ivar) - (*E2Ddata.node[inode].w)(ivar);
-
-      ax = ax + (*E2Ddata.node[inode].lsq2x2_cx)(in)*da;
-      ay = ay + (*E2Ddata.node[inode].lsq2x2_cy)(in)*da;
-
-      // cout << " (*E2Ddata.node[inode].lsq2x2_cx)(in) = "
-      //          << (*E2Ddata.node[inode].lsq2x2_cx)(in) << endl;
-      // cout << " (*E2Ddata.node[inode].lsq2x2_cy)(in) = "
-      //          << (*E2Ddata.node[inode].lsq2x2_cy)(in) << endl;
-
-   }
-
-   (*E2Ddata.node[inode].gradw)(ivar,ix) = ax;  //<-- du(ivar)/dx
-   (*E2Ddata.node[inode].gradw)(ivar,iy) = ay;  //<-- du(ivar)/dy
-
-}// end lsq_gradients_nc
-//--------------------------------------------------------------------------------
 
 
 

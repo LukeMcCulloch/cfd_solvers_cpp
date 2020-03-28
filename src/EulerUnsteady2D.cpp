@@ -200,6 +200,7 @@
 
 EulerSolver2D::MainData2D::MainData2D() {
 
+   boot_diagnostic("log/out.dat");
    cout << "end of grid constructor" << endl;
 }
 

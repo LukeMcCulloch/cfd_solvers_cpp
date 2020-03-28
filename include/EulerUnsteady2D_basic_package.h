@@ -75,7 +75,7 @@ classes:
 using std::vector;
 
 
-#include <fstream>
+//#include <fstream>
 
 //======================================
 // my simple array class template (type)
@@ -474,9 +474,11 @@ namespace EulerSolver2D{
     void compute_ar();
 
 
-    //output
+    // output
     void write_tecplot_file(const std::string& datafile);
     void write_grid_file(const std::string& datafile);
+    // logging
+    void boot_diagnostic(const std::string& filename);
     void write_diagnostic(std::ostringstream& message,
                           const std::string& filename);
 
