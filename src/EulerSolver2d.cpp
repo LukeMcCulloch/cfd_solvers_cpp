@@ -679,7 +679,6 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
          //nghbr_nghbr : do ell = 1, E2Ddata.node[in].nnghbrs
          for (size_t ell = 0; ell < E2Ddata.node[in].nnghbrs; ell++) {
 
-
             dx = E2Ddata.node[in].x - E2Ddata.node[i].x + (*E2Ddata.node[in].dx)(ell);
             dy = E2Ddata.node[in].y - E2Ddata.node[i].y + (*E2Ddata.node[in].dy)(ell);
 
@@ -801,26 +800,25 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
       }
 
       if (i < E2Ddata.maxit-1) {
-         cout << " ---------BOTTOM---------- " << endl;
-         cout << " dx = " << dx << endl;
-         cout << " dy = " << dy << endl;
-         cout << " w2 = " << w2 << endl;
          std::ostringstream out;
+         out << " ---------BOTTOM---------- " << endl;
          out << " dx = " << dx << endl;
          out << " dy = " << dy << endl;
          out << " w2 = " << w2 << endl;
-
          E2Ddata.write_diagnostic(out, "log/out.dat");
       }
 
       if (i < E2Ddata.maxit-1) {
-         cout << " a = " << endl;
-         print(a);
-         cout << "ainv = " << endl;
-         print(ainv);
+         std::ostringstream out;
+         out << " a = " << endl;
+         a.print(out);
+         out << "ainv = " << endl;
+         ainv.print(out);
          //ainv.print();
+         E2Ddata.write_diagnostic(out, "log/out.dat");
       }
       if (i < E2Ddata.maxit-1) {
+         std::ostringstream out;
          cout << " check 1" << endl;
          Array2D cka1 = matmul(ainv, ca);
          cout << "ainv * a = " << endl;

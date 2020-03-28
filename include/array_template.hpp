@@ -138,12 +138,19 @@ class Array2D{
         
 
         //methods:
+        //
+        //setting
         void build();
         void buildWithParameters(int, int);
         //void initialize();
         void setonce( T data);
-        void print();
+        //
+        // inversion
         Array2D<T>  invert();
+        //
+        //printing
+        void print();
+        std::ostringstream& print(std::ostringstream&);
 
        
         void cache() const {}
@@ -382,18 +389,48 @@ void Array2D<T>::setonce(T data){
 
 
 template <class T>
-void Array2D<T>::print(){
+void Array2D<T>::print() {
     int i,j;
     int oldp = cout.precision(numeric_limits<T>::digits10 + 1);
     for( i=0; i<nrows; i++) {
-        std::cout << '\n';
+        std::cout << "\n";
         for(j=0; j<ncols; j++) {
             //cout << i << " " << j << " " << &array[i*ncols + j] << endl;
-            cout << array[i*ncols + j] << ' ';
+            cout << array[i*ncols + j] << " ";
         }
     }
     cout << "\n" << endl;
     cout.precision(oldp);
+}
+
+
+
+// template <typename CharT, typename traits, typename T>
+// std::basic_ostringstream<CharT,traits>&& operator<<(std::basic_ostringstream<CharT,traits>&& out, const T& t) {
+//   static_cast<std::basic_ostream<CharT,traits>&>(out) << t;
+//   return std::move(out);
+// }
+
+template <class T>
+std::ostringstream& Array2D<T>::print(
+                        std::ostringstream& out) {
+    int i,j;
+    //int oldp = cout.precision(numeric_limits<T>::digits10 + 1);
+    for( i=0; i<nrows; i++) {
+        //out << "\n";
+        //out << " " << endl;
+        for(j=0; j<ncols; j++) {
+            if (j==ncols-1){
+                out << array[i*ncols + j] << " \n";
+            }
+            else {
+                out << array[i*ncols + j] << " ";
+            }
+        }
+    }
+    //out << "\n";
+    //out << " " << endl;
+    return out;
 }
 
 

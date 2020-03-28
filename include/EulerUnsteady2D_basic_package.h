@@ -75,6 +75,8 @@ classes:
 using std::vector;
 
 
+#include <fstream>
+
 //======================================
 // my simple array class template (type)
 #include "tests_array.hpp"

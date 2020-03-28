@@ -2784,10 +2784,10 @@ void EulerSolver2D::MainData2D::write_grid_file(const std::string& datafile) {//
 //********************************************************************************
 void EulerSolver2D::MainData2D::write_diagnostic(  std::ostringstream& message,
                                                    const std::string& filename = "out.dat") {
-    int i,j,os;
+   int i,j,os;
 //--------------------------------------------------------------------------------
-    ofstream outfile;
-    outfile.open( filename );
+   ofstream outfile;
+   outfile.open( filename, std::fstream::app  );
 
 
 
