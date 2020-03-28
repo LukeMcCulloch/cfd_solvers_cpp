@@ -93,15 +93,14 @@ using std::vector;
 // string trimfunctions
 //#include "StringOps.h" 
 
-//#define REAL_IS_DOUBLE true
-// #ifdef REAL_IS_DOUBLE
-//   typedef double real;
-// #else
-//   typedef double real;
-// #endif
-
-
+#define REAL_IS_DOUBLE true
+#ifdef REAL_IS_DOUBLE
   typedef double real;
+#else
+  typedef float real;
+#endif
+
+
 //======================================
 //Eigen
 //--------------------
