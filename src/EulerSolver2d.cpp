@@ -1038,33 +1038,73 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
    //Local variablesinitial_solution_shock_diffraction
    int i;
    real M_shock, u_shock, rho0, u0, v0, p0;
+   real gamma = E2Ddata.gamma;
 
-   //do i = 1, nnodes
+   //loop nnodes
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
 
-   // Pre-shock state: uniform state; no disturbance has reahced yet.
+      // Pre-shock state: uniform state; no disturbance has reahced yet.
 
-   // rho0  = one;
-   // u0    = zero;
-   // v0    = zero;
-   // p0    = one/gamma;
+      rho0  = one;
+      u0    = zero;
+      v0    = zero;
+      p0    = one/gamma;
 
-   // // Incoming shock speed
+   // Incoming shock speed
 
-   //    M_shock = 5.09;
-   //    u_shock = M_shock * sqrt(gamma*p0/rho0);
+      M_shock = 5.09;
+      u_shock = M_shock * sqrt(gamma*p0/rho0);
 
-   //    // Post-shock state: These values will be used in the inflow boundary condition.
-   //    rho_inf = rho0 * (gamma + one)*M_shock**2/( (gamma - one)*M_shock**2 + two )
-   //       p_inf =   p0 * (   two*gamma*M_shock**2 - (gamma - one) )/(gamma + one)
-   //       u_inf = (one - rho0/rho_inf)*u_shock
-   //       M_inf = u_inf / sqrt(gamma*p_inf/rho_inf)
-   //       v_inf = zero
+      // Post-shock state: These values will be used in the inflow boundary condition.
+      E2Ddata.rho_inf = rho0 * (gamma + one)*M_shock*M_shock/( (gamma - one)*M_shock*M_shock + two );
+         E2Ddata.p_inf =   p0 * (   two*gamma*M_shock*M_shock - (gamma - one) )/(gamma + one);
+         E2Ddata.u_inf = (one - rho0/E2Ddata.rho_inf)*u_shock;
+         E2Ddata.M_inf = E2Ddata.u_inf / sqrt(gamma*E2Ddata.p_inf/E2Ddata.rho_inf);
+         E2Ddata.v_inf = zero;
 
-   //    // Set the initial solution: set the pre-shock state inside the domain.
+      // Set the initial solution: set the pre-shock state inside the domain.
 
-   //    node(i)%w = (/ rho0, u0, v0, p0 /)
-   //    node(i)%u = w2u(node(i)%w)
+      E2Ddata.node[i].w[0] = rho0; 
+      E2Ddata.node[i].w[0] = u0;
+      E2Ddata.node[i].w[0] = v0;
+      E2Ddata.node[i].w[0] = p0;
+      (*E2Ddata.node[i].u) = w2u( (*E2Ddata.node[i].w), E2Ddata);
 
    }
- }  // end subroutine initial_solution_shock_diffraction
+ }  // end function initial_solution_shock_diffraction
+
+
+
+
+//********************************************************************************
+//* Compute U from W
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:  w =    primitive variables (rho,     u,     v,     p)
+//* Output:  u = conservative variables (rho, rho*u, rho*v, rho*E)
+//* ------------------------------------------------------------------------------
+//* 
+//********************************************************************************
+Array2D<real>  EulerSolver2D::Solver::w2u(const Array2D<real>& w,
+                                             EulerSolver2D::MainData2D& E2Ddata) {
+
+   // use edu2d_constants   , only : p2, one, half
+   // use edu2d_my_main_data, only : gamma
+
+   // implicit none
+
+   // real(p2), dimension(4), intent(in) :: w
+
+   // //Local variables
+   // real(p2), dimension(4)             :: u //output
+   Array2D<real> u(4,1);
+
+   u(0) = w(0);
+   u(1) = w(0)*w(1);
+   u(2) = w(0)*w(2);
+   u(3) = w(3)/(E2Ddata.gamma-one)+half*w(1)*(w(2)*w(2)+w(3)*w(3));
+
+   return u;
+
+} // end function w2u
+//--------------------------------------------------------------------------------
