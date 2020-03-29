@@ -1027,7 +1027,7 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
 //                           Outflow
 //
 //********************************************************************************
-   void initial_solution_shock_diffraction(
+   void EulerSolver2D::Solver::initial_solution_shock_diffraction(
       EulerSolver2D::MainData2D& E2Ddata ) {
 
    // use edu2d_constants       , only : p2, zero, one, two

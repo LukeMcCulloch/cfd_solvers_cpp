@@ -198,8 +198,7 @@ public:
     Array2D<real> GSinv(const Array2D<real>& a, Array2D<real>& m, const Array2D<real>& b);
 
 
-    void initial_solution_shock_diffraction();
-        //EulerSolver2D::MainData2D& E2Ddata );
+    void initial_solution_shock_diffraction( EulerSolver2D::MainData2D& E2Ddata);
 
 
 };
