@@ -319,9 +319,9 @@ void program_2D_euler_rk2(){
    E2Dsolver.compute_lsq_coeff_nc(E2Ddata);
    E2Dsolver.check_lsq_coeff_nc(E2Ddata);
 
-// // (5) Set initial solution for a shock diffraction problem
-// //     (Re-write or replace it by your own subroutine for other problems.)
-//       initial_solution_shock_diffraction();
+// (5) Set initial solution for a shock diffraction problem
+//     (Re-write or replace it by your own subroutine for other problems.)
+      // initial_solution_shock_diffraction();
 
 // // (6) Compute the solution (March in time to the final time)
 //       euler_solver_main();
@@ -338,3 +338,5 @@ void EulerSolver2D::driverEuler2D(){
 }
 
 //}  //end namespace EulerSolver2D
+
+
