@@ -1002,3 +1002,69 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
                                     Array2D<real>& m, const Array2D<real>& b) {
    return GaussSeidelInv(a,m,b);
 }
+
+
+
+//********************************************************************************
+//* Initial solution for the shock diffraction problem:
+//*
+//* NOTE: So, this is NOT a general purpose subroutine.
+//*       For other problems, specify M_inf in the main program, and
+//*       modify this subroutine to set up an appropriate initial solution.
+//
+//  Shock Diffraction Problem:
+//
+//                             Wall
+//                     --------------------
+// Post-shock (inflow) |                  |
+// (rho,u,v,p)_inf     |->Shock (M_shock) |            o: Corner node
+//    M_inf            |                  |
+//              .......o  Pre-shock       |Outflow
+//                Wall |  (rho0,u0,v0,p0) |
+//                     |                  |
+//                     |                  |
+//                     --------------------
+//                           Outflow
+//
+//********************************************************************************
+   void initial_solution_shock_diffraction(
+      EulerSolver2D::MainData2D& E2Ddata ) {
+
+   // use edu2d_constants       , only : p2, zero, one, two
+   // use edu2d_my_main_data    , only : nnodes, node, gamma, M_inf, rho_inf, u_inf, v_inf, p_inf
+   // use edu2d_euler_rk2_solver, only : w2u
+
+
+   //Local variablesinitial_solution_shock_diffraction
+   int i;
+   real M_shock, u_shock, rho0, u0, v0, p0;
+
+   //do i = 1, nnodes
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+
+   // Pre-shock state: uniform state; no disturbance has reahced yet.
+
+   // rho0  = one;
+   // u0    = zero;
+   // v0    = zero;
+   // p0    = one/gamma;
+
+   // // Incoming shock speed
+
+   //    M_shock = 5.09;
+   //    u_shock = M_shock * sqrt(gamma*p0/rho0);
+
+   //    // Post-shock state: These values will be used in the inflow boundary condition.
+   //    rho_inf = rho0 * (gamma + one)*M_shock**2/( (gamma - one)*M_shock**2 + two )
+   //       p_inf =   p0 * (   two*gamma*M_shock**2 - (gamma - one) )/(gamma + one)
+   //       u_inf = (one - rho0/rho_inf)*u_shock
+   //       M_inf = u_inf / sqrt(gamma*p_inf/rho_inf)
+   //       v_inf = zero
+
+   //    // Set the initial solution: set the pre-shock state inside the domain.
+
+   //    node(i)%w = (/ rho0, u0, v0, p0 /)
+   //    node(i)%u = w2u(node(i)%w)
+
+   }
+ }  // end subroutine initial_solution_shock_diffraction

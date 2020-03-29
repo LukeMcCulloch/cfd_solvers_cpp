@@ -321,7 +321,7 @@ void program_2D_euler_rk2(){
 
 // (5) Set initial solution for a shock diffraction problem
 //     (Re-write or replace it by your own subroutine for other problems.)
-      // initial_solution_shock_diffraction();
+   //E2Dsolver.initial_solution_shock_diffraction();
 
 // // (6) Compute the solution (March in time to the final time)
 //       euler_solver_main();
