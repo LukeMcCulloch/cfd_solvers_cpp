@@ -1030,11 +1030,6 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
    void EulerSolver2D::Solver::initial_solution_shock_diffraction(
       EulerSolver2D::MainData2D& E2Ddata ) {
 
-   // use edu2d_constants       , only : p2, zero, one, two
-   // use edu2d_my_main_data    , only : nnodes, node, gamma, M_inf, rho_inf, u_inf, v_inf, p_inf
-   // use edu2d_euler_rk2_solver, only : w2u
-
-
    //Local variablesinitial_solution_shock_diffraction
    int i;
    real M_shock, u_shock, rho0, u0, v0, p0;
@@ -1056,7 +1051,7 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
       u_shock = M_shock * sqrt(gamma*p0/rho0);
 
       // Post-shock state: These values will be used in the inflow boundary condition.
-      E2Ddata.rho_inf = rho0 * (gamma + one)*M_shock*M_shock/( (gamma - one)*M_shock*M_shock + two );
+       E2Ddata.rho_inf = rho0 * (gamma + one)*M_shock*M_shock/( (gamma - one)*M_shock*M_shock + two );
          E2Ddata.p_inf =   p0 * (   two*gamma*M_shock*M_shock - (gamma - one) )/(gamma + one);
          E2Ddata.u_inf = (one - rho0/E2Ddata.rho_inf)*u_shock;
          E2Ddata.M_inf = E2Ddata.u_inf / sqrt(gamma*E2Ddata.p_inf/E2Ddata.rho_inf);
@@ -1087,16 +1082,6 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
 //********************************************************************************
 Array2D<real>  EulerSolver2D::Solver::w2u(const Array2D<real>& w,
                                              EulerSolver2D::MainData2D& E2Ddata) {
-
-   // use edu2d_constants   , only : p2, one, half
-   // use edu2d_my_main_data, only : gamma
-
-   // implicit none
-
-   // real(p2), dimension(4), intent(in) :: w
-
-   // //Local variables
-   // real(p2), dimension(4)             :: u //output
    Array2D<real> u(4,1);
 
    u(0) = w(0);
@@ -1107,4 +1092,28 @@ Array2D<real>  EulerSolver2D::Solver::w2u(const Array2D<real>& w,
    return u;
 
 } // end function w2u
+//--------------------------------------------------------------------------------
+
+//********************************************************************************
+//* Compute U from W
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:  u = conservative variables (rho, rho*u, rho*v, rho*E)
+//* Output:  w =    primitive variables (rho,     u,     v,     p)
+//* ------------------------------------------------------------------------------
+//* 
+//********************************************************************************
+Array2D<real>  EulerSolver2D::Solver::u2w(const Array2D<real>& u,
+                                             EulerSolver2D::MainData2D& E2Ddata) {
+
+   Array2D<real> w(4,1);
+
+   w(1) = u(1);
+   w(2) = u(2)/u(1);
+   w(3) = u(3)/u(1);
+   w(4) = (E2Ddata.gamma-one)*( u(4) - half*w(1)*(w(2)*w(2)+w(3)*w(3)) );
+
+   return w;
+
+}//end function u2w
 //--------------------------------------------------------------------------------

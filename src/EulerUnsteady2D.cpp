@@ -323,8 +323,8 @@ void program_2D_euler_rk2(){
 //     (Re-write or replace it by your own subroutine for other problems.)
    E2Dsolver.initial_solution_shock_diffraction(E2Ddata);
 
-// // (6) Compute the solution (March in time to the final time)
-//       euler_solver_main();
+// (6) Compute the solution (March in time to the final time)
+   E2Dsolver.euler_solver_main(E2Ddata);
 
 // // (7) Write out the tecplot data file (Solutions at nodes)
 //       write_tecplot_file(datafile_tec);

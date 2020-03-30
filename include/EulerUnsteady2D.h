@@ -199,7 +199,10 @@ public:
 
 
     void initial_solution_shock_diffraction( EulerSolver2D::MainData2D& E2Ddata);
+    
     Array2D<real> w2u(const Array2D<real>& w, 
+                        EulerSolver2D::MainData2D& E2Ddata);
+    Array2D<real> u2w(const Array2D<real>& u, 
                         EulerSolver2D::MainData2D& E2Ddata);
 
 };
