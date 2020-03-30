@@ -102,11 +102,229 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    // NOTE: Necessary because initial solution may generate the normal component.
    //--------------------------------------------------------------------------------
 
+    eliminate_normal_mass_flux(E2Ddata);
+
+   //--------------------------------------------------------------------------------
+   // Time-stepping toward the final time
+   //--------------------------------------------------------------------------------
+
+
 }
 //********************************************************************************
 // End of program
 //********************************************************************************
 
+
+
+
+//********************************************************************************
+//* Prepararion for Tangency condition (slip wall):
+//*
+//* Eliminate normal mass flux component at all solid-boundary nodes at the
+//* beginning. The normal component will never be changed in the solver: the
+//* residuals will be constrained to have zero normal component.
+//*
+//********************************************************************************
+void EulerSolver2D::Solver::eliminate_normal_mass_flux( EulerSolver2D::MainData2D& E2Ddata ) {
+
+   int i, j, inode;
+   real normal_mass_flux;
+   Array2D<real> n12(2,1);
+
+   //  bc_loop : loop nbound
+   for (size_t i = 0; i < E2Ddata.nbound; i++) {
+
+      // only_slip_wall : if (trim(bound(i)%bc_type) == "slip_wall") then
+      if ( trim(E2Ddata.bound[i].bc_type) == "slip_wall" ) {
+
+         cout << " Eliminating the normal momentum on slip wall boundary " << i << " \n";
+
+         // bnodes_slip_wall : loop bound(i)%nbnodes
+         for (size_t j = 0; j < E2Ddata.bound[i].nbnodes; j++ ) {
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // THIS IS A SPECIAL TREATMENT FOR SHOCK DIFFRACTION PROBLEM.
+            //
+            // NOTE: This is a corner point between the inflow boundary and
+            //       the lower-left wall. Enforce zero y-momentum, which is
+            //       not ensured by the standard BCs.
+            //       This special treatment is necessary because the domain
+            //       is rectangular (the left boundary is a straight ine) and
+            //       the midpoint node on the left boundary is actually a corner.
+            //
+            //       Our computational domain:
+            //
+            //                 ---------------
+            //          Inflow |             |
+            //                 |             |  o: Corner node
+            //          .......o             |
+            //            Wall |             |  This node is a corner.
+            //                 |             |
+            //                 ---------------
+            //
+            //       This is to simulate the actual domain shown below:
+            //      
+            //         -----------------------
+            // Inflow  |                     |
+            //         |                     |  o: Corner node
+            //         --------o             |
+            //            Wall |             |
+            //                 |             |
+            //                 ---------------
+            //      In effect, we're simulating this flow by a simplified
+            //      rectangular domain (easier to generate the grid).
+            //      So, an appropriate slip BC at the corner node needs to be applied,
+            //      which is "zero y-momentum", and that's all.
+            //
+            if (i==1 and j==0) {
+               inode                       = (*E2Ddata.bound[i].bnode)(j);
+               (*E2Ddata.node[inode].u)(1) = zero;                                  // Make sure zero y-momentum.
+               (*E2Ddata.node[inode].w)    = u2w( (*E2Ddata.node[inode].u) , E2Ddata );// Update primitive variables
+               
+               continue; // cycle bnodes_slip_wall // That's all we neeed. Go to the next.
+
+            }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            inode = (*E2Ddata.bound[i].bnode)(j);
+            n12(0) = (*E2Ddata.bound[i].bnx)(j);
+            n12(1) = (*E2Ddata.bound[i].bny)(j);
+
+            normal_mass_flux = (*E2Ddata.node[inode].u)(0)*n12(0) + (*E2Ddata.node[inode].u)(1)*n12(0); //tlm fixed
+
+            (*E2Ddata.node[inode].u)(1) = (*E2Ddata.node[inode].u)(1) - normal_mass_flux * n12(0);
+            (*E2Ddata.node[inode].u)(2) = (*E2Ddata.node[inode].u)(2) - normal_mass_flux * n12(1);
+
+            (*E2Ddata.node[inode].w)    = u2w( (*E2Ddata.node[inode].u) , E2Ddata );
+
+         }//end loop bnodes_slip_wall
+
+         cout << " Finished eliminating the normal momentum on slip wall boundary " << i << " \n";
+
+      }//end if only_slip_wall
+
+   }//end loop bc_loop
+
+ } // end eliminate_normal_mass_flux
+
+//--------------------------------------------------------------------------------
+
+
+
+
+//********************************************************************************
+//* Initial solution for the shock diffraction problem:
+//*
+//* NOTE: So, this is NOT a general purpose subroutine.
+//*       For other problems, specify M_inf in the main program, and
+//*       modify this subroutine to set up an appropriate initial solution.
+//
+//  Shock Diffraction Problem:
+//
+//                             Wall
+//                     --------------------
+// Post-shock (inflow) |                  |
+// (rho,u,v,p)_inf     |->Shock (M_shock) |            o: Corner node
+//    M_inf            |                  |
+//              .......o  Pre-shock       |Outflow
+//                Wall |  (rho0,u0,v0,p0) |
+//                     |                  |
+//                     |                  |
+//                     --------------------
+//                           Outflow
+//
+//********************************************************************************
+void EulerSolver2D::Solver::initial_solution_shock_diffraction(
+                                             EulerSolver2D::MainData2D& E2Ddata ) {
+
+   //Local variablesinitial_solution_shock_diffraction
+   int i;
+   real M_shock, u_shock, rho0, u0, v0, p0;
+   real gamma = E2Ddata.gamma;
+
+   //loop nnodes
+   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
+
+      // Pre-shock state: uniform state; no disturbance has reahced yet.
+
+      rho0  = one;
+      u0    = zero;
+      v0    = zero;
+      p0    = one/gamma;
+
+   // Incoming shock speed
+
+      M_shock = 5.09;
+      u_shock = M_shock * sqrt(gamma*p0/rho0);
+
+      // Post-shock state: These values will be used in the inflow boundary condition.
+       E2Ddata.rho_inf = rho0 * (gamma + one)*M_shock*M_shock/( (gamma - one)*M_shock*M_shock + two );
+         E2Ddata.p_inf =   p0 * (   two*gamma*M_shock*M_shock - (gamma - one) )/(gamma + one);
+         E2Ddata.u_inf = (one - rho0/E2Ddata.rho_inf)*u_shock;
+         E2Ddata.M_inf = E2Ddata.u_inf / sqrt(gamma*E2Ddata.p_inf/E2Ddata.rho_inf);
+         E2Ddata.v_inf = zero;
+
+      // Set the initial solution: set the pre-shock state inside the domain.
+
+      E2Ddata.node[i].w[0] = rho0;
+      E2Ddata.node[i].w[0] = u0;
+      E2Ddata.node[i].w[0] = v0;
+      E2Ddata.node[i].w[0] = p0;
+      (*E2Ddata.node[i].u) = w2u( (*E2Ddata.node[i].w), E2Ddata);
+
+   }
+ }  // end function initial_solution_shock_diffraction
+
+
+
+
+//********************************************************************************
+//* Compute U from W
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:  w =    primitive variables (rho,     u,     v,     p)
+//* Output:  u = conservative variables (rho, rho*u, rho*v, rho*E)
+//* ------------------------------------------------------------------------------
+//* 
+//********************************************************************************
+Array2D<real>  EulerSolver2D::Solver::w2u(const Array2D<real>& w,
+                                             EulerSolver2D::MainData2D& E2Ddata) {
+   Array2D<real> u(4,1);
+
+   u(0) = w(0);
+   u(1) = w(0)*w(1);
+   u(2) = w(0)*w(2);
+   u(3) = w(3)/(E2Ddata.gamma-one)+half*w(1)*(w(2)*w(2)+w(3)*w(3));
+
+   return u;
+
+} // end function w2u
+//--------------------------------------------------------------------------------
+
+//********************************************************************************
+//* Compute U from W
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:  u = conservative variables (rho, rho*u, rho*v, rho*E)
+//* Output:  w =    primitive variables (rho,     u,     v,     p)
+//* ------------------------------------------------------------------------------
+//* 
+//********************************************************************************
+Array2D<real>  EulerSolver2D::Solver::u2w(const Array2D<real>& u,
+                                             EulerSolver2D::MainData2D& E2Ddata) {
+
+   Array2D<real> w(4,1);
+
+   w(0) = u(0);
+   w(1) = u(1)/u(0);
+   w(2) = u(2)/u(0);
+   w(3) = (E2Ddata.gamma-one)*( u(3) - half*w(0)*(w(1)*w(1)+w(2)*w(2)) );
+
+   return w;
+
+}//end function u2w
+//--------------------------------------------------------------------------------
 
 
 
@@ -1002,118 +1220,3 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
                                     Array2D<real>& m, const Array2D<real>& b) {
    return GaussSeidelInv(a,m,b);
 }
-
-
-
-//********************************************************************************
-//* Initial solution for the shock diffraction problem:
-//*
-//* NOTE: So, this is NOT a general purpose subroutine.
-//*       For other problems, specify M_inf in the main program, and
-//*       modify this subroutine to set up an appropriate initial solution.
-//
-//  Shock Diffraction Problem:
-//
-//                             Wall
-//                     --------------------
-// Post-shock (inflow) |                  |
-// (rho,u,v,p)_inf     |->Shock (M_shock) |            o: Corner node
-//    M_inf            |                  |
-//              .......o  Pre-shock       |Outflow
-//                Wall |  (rho0,u0,v0,p0) |
-//                     |                  |
-//                     |                  |
-//                     --------------------
-//                           Outflow
-//
-//********************************************************************************
-   void EulerSolver2D::Solver::initial_solution_shock_diffraction(
-      EulerSolver2D::MainData2D& E2Ddata ) {
-
-   //Local variablesinitial_solution_shock_diffraction
-   int i;
-   real M_shock, u_shock, rho0, u0, v0, p0;
-   real gamma = E2Ddata.gamma;
-
-   //loop nnodes
-   for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-
-      // Pre-shock state: uniform state; no disturbance has reahced yet.
-
-      rho0  = one;
-      u0    = zero;
-      v0    = zero;
-      p0    = one/gamma;
-
-   // Incoming shock speed
-
-      M_shock = 5.09;
-      u_shock = M_shock * sqrt(gamma*p0/rho0);
-
-      // Post-shock state: These values will be used in the inflow boundary condition.
-       E2Ddata.rho_inf = rho0 * (gamma + one)*M_shock*M_shock/( (gamma - one)*M_shock*M_shock + two );
-         E2Ddata.p_inf =   p0 * (   two*gamma*M_shock*M_shock - (gamma - one) )/(gamma + one);
-         E2Ddata.u_inf = (one - rho0/E2Ddata.rho_inf)*u_shock;
-         E2Ddata.M_inf = E2Ddata.u_inf / sqrt(gamma*E2Ddata.p_inf/E2Ddata.rho_inf);
-         E2Ddata.v_inf = zero;
-
-      // Set the initial solution: set the pre-shock state inside the domain.
-
-      E2Ddata.node[i].w[0] = rho0;
-      E2Ddata.node[i].w[0] = u0;
-      E2Ddata.node[i].w[0] = v0;
-      E2Ddata.node[i].w[0] = p0;
-      (*E2Ddata.node[i].u) = w2u( (*E2Ddata.node[i].w), E2Ddata);
-
-   }
- }  // end function initial_solution_shock_diffraction
-
-
-
-
-//********************************************************************************
-//* Compute U from W
-//*
-//* ------------------------------------------------------------------------------
-//*  Input:  w =    primitive variables (rho,     u,     v,     p)
-//* Output:  u = conservative variables (rho, rho*u, rho*v, rho*E)
-//* ------------------------------------------------------------------------------
-//* 
-//********************************************************************************
-Array2D<real>  EulerSolver2D::Solver::w2u(const Array2D<real>& w,
-                                             EulerSolver2D::MainData2D& E2Ddata) {
-   Array2D<real> u(4,1);
-
-   u(0) = w(0);
-   u(1) = w(0)*w(1);
-   u(2) = w(0)*w(2);
-   u(3) = w(3)/(E2Ddata.gamma-one)+half*w(1)*(w(2)*w(2)+w(3)*w(3));
-
-   return u;
-
-} // end function w2u
-//--------------------------------------------------------------------------------
-
-//********************************************************************************
-//* Compute U from W
-//*
-//* ------------------------------------------------------------------------------
-//*  Input:  u = conservative variables (rho, rho*u, rho*v, rho*E)
-//* Output:  w =    primitive variables (rho,     u,     v,     p)
-//* ------------------------------------------------------------------------------
-//* 
-//********************************************************************************
-Array2D<real>  EulerSolver2D::Solver::u2w(const Array2D<real>& u,
-                                             EulerSolver2D::MainData2D& E2Ddata) {
-
-   Array2D<real> w(4,1);
-
-   w(1) = u(1);
-   w(2) = u(2)/u(1);
-   w(3) = u(3)/u(1);
-   w(4) = (E2Ddata.gamma-one)*( u(4) - half*w(1)*(w(2)*w(2)+w(3)*w(3)) );
-
-   return w;
-
-}//end function u2w
-//--------------------------------------------------------------------------------

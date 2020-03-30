@@ -207,6 +207,9 @@ public:
     Array2D<real> u2w(const Array2D<real>& u, 
                         EulerSolver2D::MainData2D& E2Ddata);
 
+    void eliminate_normal_mass_flux(
+                        EulerSolver2D::MainData2D& E2Ddata);
+
 };
 
 
