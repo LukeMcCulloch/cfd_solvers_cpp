@@ -1059,7 +1059,7 @@ Array2D<real> EulerSolver2D::Solver::GSinv(const Array2D<real>& a,
 
       // Set the initial solution: set the pre-shock state inside the domain.
 
-      E2Ddata.node[i].w[0] = rho0; 
+      E2Ddata.node[i].w[0] = rho0;
       E2Ddata.node[i].w[0] = u0;
       E2Ddata.node[i].w[0] = v0;
       E2Ddata.node[i].w[0] = p0;
