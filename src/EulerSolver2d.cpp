@@ -79,7 +79,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    Array2D<real> res_norm(4,3); //Residual norms(L1,L2,Linf)
    Array2D<real>*  u0;       //Saved solution
    real dt, time;    //Time step and actual time
-   int i_time_step; //Number of time steps
+   //int i_time_step; //Number of time steps
    int i;
 
    // // Allocate the temporary solution array needed for the Runge-Kutta method.
@@ -102,11 +102,34 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    // NOTE: Necessary because initial solution may generate the normal component.
    //--------------------------------------------------------------------------------
 
-    eliminate_normal_mass_flux(E2Ddata);
+   eliminate_normal_mass_flux(E2Ddata);
 
    //--------------------------------------------------------------------------------
    // Time-stepping toward the final time
    //--------------------------------------------------------------------------------
+   time = zero;
+
+
+   for ( int i_time_step = 0; i_time_step < 2; ++i_time_step ) {
+      
+      //------------------------------------------------------
+      // Two-stage Runge-Kutta scheme: u^n is saved as u0(:,:)
+      //  1. u^*     = u^n - (dt/vol)*Res(u^n)
+      //  2. u^{n+1} = 1/2*u^n + 1/2*[u^* - (dt/vol)*Res(u^*)]
+      //------------------------------------------------------
+
+      
+      //-----------------------------
+      //- 1st Stage of Runge-Kutta:
+      //-----------------------------
+      compute_residual_ncfv(E2Ddata);
+      
+      //   Compute Res(u^n)
+      
+      if (i_time_step==1) std::cout << "Density    X-momentum  Y-momentum   Energy" << std::endl;
+
+
+   }
 
 
 }
@@ -200,7 +223,8 @@ void EulerSolver2D::Solver::eliminate_normal_mass_flux( EulerSolver2D::MainData2
 
          }//end loop bnodes_slip_wall
 
-         cout << " Finished eliminating the normal momentum on slip wall boundary " << i << " \n";
+         std::cout << " Finished eliminating the normal momentum on slip wall boundary " << i << " \n";
+         std::cout << " \n";
 
       }//end if only_slip_wall
 
@@ -276,6 +300,94 @@ void EulerSolver2D::Solver::initial_solution_shock_diffraction(
    }
  }  // end function initial_solution_shock_diffraction
 
+
+
+
+
+
+//********************************************************************************
+//* This subroutine computes the residual for a node-centered finite-volume method
+//*
+//* ------------------------------------------------------------------------------
+//*  Input: the current solution
+//*
+//* Output: node(:)%res = the residual computed by the current solution.
+//* ------------------------------------------------------------------------------
+//*
+//* Note: dU/dt + dF/dx + dG/dy = 0. Residuals are first computed as
+//*       the integral of (dF/dx + dG/dy), and at the end negative sign is added
+//*       so that we have dU/dt = Res at every node.
+//* 
+//********************************************************************************
+void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2Ddata ) {
+
+   //Local variables
+   Array2D<real> num_flux   = Array2D<real>(E2Ddata.nq,1);        //Numerical flux
+   Array2D<real> wL, wR   = Array2D<real>(E2Ddata.nq,1);          //Left and right face values
+   Array2D<real> dwL, dwR   = Array2D<real>(E2Ddata.nq,1);        //Slope at left and right nodes
+   Array2D<real> dwm, dwp, dwij   = Array2D<real>(E2Ddata.nq,1);  //Re-defined slopes to be limited
+   Array2D<real> e12   = Array2D<real>(2,1);                      //Unit edge vector
+   Array2D<real> n12   = Array2D<real>(2,1);                      //Unit face normal vector
+   real mag_e12;                                                  //Magnitude of the edge vector
+   real mag_n12;                                                  //Magnitude of the face-normal vector
+   real wsn;                                                      //Scaled maximum wave speed
+   real norm_momentum;                                            //Normal component of the momentum
+   Array2D<real> bfluxL, bfluxR   = Array2D<real>(E2Ddata.nq,1);  //Boundary flux at left/right nodes
+   int                node1, node2;                               //Left and right nodes of each edge
+   int                boundary_elm;                               //Element adjacent to boundary face
+   int                n1, n2;                                     //Left and right nodes of boundary face
+   //int                i, j;
+   int                ix=1, iy=2;
+
+   //MatrixXd me(5,5),ime(5,5);
+   
+   //-------------------------------------------------------------------------
+   // Gradient computations for second-order accuracy
+
+   //  Initialization of the gradient of the primitive variables.
+
+   for (int i=0; i<E2Ddata.nnodes; ++i) {
+      for (int j=0; j<E2Ddata.nq; ++j) {
+         (*E2Ddata.node[i].gradw)(j) = zero;
+      }
+   }
+
+   //  Perform LSQ gradient computations in the premitive variables w=[rho,u,v,p]:
+   compute_gradient_nc(E2Ddata, 0, E2Ddata.gradient_type);     // Density gradient: grad(rho)
+   compute_gradient_nc(E2Ddata, 1, E2Ddata.gradient_type);     // Velocity gradient: grad(u)
+   compute_gradient_nc(E2Ddata, 2, E2Ddata.gradient_type);     // Velocity gradient: grad(v)
+   compute_gradient_nc(E2Ddata, 3, E2Ddata.gradient_type);     // Pressure gradient: grad(p)
+
+   //-------------------------------------------------------------------------
+   // Residual computation: interior fluxes
+
+   for (int i=0; i<E2Ddata.nnodes; ++i) {
+      for (int j=0; j<E2Ddata.nq; ++j) {
+         (*E2Ddata.node[i].res)(j) = zero;
+      }
+      E2Ddata.node[i].wsn = zero;
+   }
+   // Flux computation across internal edges (to be accumulated in res(:))
+   //
+   //   node2              1. Extrapolate the solutions to the edge-midpoint
+   //       o                 from the nodes, n1 and n2.
+   //        \   face      2. Compute the numerical flux
+   //         \ -------c2  3. Add it to the residual for n1, and subtract it from
+   //        / \              the residual for n2.
+   //   face/   \ edge
+   //      /     o         Directed area is the sum of the left and the right faces.
+   //    c1    node1       Left/right face is defined by the edge-midpoint and
+   //                      the centroid of the left/right element.
+   //                      Directed area is positive in n1 -> n2
+   // 
+   // (c1, c2: element centroids)
+   // 
+   //--------------------------------------------------------------------------------
+   for (int i=0; i<E2Ddata.nedges; ++i) {
+
+   }
+
+}
 
 
 
@@ -568,7 +680,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(
 
    int in;
 
-   cout << "computing gradient nc type " << grad_type << endl;
+   //cout << "computing gradient nc type " << grad_type << endl;
 
    if (trim(grad_type) == "none") {
       cout << "trim(grad_type) == none, return " << endl;

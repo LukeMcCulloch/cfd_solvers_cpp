@@ -199,6 +199,7 @@ public:
 
 
     void initial_solution_shock_diffraction( EulerSolver2D::MainData2D& E2Ddata);
+    void compute_residual_ncfv( EulerSolver2D::MainData2D& E2Ddata);
     
     // primative to conserved variables
     Array2D<real> w2u(const Array2D<real>& w, 

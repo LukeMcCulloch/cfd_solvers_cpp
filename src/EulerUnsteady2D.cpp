@@ -284,7 +284,7 @@ void program_2D_euler_rk2(){
         E2Ddata.inviscid_flux = "rhll";      // = Rotated-RHLL      , "roe"  = Roe flux
          E2Ddata.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
                    E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
-    E2Ddata.gradient_type     = "linear";    // or "quadratic2 for a quadratic LSQ.
+    E2Ddata.gradient_type     = "linear";    // "linear" or "quadratic2 for a quadratic LSQ.
     E2Ddata.gradient_weight   = "none";      // or "inverse_distance"
     E2Ddata.gradient_weight_p =  EulerSolver2D::one;  // or any other real value
 //--------------------------------------------------------------------------------
@@ -312,9 +312,9 @@ void program_2D_euler_rk2(){
 // (3) Check the grid data (It is always good to check them before use//)
    E2Ddata.check_grid_data();
    cout << "now in program_2D_euler_rk2" << endl;
-
    E2Ddata.write_tecplot_file(E2Ddata.datafile_tria_tec);
    E2Ddata.write_grid_file(E2Ddata.datafile_tria);
+
 // (4) Prepare LSQ gradients
    E2Dsolver.compute_lsq_coeff_nc(E2Ddata);
    E2Dsolver.check_lsq_coeff_nc(E2Ddata);

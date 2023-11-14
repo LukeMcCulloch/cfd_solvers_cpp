@@ -436,7 +436,7 @@ void Grid2D::gridGen2D::generate_quad_grid(){
 //void gridGen2D::write_tecplot_file(char* datafile){
 void Grid2D::gridGen2D::write_tecplot_file(const std::string& datafile){
 
-    int os;
+    //int os;
     // float entropy;
 
     ofstream outfile;
@@ -497,7 +497,7 @@ void Grid2D::gridGen2D::write_tecplot_file(const std::string& datafile){
 // NOTE: Unlike the tecplot file, this files contains boundary info.
 //********************************************************************************
 void Grid2D::gridGen2D::write_grid_file(const std::string& datafile) {//(char* datafile)
-    int i,j,os;
+    //int i,j,os;
 //--------------------------------------------------------------------------------
     ofstream outfile;
     outfile.open (datafile);

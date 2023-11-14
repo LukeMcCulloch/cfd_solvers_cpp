@@ -2584,7 +2584,7 @@ void EulerSolver2D::MainData2D::compute_ar() {
 // plot grids
 void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) {
 
-   int os;
+   //int os;
    // float entropy;
 
    ofstream outfile;
@@ -2645,7 +2645,7 @@ void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) 
 // NOTE: Unlike the tecplot file, this files contains boundary info.
 //********************************************************************************
 void EulerSolver2D::MainData2D::write_grid_file(const std::string& datafile) {//(char* datafile)
-    int i,j,os;
+    //int i,j,os;
 //--------------------------------------------------------------------------------
     ofstream outfile;
     outfile.open (datafile);
@@ -2782,7 +2782,7 @@ void EulerSolver2D::MainData2D::write_grid_file(const std::string& datafile) {//
 // NOTE: Unlike the tecplot file, this files contains boundary info.
 //********************************************************************************
 void EulerSolver2D::MainData2D::boot_diagnostic( const std::string& filename = "out.dat") {
-   int i,j,os;
+   //int i,j,os;
    std::ostringstream message;
 
    message << " Euler Solver Log File" << endl;
@@ -2811,7 +2811,7 @@ void EulerSolver2D::MainData2D::boot_diagnostic( const std::string& filename = "
 //********************************************************************************
 void EulerSolver2D::MainData2D::write_diagnostic(  std::ostringstream& message,
                                                    const std::string& filename = "out.dat") {
-   int i,j,os;
+   //int i,j,os;
 //--------------------------------------------------------------------------------
    ofstream outfile;
    outfile.open( filename, std::fstream::app  );
