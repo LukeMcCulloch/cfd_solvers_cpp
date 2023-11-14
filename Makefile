@@ -9,21 +9,21 @@
 # SUITESPARSE_LIBS  = -lspqr -lumfpack -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -ltbb -lm -lsuitesparseconfig
 # OPENGL_LIBS       = -framework OpenGL -framework GLUT
 
-# # Linux
-INCLUDE_PATH      = -I./include -I./src
-LIBRARY_PATH      =
-BLAS_LIBS         = -llapack -lblas -lgfortran
-# SUITESPARSE_LIBS  = -lspqr -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -lm
-# OPENGL_LIBS       = -lglut -lGL -lGLU -lX11
-SUITESPARSE_LIBS  = -lspqr -lcholmod -lcolamd -lccolamd -lcamd -lamd -lm -lumfpack -lamd #-lmetis 
-OPENGL_LIBS       = -lGL -lGLU -lglut -lGLEW #-lX11
+# # # Linux
+# INCLUDE_PATH      = -I./include -I./src
+# LIBRARY_PATH      =
+# BLAS_LIBS         = -llapack -lblas -lgfortran
+# # SUITESPARSE_LIBS  = -lspqr -lcholmod -lmetis -lcolamd -lccolamd -lcamd -lamd -lm
+# # OPENGL_LIBS       = -lglut -lGL -lGLU -lX11
+# SUITESPARSE_LIBS  = -lspqr -lcholmod -lcolamd -lccolamd -lcamd -lamd -lm -lumfpack -lamd #-lmetis 
+# OPENGL_LIBS       = -lGL -lGLU -lglut -lGLEW #-lX11
 
-# # Windows / Cygwin
-# INCLUDE_PATH      = -I/usr/include/opengl -I/usr/include/suitesparse
-# LIBRARY_PATH      = -L/usr/lib/w32api -L/usr/lib/suitesparse
-# BLAS_LIBS         = -llapack -lblas
-# SUITESPARSE_LIBS  = -lspqr -lcholmod -lcolamd -lccolamd -lcamd -lamd -lm
-# OPENGL_LIBS       = -lglut32 -lglu32 -lopengl32
+# Windows / Cygwin, commenting out everything to get running on a barebones install
+INCLUDE_PATH      = -I./include -I./src 
+LIBRARY_PATH      = #-L/usr/lib/w32api -L/usr/lib/suitesparse  
+BLAS_LIBS         = #-llapack -lblas
+SUITESPARSE_LIBS  = #-lspqr -lcholmod -lcolamd -lccolamd -lcamd -lamd -lm
+OPENGL_LIBS       = #-lglut32 -lglu32 -lopengl32
 
 ########################################################################################
 

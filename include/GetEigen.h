@@ -12,8 +12,18 @@
 //--------------------
 // Windows:
 #elif _WIN32
-   #include <Eigen\Dense>
-   #include  <Eigen\Core>
+   //#include <Eigen\Dense> 
+   //#include  <Eigen\Core>
+   // //quick hack to get Eigen into my particular build (you will need to link to Eigen your own way)
+   #include "../../Eigen/Dense"
+   #include "../../Eigen/Core"
+#elif __CYGWIN__
+   #include "../../Eigen/Dense"
+   #include "../../Eigen/Core"
+#elif __MINGW32__
+   #include "../../Eigen/Dense"
+   #include "../../Eigen/Core"
+
 //--------------------
 // OSX (not correct yet)
 #elif __APPLE__ 
