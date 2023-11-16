@@ -151,7 +151,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       }
 
       //   Compute the time step (local and global)
-      //compute_time_step(dt);
+      compute_time_step(E2Ddata, dt);
       //   Adjust dt so as to finish exactly at the final time
       if (time + dt > E2Ddata.t_final) dt = E2Ddata.t_final - time;
 
@@ -862,6 +862,52 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 }
 
 
+
+//********************************************************************************
+//* This subroutine computes the explicit time-step: the minimum dt over nodes.
+//*
+//* ------------------------------------------------------------------------------
+//*  Input: node(i)%vol = Dual volume
+//*         node(i)%wsn = Sum of the max wave speed multiplied by the face length
+//*
+//* Output:         dt  = global time step
+//*         node(:)%dt  =  local time step
+//* ------------------------------------------------------------------------------
+//*
+//* NOTE: Local time step is computed and stored at every node, but not used.
+//*       For steady problems, it can be used to accelerate the convergence.
+//*
+//********************************************************************************
+ void EulerSolver2D::Solver::compute_time_step( EulerSolver2D::MainData2D& E2Ddata,real dt) {
+
+   //Local variables
+   real dt_min;
+
+   dt_min = 1.0e+05;
+
+   //--------------------------------------------------------------------------------
+   for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+   //--------------------------------------------------------------------------------
+
+      // Local time step: dt = volume/sum(0.5*max_wave_speed*face_area).
+
+      E2Ddata.node[i].dt = E2Ddata.node[i].vol / E2Ddata.node[i].wsn;
+
+      // Keep the minimum dt
+
+      if (i==0) dt_min = E2Ddata.node[i].dt;
+      dt_min = std::min( dt_min, E2Ddata.node[i].dt );
+
+   //--------------------------------------------------------------------------------
+   }
+   //--------------------------------------------------------------------------------
+
+   // Global time-step
+
+   dt = dt_min;
+
+ }
+//--------------------------------------------------------------------------------
 
 
 //********************************************************************************

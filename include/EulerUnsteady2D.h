@@ -206,6 +206,9 @@ public:
     void residual_norm( EulerSolver2D::MainData2D& E2Ddata, Array2D<real>& res_norm_data);
     void update_solution( EulerSolver2D::MainData2D& E2Ddata, 
                                              real coeff, real dt, real CFL);
+    void compute_time_step( EulerSolver2D::MainData2D& E2Ddata, real dt);
+    
+    
     //roe flux
     void roe( EulerSolver2D::MainData2D& E2Ddata,
             const Array2D<real>& primL, const Array2D<real>& primR,
