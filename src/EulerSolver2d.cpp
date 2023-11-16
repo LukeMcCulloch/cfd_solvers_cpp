@@ -79,7 +79,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
 
    // //Local variables
    Array2D<real> res_norm(4,3); //Residual norms(L1,L2,Linf)
-   Array2D<real>*  u0;       //Saved solution
+   Array2D<real> u0(E2Ddata.nnodes,E2Ddata.nq);  //Saved solution
    real dt, time;    //Time step and actual time
    //int i_time_step; //Number of time steps
    int i;
@@ -127,18 +127,71 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       compute_residual_ncfv(E2Ddata);
       
       //   Compute Res(u^n)
+      residual_norm(E2Ddata, res_norm);
       
-      if (i_time_step==1) std::cout << "Density    X-momentum  Y-momentum   Energy" << std::endl;
+      if (i_time_step==1) {
+         std::cout << "Density    X-momentum  Y-momentum   Energy" << std::endl;
+         std::cout << "t= " << time << "steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << res_norm(1,0) << res_norm(2,0) << res_norm(3,0) << std::endl;
+      } else { 
+         std::cout << "t= " << time << " steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << res_norm(1,0) << res_norm(2,0) << res_norm(3,0) << std::endl;
+      }
 
 
-   }
+      
+      //   Stop if the final time is reached.
+      // if ( abs(time-t_final) < 1.0e-12_p2 ) exit time_step  //tlm todo exit loop
+
+      // }
+
+      for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+         u0(i,0) = (*E2Ddata.node[i].u)(0);
+         u0(i,1) = (*E2Ddata.node[i].u)(1);
+         u0(i,2) = (*E2Ddata.node[i].u)(2);
+         u0(i,3) = (*E2Ddata.node[i].u)(3);
+      }
+
+      //   Compute the time step (local and global)
+      //compute_time_step(dt);
+      //   Adjust dt so as to finish exactly at the final time
+      if (time + dt > E2Ddata.t_final) dt = E2Ddata.t_final - time;
+
+      
+      // Update the solution
+      // 1st Stage => u^* = u^n - dt/dx*Res(u^n)
+      //update_solution(one,dt,CFL)
+
+      //-----------------------------
+      //- 2nd Stage of Runge-Kutta:
+      //-----------------------------
+
+      //   Compute Res(u^*)
+      compute_residual_ncfv(E2Ddata);
+
+      //   Compute 1/2*(u^n + u^*)
+      // for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+      //    node(i)%u = half*( node(i)%u + u0(i,:) )
+      // }//end do
+
+      //   2nd Stage => u^{n+1} = 1/2*(u^n + u^*) - 1/2*dt/dx*Res(u^*)
+      //update_solution(half,dt,CFL)
+
+      time = time + dt;
+
+      // if (mod(i_time_step,5) .eq. 0.0) {
+      //    write(picCount,*) i_time_step
+      //    write_tecplot_file('shock_time_s_'//trim(adjustl(picCount))//'.dat');
+      // }
 
 
-}
+   }//end loop time_step
+   //--------------------------------------------------------------------------------
+   // End of Time-stepping to the final time.
+   //--------------------------------------------------------------------------------
+
 //********************************************************************************
 // End of program
 //********************************************************************************
-
+}
 
 
 
@@ -159,12 +212,12 @@ void EulerSolver2D::Solver::eliminate_normal_mass_flux( EulerSolver2D::MainData2
    //  bc_loop : loop nbound
    for (size_t i = 0; i < E2Ddata.nbound; i++) {
 
-      // only_slip_wall : if (trim(bound(i)%bc_type) == "slip_wall") then
+      // only_slip_wall : if (trim(E2Ddata.bound[i].bc_type) == "slip_wall") then
       if ( trim(E2Ddata.bound[i].bc_type) == "slip_wall" ) {
 
          cout << " Eliminating the normal momentum on slip wall boundary " << i << " \n";
 
-         // bnodes_slip_wall : loop bound(i)%nbnodes
+         // bnodes_slip_wall : loop E2Ddata.bound[i].nbnodes
          for (size_t j = 0; j < E2Ddata.bound[i].nbnodes; j++ ) {
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -398,7 +451,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       node1   = E2Ddata.edge[i].n1;  // Left node of the edge
       node2   = E2Ddata.edge[i].n2;  // Right node of the edge
-      n12     = E2Ddata.edge[i].dav; // This is the directed area vector (unit vector) !!TLM check this copy!!
+      n12     = E2Ddata.edge[i].dav; // This is the directed area vector (unit vector) 
       // std::cout << "E2Ddata.edge[i].dav(1) = " << E2Ddata.edge[i].dav(0) << "\n";
       // std::cout << "E2Ddata.edge[i].dav(2) = " << E2Ddata.edge[i].dav(1) << "\n";
       // std::cout << "n12 = " << n12(0) << "\n";
@@ -564,13 +617,292 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
    //
    //
    //--------------------------------------------------------------------------------
-   
+   for (size_t i=0; i<E2Ddata.nbound; ++i) { //bc_loop
+      //--------------------------------------------------------------------------------
 
+      //------------------------------------------------
+      //  BC: Upwind flux via freestream values
+      //
+      //      NOTE: If the final solution at the boundary node is far from
+      //            the freestream values, then the domain is probably is not large enough.
+      if (E2Ddata.bound[i].bc_type == "freestream") {
+         for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { //freestream condition
+
+            n1 = (*E2Ddata.bound[i].bnode)(j  );  //Left node
+            n2 = (*E2Ddata.bound[i].bnode)(j+1);  //Right node
+            n12(0) = (*E2Ddata.bound[i].bfnx)(j);     //x-component of the unit face normal vector
+            n12(1) = (*E2Ddata.bound[i].bfny)(j);     //y-component of the unit face normal vector
+            mag_e12 = (*E2Ddata.bound[i].bfn)(j)*half; //Half length of the boundary face, j.
+            
+            
+
+            //  1. Left node
+            wL = (*E2Ddata.node[n1].w);
+            wR(0) = E2Ddata.rho_inf;
+            wR(1) = E2Ddata.u_inf;
+            wR(2) = E2Ddata.v_inf;
+            wR(3) = E2Ddata.p_inf;
+            roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+            bfluxL = num_flux;
+            E2Ddata.node[n1].wsn = E2Ddata.node[n1].wsn + wsn*mag_e12;
+
+            //   2. Right node
+            wL = (*E2Ddata.node[n2].w);
+            wR(0) = E2Ddata.rho_inf;
+            wR(1) = E2Ddata.u_inf;
+            wR(2) = E2Ddata.v_inf;
+            wR(3) = E2Ddata.p_inf;
+            roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+            bfluxR = num_flux;
+            E2Ddata.node[n2].wsn = E2Ddata.node[n2].wsn + wsn*mag_e12;
+
+            //   3. Add contributions to the two nodes (See Nishikawa AIAA2010-5093)
+            boundary_elm = (*E2Ddata.bound[i].belm)(j);
+
+            if  (E2Ddata.elm[boundary_elm].nvtx == 3) { //Triangle
+
+               (*E2Ddata.node[n1].res) = (*E2Ddata.node[n1].res) + (5.0*bfluxL + bfluxR)/6.0*mag_e12;
+               (*E2Ddata.node[n2].res )= (*E2Ddata.node[n2].res) + (5.0*bfluxR + bfluxL)/6.0*mag_e12;
+
+            } else if (E2Ddata.elm[boundary_elm].nvtx == 4) { //Quad
+
+               (*E2Ddata.node[n1].res) = (*E2Ddata.node[n1].res) + bfluxL*mag_e12;
+               (*E2Ddata.node[n2].res) = (*E2Ddata.node[n2].res) + bfluxR*mag_e12;
+
+            } else {
+
+               std::cout <<  " Error: Element is neither tria nor quad. Stop. "; 
+               //stop
+
+            }
+
+         }  //end do bnodes_numerical_flux_via_freestream
+
+      } //end freestream boundary type
+         
+
+      //------------------------------------------------
+      //  BC: Solid body and Supersonic outflow
+      //
+      //      NOTE: Basically, simply compute the physical flux, which
+      //            can be done by calling the Roe flux with wR = wL.
+      //            It is equivalent to the interior-extrapolation condition.
+      //
+      //      NOTE: Tangency condition for solid body will be applied later.
+
+
+      if ( (E2Ddata.bound[i].bc_type == "slip_wall")  || ((E2Ddata.bound[i].bc_type == "outflow_supersonic") ) ) {
+         
+         for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { //slip wall(part of it anyway) and outflow supersonic
+            
+            //bnodes_slip_wall
+            n1 = (*E2Ddata.bound[i].bnode)(j);   // Left node
+            n2 = (*E2Ddata.bound[i].bnode)(j+1); // Right node
+            n12(0) = (*E2Ddata.bound[i].bfnx)(j);
+            n12(1) = (*E2Ddata.bound[i].bfny)(j);
+            mag_e12 = (*E2Ddata.bound[i].bfn)(j)*half;
+
+            //   1. Left node
+            wL = (*E2Ddata.node[n1].w);
+            wR = wL;
+            roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+            bfluxL = num_flux;
+            E2Ddata.node[n1].wsn = E2Ddata.node[n1].wsn + wsn*mag_e12;
+
+            //   2. Right node
+            wL = (*E2Ddata.node[n2].w);
+            wR = wL;
+            roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+            bfluxR = num_flux;
+            E2Ddata.node[n2].wsn = E2Ddata.node[n2].wsn + wsn*mag_e12;
+
+            //   3. Add contributions to the two nodes (See Nishikawa AIAA2010-5093)
+            boundary_elm = (*E2Ddata.bound[i].belm)(j);
+
+            if     (E2Ddata.elm[boundary_elm].nvtx == 3) { //Triangle
+
+               (*E2Ddata.node[n1].res) = (*E2Ddata.node[n1].res) + (5.0*bfluxL + bfluxR)/6.0*mag_e12;
+               (*E2Ddata.node[n2].res) = (*E2Ddata.node[n2].res) + (5.0*bfluxR + bfluxL)/6.0*mag_e12;
+
+            } else if (E2Ddata.elm[boundary_elm].nvtx == 4) { //Quad
+
+               (*E2Ddata.node[n1].res) = (*E2Ddata.node[n1].res) + bfluxL*mag_e12;
+               (*E2Ddata.node[n2].res) = (*E2Ddata.node[n2].res) + bfluxR*mag_e12;
+
+            } else {
+
+               std::cout << " Error: Element is neither tria nor quad. Stop. \n"; //stop
+
+            }
+
+         } //end do bnodes_slip_wall
+      
+
+
+      //------------------------------------------------
+      //  BC: Subsonic Outflow - Fixed Back Pressure
+      //
+      //      NOTE: Fix the pressure as freestream pressure
+      //            on the right side of the face (outside the domain).
+      //            Assumption is that the outflow boundary is far from the body.
+
+      } else if (E2Ddata.bound[i].bc_type == "outflow_back_pressure") {
+
+         //bnodes_outflow : do j = 1, E2Ddata.bound[i].nbfaces
+         for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { 
+
+            n1 = (*E2Ddata.bound[i].bnode)(j);   // Left node
+            n2 = (*E2Ddata.bound[i].bnode)(j+1); // Right node
+            n12(0) = (*E2Ddata.bound[i].bfnx)(j);
+            n12(2) = (*E2Ddata.bound[i].bfny)(j);
+            mag_e12 = (*E2Ddata.bound[i].bfn)(j)*half;
+
+            //   1. Left node
+            wL = (*E2Ddata.node[n1].w);
+            wR    = wL;
+            wR(3) = E2Ddata.p_inf; //Fix the pressure
+            roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+            bfluxL = num_flux;
+            E2Ddata.node[n1].wsn = E2Ddata.node[n1].wsn + wsn*mag_e12;
+
+            //   2. Right node
+            wL = (*E2Ddata.node[n2].w);
+            wR = wL;
+            wR(3) = E2Ddata.p_inf; //Fix the pressure
+            roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+            bfluxR = num_flux;
+            E2Ddata.node[n2].wsn = E2Ddata.node[n2].wsn + wsn*mag_e12;
+
+            //   3. Add contributions to the two nodes (See Nishikawa AIAA2010-5093)
+            
+            //   3. Add contributions to the two nodes (See Nishikawa AIAA2010-5093)
+            boundary_elm = (*E2Ddata.bound[i].belm)(j);
+
+            if (E2Ddata.elm[boundary_elm].nvtx == 3) { //Triangle
+
+               (*E2Ddata.node[n1].res) = (*E2Ddata.node[n1].res) + (5.0*bfluxL + bfluxR)/6.0*mag_e12;
+               (*E2Ddata.node[n2].res) = (*E2Ddata.node[n2].res) + (5.0*bfluxR + bfluxL)/6.0*mag_e12;
+
+            } else if (E2Ddata.elm[boundary_elm].nvtx == 4) { //Quad
+
+               (*E2Ddata.node[n1].res) = (*E2Ddata.node[n1].res) + bfluxL*mag_e12;
+               (*E2Ddata.node[n2].res) = (*E2Ddata.node[n2].res) + bfluxR*mag_e12;
+
+            } else {
+
+               std::cout << " Error: Element is neither tria nor quad. Stop. \n"; //stop
+
+            }
+
+         }//end loop bnodes_outflow
+
+      //------------------------------------------------
+      }//endif bc
+
+   //--------------------------------------------------------------------------------
+   }//end do bc_loop
+   //--------------------------------------------------------------------------------
+
+
+   //------------------------------------------------
+   //  BC: Solid body - Slip condition (Tangency condition).
+   //
+   //  NOTE: It is good to enforce this condition after everything else has been done.
+
+   //bc_loop2 : do i = 1, nbound
+   for (size_t i=0; i<E2Ddata.nbound; ++i) { //bc_loop
+
+         //only_slip_wall : if (trim(E2Ddata.bound[i].bc_type) == "slip_wall") then
+      if (E2Ddata.bound[i].bc_type == "slip_wall") {
+
+         //bnodes_slip_wall2 : do j = 1, E2Ddata.bound[i].nbnodes
+         for (size_t j=0; j<E2Ddata.bound[i].nbnodes; ++j) { 
+
+            n1 = (*E2Ddata.bound[i].bnode)(j);   // Left node
+            n12(0) = (*E2Ddata.bound[i].bfnx)(j);
+            n12(2) = (*E2Ddata.bound[i].bfny)(j);
+
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // THIS IS A SPECIAL TREATMENT FOR SHOCK DIFFRACTION PROBLEM.
+            // Same as in the subroutine "eliminate_normal_mass_flux" above.
+
+            if (i==1 && j==0) {
+               std::cout << "shock y mmtm 0, n1 = " << n1 << "\n";
+               (*E2Ddata.node[n1].res)(2) = zero; // Make sure no updates to y-momentum.
+               //cycle bnodes_slip_wall2 // That's all we neeed. Go to the next. TLM TODO: c++ cycle
+            }//endif
+            //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+            //    Subtract the normal component of the mass flow for tangency, so that
+            //    normal mass flow through the boundary will not be created at nodes
+            //    after the solution update.
+               
+            norm_momentum = (*E2Ddata.node[n1].res)(1)*n12(0) + (*E2Ddata.node[n1].res)(2)*n12(1);
+            (*E2Ddata.node[n1].res)(1) = (*E2Ddata.node[n1].res)(1) - norm_momentum*n12(0);
+            (*E2Ddata.node[n1].res)(2) = (*E2Ddata.node[n1].res)(2) - norm_momentum*n12(1);
+
+         } //end loop bnodes_slip_wall2
+
+      } //endif only_slip_wall
+
+   }//end loop bc_loop2
+
+   // Switch the residual sign.
+
+   //nodes3 : do i = 1, nnodes
+   for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+
+      (*E2Ddata.node[i].res) = -(*E2Ddata.node[i].res);
+
+   }//end do nodes3
 
 
 }
 
 
+
+//********************************************************************************
+//* This subroutine computes the residual norms: L1, L2, L_infty
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:  node(:)res = the residuals
+//*
+//* Output:  res_norm   = residual norms (L1, L2, Linf)
+//* ------------------------------------------------------------------------------
+//*
+//* NOTE: It is not done here, but I advise you to keep the location of the
+//*       maximum residual (L_inf).
+//*
+//********************************************************************************
+void EulerSolver2D::Solver::residual_norm( EulerSolver2D::MainData2D& E2Ddata, Array2D<real>& res_norm_data) {
+   //Array2D<real> res_norm_data(4,3); // residual norms L1, L2, Linfinity
+   Array2D<real> residual(4,1);      // residual
+
+   for (size_t i=0; i<E2Ddata.nq; ++i){
+      res_norm_data(i,0) =  zero;
+      res_norm_data(i,1) =  zero;
+      res_norm_data(i,2) = - one;
+   }
+
+   
+   //--------------------------------------------------------------------------------
+   for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+   //--------------------------------------------------------------------------------
+      for (size_t j=0; j<E2Ddata.nq; ++j){
+         residual(j) = std::abs( (*E2Ddata.node[i].res)(j)/E2Ddata.node[i].vol );      //Divided residual
+         res_norm_data(j,0) = res_norm_data(j,0)    + residual(j);               //L1   norm
+         res_norm_data(j,1) = res_norm_data(j,1)    + residual(j)*residual(j);   //L2   norm
+         res_norm_data(j,2) = std::max(res_norm_data(j,2), residual(j));         //Linf norm
+      }
+   //--------------------------------------------------------------------------------
+   }//end loop nodes
+   //--------------------------------------------------------------------------------
+   for (size_t j=0; j<E2Ddata.nq; ++j){
+      res_norm_data(j,0) = res_norm_data(j,0)/real(E2Ddata.nnodes);
+      res_norm_data(j,1) = sqrt(res_norm_data(j,1)/real(E2Ddata.nnodes));
+   }
+
+}
 
 // *******************************************************************************
 //  -- Roe's Flux Function with entropy fix---
