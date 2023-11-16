@@ -281,7 +281,7 @@ void program_2D_euler_rk2(){
                   E2Ddata.CFL = 0.95;        // CFL number
               E2Ddata.t_final = 0.18;        // Final time to stop the calculation.
         E2Ddata.time_step_max = 5000;        // Max time steps (just a big enough number)
-        E2Ddata.inviscid_flux = "rhll";      // = Rotated-RHLL      , "roe"  = Roe flux
+        E2Ddata.inviscid_flux = "roe";      // "rhll" = Rotated-RHLL      , "roe"  = Roe flux
          E2Ddata.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
                    E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
     E2Ddata.gradient_type     = "linear";    // "linear" or "quadratic2 for a quadratic LSQ.

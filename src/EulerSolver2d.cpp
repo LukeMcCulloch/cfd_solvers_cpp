@@ -497,11 +497,17 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
    //  (1) Roe flux (carbuncle is expected for strong shocks)
    if     (E2Ddata.inviscid_flux == "roe") {
       
-      //roe(wL,wR,n12, num_flux,wsn);
+      roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+      // if (node1 >= E2Ddata.nnodes-1) {
+      //    std::cout << "num_flux = \n";
+      //    num_flux.print();
+      //    std::cout << "wsn = " << wsn << "\n";
+      // }
 
    //  (2) Rotated-RHLL flux (no carbuncle is expected for strong shocks)
    } else if (E2Ddata.inviscid_flux =="rhll") {
       
+      //TLM todo: implement the rotated rhll flux:
       //rotated_rhll(wL,wR,n12, num_flux,wsn);
 
    } else {
@@ -522,6 +528,163 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
 
 
+// *******************************************************************************
+//  -- Roe's Flux Function with entropy fix---
+// 
+//  P. L. Roe, Approximate Riemann Solvers, Parameter Vectors and Difference
+//  Schemes, Journal of Computational Physics, 43, pp. 357-372.
+// 
+//  NOTE: 3D version of this subroutine is available for download at
+//        http://cfdbooks.com/cfdcodes.html
+// 
+//  ------------------------------------------------------------------------------
+//   Input:   primL(1:5) =  left state (rhoL, uL, vL, pL)
+//            primR(1:5) = right state (rhoR, uR, vR, pR)
+//                njk(2) = Face normal (L -> R). Must be a unit vector.
+// 
+//  Output:    flux(1:5) = numerical flux
+//                   wsn = half the max wave speed
+//                         (to be used for time step calculations)
+//  ------------------------------------------------------------------------------
+// 
+// *******************************************************************************
+//roe(primL, primR, njk,  flux, wsn)
+void EulerSolver2D::Solver::roe(EulerSolver2D::MainData2D& E2Ddata,
+                                                      const Array2D<real>& primL,
+                                                      const Array2D<real>& primR,
+                                                      const Array2D<real>& njk,
+                                                      Array2D<real>& flux,
+                                                      real wsn) {
+
+   
+   //Local variables
+   real nx, ny;                  // Normal vector
+   real mx, my;                  // Tangent vector: mx*nx+my*ny = 0
+   real uL, uR, vL, vR;          // Velocity components.
+   real rhoL, rhoR, pL, pR;      // Primitive variables.
+   real unL, unR, umL, umR;      // Normal and tangent velocities
+   real aL, aR, HL, HR;          // Speeds of sound.
+   real RT,rho,u,v,H,a,un, um;   // Roe-averages
+   real drho,dun,dum,dp;
+   Array2D<real> LdU(4,1);       // Wave strenghs
+   Array2D<real> ws(4,1);        // Wave speeds
+   Array2D<real> Rv(4,4);        // right-eigevectors
+   Array2D<real> fL(4,1);        // Flux left
+   Array2D<real> fR(4,1);        // Flux right
+   Array2D<real> diss(4,1);      // dissipation term
+   Array2D<real> dws(4,1);       // User-specified width for entropy fix
+
+   
+   nx = njk(0);
+   ny = njk(1);
+
+   //Tangent vector (Actually, Roe flux can be implemented 
+   // without any tangent vector. See "I do like CFD, VOL.1" for details.)
+   mx = -ny;
+   my =  nx;
+
+   //Primitive and other variables.
+   //  Left state
+    rhoL = primL(0);
+      uL = primL(1);
+      vL = primL(2);
+     unL = uL*nx+vL*ny;
+     umL = uL*mx+vL*my;
+      pL = primL(3);
+      aL = sqrt(E2Ddata.gamma*pL/rhoL);
+      HL = aL*aL/(E2Ddata.gamma-one) + half*(uL*uL+vL*vL);
+   //  Right state
+    rhoR = primR(0);
+      uR = primR(1);
+      vR = primR(2);
+     unR = uR*nx+vR*ny;
+     umR = uR*mx+vR*my;
+      pR = primR(3);
+      aR = sqrt(E2Ddata.gamma*pR/rhoR);
+      HR = aR*aR/(E2Ddata.gamma-one) + half*(uR*uR+vR*vR);
+
+   //First compute the Roe Averages
+    RT = sqrt(rhoR/rhoL);
+   rho = RT*rhoL;
+     u = (uL+RT*uR)/(one+RT);
+     v = (vL+RT*vR)/(one+RT);
+     H = (HL+RT* HR)/(one+RT);
+     a = sqrt( (E2Ddata.gamma-one)*(H-half*(u*u+v*v)) );
+    un = u*nx+v*ny;
+    um = u*mx+v*my;
+
+   //Wave Strengths
+   drho = rhoR - rhoL;
+     dp =   pR - pL;
+    dun =  unR - unL;
+    dum =  umR - umL;
+
+   LdU(0) = (dp - rho*a*dun )/(two*a*a);
+   LdU(1) = rho*dum;
+   LdU(2) =  drho - dp/(a*a);
+   LdU(3) = (dp + rho*a*dun )/(two*a*a);
+
+   //Wave Speed
+   ws(0) = abs(un-a);
+   ws(1) = abs(un);
+   ws(2) = abs(un);
+   ws(3) = abs(un+a);
+
+   //Harten's Entropy Fix JCP(1983), 49, pp357-393:
+   // only for the nonlinear fields.
+   dws(0) = fifth;
+   if ( ws(0) < dws(0) ) ws(0) = half * ( ws(0)*ws(0)/dws(0)+dws(0) );
+   dws(3) = fifth;
+   if ( ws(3) < dws(3) ) ws(3) = half * ( ws(3)*ws(3)/dws(3)+dws(3) );
+
+   //Right Eigenvectors
+   Rv(0,0) = one;
+   Rv(1,0) = u - a*nx;
+   Rv(2,0) = v - a*ny;
+   Rv(3,0) = H - un*a;
+
+   Rv(0,1) = zero;
+   Rv(1,1) = mx;
+   Rv(2,1) = my;
+   Rv(3,1) = um;
+
+   Rv(0,2) = one;
+   Rv(1,2) = u;
+   Rv(2,2) = v;
+   Rv(3,2) = half*(u*u+v*v);
+
+   Rv(0,3) = one;
+   Rv(1,3) = u + a*nx;
+   Rv(2,3) = v + a*ny;
+   Rv(3,3) = H + un*a;
+
+
+   //Dissipation Term
+   diss = zero;
+   for (size_t i=0; i<E2Ddata.nq; ++i) {
+      for (size_t j=0; j<E2Ddata.nq; ++j) {
+         diss(i) += ws(j)*LdU(j)*Rv(i,j);
+      }
+   }
+
+   //Compute the flux.
+   fL(0) = rhoL*unL;
+   fL(1) = rhoL*unL * uL + pL*nx;
+   fL(2) = rhoL*unL * vL + pL*ny;
+   fL(3) = rhoL*unL * HL;
+
+   fR(0) = rhoR*unR;
+   fR(1) = rhoR*unR * uR + pR*nx;
+   fR(2) = rhoR*unR * vR + pR*ny;
+   fR(3) = rhoR*unR * HR;
+
+   flux = half * (fL + fR - diss);
+   wsn = half*(abs(un) + a);  //Normal max wave speed times half
+
+
+}  
+
+
 //********************************************************************************
 //* -- vanAlbada Slope Limiter Function--
 //*
@@ -539,7 +702,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 Array2D<real> EulerSolver2D::Solver::va_slope_limiter(EulerSolver2D::MainData2D& E2Ddata,
                                                       const Array2D<real>& da, 
                                                       const Array2D<real>& db, 
-                                                      real h) {
+                                                      const real h) {
    Array2D<real> va_slope_limiter_data(4,1);
    real eps2;
    

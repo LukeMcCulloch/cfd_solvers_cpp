@@ -203,10 +203,17 @@ public:
     void initial_solution_shock_diffraction( EulerSolver2D::MainData2D& E2Ddata);
     void compute_residual_ncfv( EulerSolver2D::MainData2D& E2Ddata);
     
+    //roe flux
+    void roe( EulerSolver2D::MainData2D& E2Ddata,
+            const Array2D<real>& primL, const Array2D<real>& primR,
+            const Array2D<real>& njk,
+            Array2D<real>& flux, real wsn);
+
     //vanAlbada slope limiter (muscl type)
     Array2D<real> va_slope_limiter( EulerSolver2D::MainData2D& E2Ddata,
                                     const Array2D<real>& da, 
-                                    const Array2D<real>& db, real h);
+                                    const Array2D<real>& db, 
+                                    const real h);
 
     // primative to conserved variables
     Array2D<real> w2u(const Array2D<real>& w, 
