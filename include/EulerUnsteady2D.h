@@ -152,6 +152,8 @@
 #ifndef __eulerUnsteady2d_INCLUDED__
 #define __eulerUnsteady2d_INCLUDED__
 
+// math
+#include <math.h>       /* copysign */
 
 //======================================
 // my simple array class template (type)
@@ -201,6 +203,11 @@ public:
     void initial_solution_shock_diffraction( EulerSolver2D::MainData2D& E2Ddata);
     void compute_residual_ncfv( EulerSolver2D::MainData2D& E2Ddata);
     
+    //vanAlbada slope limiter (muscl type)
+    Array2D<real> va_slope_limiter( EulerSolver2D::MainData2D& E2Ddata,
+                                    const Array2D<real>& da, 
+                                    const Array2D<real>& db, real h);
+
     // primative to conserved variables
     Array2D<real> w2u(const Array2D<real>& w, 
                         EulerSolver2D::MainData2D& E2Ddata);

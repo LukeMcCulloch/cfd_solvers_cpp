@@ -24,6 +24,8 @@
 // string trimfunctions
 #include "StringOps.h"
 
+// math
+#include <math.h>       /* copysign */
 
 //using Eigen::Dynamic;
 using Eigen::MatrixXd;
@@ -199,7 +201,7 @@ void EulerSolver2D::Solver::eliminate_normal_mass_flux( EulerSolver2D::MainData2
             //      So, an appropriate slip BC at the corner node needs to be applied,
             //      which is "zero y-momentum", and that's all.
             //
-            if (i==1 and j==0) {
+            if (i==1 && j==0) {
                inode                       = (*E2Ddata.bound[i].bnode)(j);
                (*E2Ddata.node[inode].u)(1) = zero;                                  // Make sure zero y-momentum.
                (*E2Ddata.node[inode].w)    = u2w( (*E2Ddata.node[inode].u) , E2Ddata );// Update primitive variables
@@ -323,21 +325,25 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
    //Local variables
    Array2D<real> num_flux   = Array2D<real>(E2Ddata.nq,1);        //Numerical flux
-   Array2D<real> wL, wR   = Array2D<real>(E2Ddata.nq,1);          //Left and right face values
-   Array2D<real> dwL, dwR   = Array2D<real>(E2Ddata.nq,1);        //Slope at left and right nodes
-   Array2D<real> dwm, dwp, dwij   = Array2D<real>(E2Ddata.nq,1);  //Re-defined slopes to be limited
+   Array2D<real> wL = Array2D<real>(E2Ddata.nq,1);          //Left and right face values
+   Array2D<real> wR = Array2D<real>(E2Ddata.nq,1);          //Left and right face values
+   Array2D<real> dwL = Array2D<real>(E2Ddata.nq,1);        //Slope at left and right nodes
+   Array2D<real> dwR = Array2D<real>(E2Ddata.nq,1);        //Slope at left and right nodes
+   Array2D<real> dwm  = Array2D<real>(E2Ddata.nq,1);  //Re-defined slopes to be limited
+   Array2D<real> dwp  = Array2D<real>(E2Ddata.nq,1);  //Re-defined slopes to be limited
+   Array2D<real> dwij   = Array2D<real>(E2Ddata.nq,1);  //Re-defined slopes to be limited
    Array2D<real> e12   = Array2D<real>(2,1);                      //Unit edge vector
    Array2D<real> n12   = Array2D<real>(2,1);                      //Unit face normal vector
    real mag_e12;                                                  //Magnitude of the edge vector
    real mag_n12;                                                  //Magnitude of the face-normal vector
    real wsn;                                                      //Scaled maximum wave speed
    real norm_momentum;                                            //Normal component of the momentum
-   Array2D<real> bfluxL, bfluxR   = Array2D<real>(E2Ddata.nq,1);  //Boundary flux at left/right nodes
-   int                node1, node2;                               //Left and right nodes of each edge
-   int                boundary_elm;                               //Element adjacent to boundary face
-   int                n1, n2;                                     //Left and right nodes of boundary face
-   //int                i, j;
-   int                ix=1, iy=2;
+   Array2D<real> bfluxL   = Array2D<real>(E2Ddata.nq,1);  //Boundary flux at left/right nodes
+   Array2D<real> bfluxR   = Array2D<real>(E2Ddata.nq,1);  //Boundary flux at left/right nodes
+   int node1, node2;                                              //Left and right nodes of each edge
+   int boundary_elm;                                              //Element adjacent to boundary face
+   int n1, n2;                                                    //Left and right nodes of boundary face
+   int ix=0, iy=1;
 
    //MatrixXd me(5,5),ime(5,5);
    
@@ -346,8 +352,8 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
    //  Initialization of the gradient of the primitive variables.
 
-   for (int i=0; i<E2Ddata.nnodes; ++i) {
-      for (int j=0; j<E2Ddata.nq; ++j) {
+   for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+      for (size_t j=0; j<E2Ddata.nq; ++j) {
          (*E2Ddata.node[i].gradw)(j) = zero;
       }
    }
@@ -361,9 +367,11 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
    //-------------------------------------------------------------------------
    // Residual computation: interior fluxes
 
-   for (int i=0; i<E2Ddata.nnodes; ++i) {
-      for (int j=0; j<E2Ddata.nq; ++j) {
+   for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+      for (size_t j=0; j<E2Ddata.nq; ++j) {
          (*E2Ddata.node[i].res)(j) = zero;
+         //std::cout << "E2Ddata.node[i].res(j)= " << (*E2Ddata.node[i].res)(j) << "\n";
+         //std::cout << "E2Ddata.node[i].gradw(j)= " << (*E2Ddata.node[i].gradw)(j) << "\n";
       }
       E2Ddata.node[i].wsn = zero;
    }
@@ -384,11 +392,167 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
    // 
    //--------------------------------------------------------------------------------
    for (int i=0; i<E2Ddata.nedges; ++i) {
+      //--------------------------------------------------------------------------------
+
+      // Left and right nodes of the i-th edge
+
+      node1   = E2Ddata.edge[i].n1;  // Left node of the edge
+      node2   = E2Ddata.edge[i].n2;  // Right node of the edge
+      n12     = E2Ddata.edge[i].dav; // This is the directed area vector (unit vector) !!TLM check this copy!!
+      // std::cout << "E2Ddata.edge[i].dav(1) = " << E2Ddata.edge[i].dav(0) << "\n";
+      // std::cout << "E2Ddata.edge[i].dav(2) = " << E2Ddata.edge[i].dav(1) << "\n";
+      // std::cout << "n12 = " << n12(0) << "\n";
+      // std::cout << "n12 = " << n12(1) << "\n";
+      mag_n12 = E2Ddata.edge[i].da;  // Magnitude of the directed area vector
+      e12     = E2Ddata.edge[i].ev;  // This is the vector along the edge (uniti vector)
+      mag_e12 = E2Ddata.edge[i].e;   // Magnitude of the edge vector (Length of the edge)
+
+      // Solution gradient projected along the edge
+      //
+      //  NOTE: The gradient is multiplied by the distance.
+      //        So, it is equivalent to the solution difference.
+
+      for  (int j=0; j< E2Ddata.nq; ++j){ 
+         dwL = (*E2Ddata.node[node1].gradw)(j,ix)*e12(ix) + (*E2Ddata.node[node1].gradw)(j,iy) * e12(iy) *half*mag_e12;
+         dwR = (*E2Ddata.node[node2].gradw)(j,ix)*e12(ix) + (*E2Ddata.node[node2].gradw)(j,iy) * e12(iy) *half*mag_e12;
+      }
+      //  It is now limiter time!
+      
+      // if (node1 >= E2Ddata.nnodes-1) {
+      //    std::cout << "ix = " << ix << "\n";
+      //    std::cout << "iy = " << iy << "\n";
+      //    std::cout << "node1 = " << node1 << "\n";
+      //    std::cout << "node2 = " << node2 << "\n";
+      //    std::cout << "w = \n";
+      //    (*E2Ddata.node[node2].w).print();
+
+      //    // std::cout << "dwL = \n";
+      //    // dwL.print();
+      //    // std::cout << "dwR = \n";
+      //    // dwR.print();
+         
+      //    std::cout << "wL = \n";
+      //    wL.print();
+      //    std::cout << "wR = \n";
+      //    wR.print();
+
+      // }
+
+      //  (1) No limiter (good for smooth solutions)
+
+      //limiter : if (trim(limiter_type) == "none") then
+      if (E2Ddata.limiter_type == "none") {
+
+         //  Simple linear extrapolation
+         wL = (*E2Ddata.node[node1].w) + dwL;
+         wR = (*E2Ddata.node[node2].w) - dwR;
+
+
+      //  (2) UMUSCL-type limiters: simple 1D limiting.
+      } else if (E2Ddata.limiter_type == "vanalbada") {
+
+         //       In 1D: dwp = w_{j+1}-w_j, dwm = w_j-w_{j-1} => limited_slope = limiter(dwm,dwp)
+         //
+         //       We can do the same in 2D as follows.
+         //
+         //       In 2D:    dwp = w_{neighbor}-w_j, dwm = 2*(grad_w_j*edge)-dwp
+         //              => limited_slope = limiter(dwm,dwp)
+         //
+         //      NOTE: On a regular grid, grad_w_j*edge will be the central-difference,
+         //            so that the average (dwm+dwp)/2 will be the central-difference just like in 1D.
+
+         //     Edge derivative
+         //dwij = half*(node(node2)%w - node(node1)%w)
+         dwij = half*( (*E2Ddata.node[node2].w) - (*E2Ddata.node[node1].w) );
+
+         // //     Left face value (wL) with the Van Albada limiter
+         dwm  = two*dwL-dwij;
+         dwp  = dwij;
+         //wL  = node(node1)%w + va_slope_limiter(dwm,dwp,mag_e12)
+         wL  = (*E2Ddata.node[node1].w) + va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+
+         //     Right face value (wR) with the Van Albada limiter
+         dwm  = -(two*dwR-dwij);
+         dwp  = -dwij;
+         //wR  = node(node2)%w + va_slope_limiter(dwm,dwp,mag_e12)
+         wR = (*E2Ddata.node[node2].w) + va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+
+      //  (3) No other limiters available.
+      } else {
+
+      //std::cout << " Invalid input for limiter_type = ", E2Ddata.limiter_type << std::endl;
+      std::cout << " Choose none or vanalbada, and try again."<< "\n";
+      std::cout <<  " ... Stop."<< "\n";
+      //stop
+
+      } //endif limiter
+
+
+
+
+
+      
+//  Compute the numerical flux for given wL and wR.
+
+   //  (1) Roe flux (carbuncle is expected for strong shocks)
+   if     (E2Ddata.inviscid_flux == "roe") {
+      
+      //roe(wL,wR,n12, num_flux,wsn);
+
+   //  (2) Rotated-RHLL flux (no carbuncle is expected for strong shocks)
+   } else if (E2Ddata.inviscid_flux =="rhll") {
+      
+      //rotated_rhll(wL,wR,n12, num_flux,wsn);
+
+   } else {
+      
+      std::cout <<  " Invalid input for inviscid_flux = " << E2Ddata.inviscid_flux << std::endl;
+      std::cout <<  " Choose roe or rhll, and try again." << std::endl;
+      std::cout <<  " ... Stop. \n";
+      //stop
+
+   }
+
+
+
 
    }
 
 }
 
+
+
+//********************************************************************************
+//* -- vanAlbada Slope Limiter Function--
+//*
+//* 'A comparative study of computational methods in cosmic gas dynamics', 
+//* Van Albada, G D, B. Van Leer and W. W. Roberts, Astronomy and Astrophysics,
+//* 108, p76, 1982
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:   da, db     : two differences
+//*
+//* Output:   va_limiter : limited difference
+//* ------------------------------------------------------------------------------
+//*
+//********************************************************************************
+Array2D<real> EulerSolver2D::Solver::va_slope_limiter(EulerSolver2D::MainData2D& E2Ddata,
+                                                      const Array2D<real>& da, 
+                                                      const Array2D<real>& db, 
+                                                      real h) {
+   Array2D<real> va_slope_limiter_data(4,1);
+   real eps2;
+   
+   eps2 = pow(3, (0.3 * h) );
+
+   // TLM todo: implement a vector (array) version of copysign and make the code below a 1 liner. 
+   for (size_t i=0; i<E2Ddata.nq; ++i){
+      va_slope_limiter_data(i) = half*( copysign(1.0,da(i)*db(i)) + one ) * 
+           ( (db(i)*db(i) + eps2)*da(i) + (da(i)*da(i) + eps2)*db(i) ) /
+           (da(i)*da(i) + db(i)*da(i) + two*eps2);
+   }
+   return va_slope_limiter_data;
+}
 
 
 //********************************************************************************
@@ -716,7 +880,7 @@ void EulerSolver2D::Solver::compute_gradient_nc(
    //------------------------------------------------------------
    //------------------------------------------------------------
    //-- Compute LSQ Gradients at all nodes.
-   cout << "Compute LSQ Gradients at all nodes. " << endl;
+   //cout << "Compute LSQ Gradients at all nodes. " << endl;
    //------------------------------------------------------------
    //------------------------------------------------------------
 
@@ -797,6 +961,11 @@ void EulerSolver2D::Solver::lsq_gradients_nc(
 
       ax = ax + (*E2Ddata.node[inode].lsq2x2_cx)(in)*da;
       ay = ay + (*E2Ddata.node[inode].lsq2x2_cy)(in)*da;
+      
+      // if (inode<E2Ddata.maxit-0) {
+      //    cout << " ax = " << ax << endl;
+      //    cout << " ay = " << ay << endl;
+      // }
 
       // cout << " (*E2Ddata.node[inode].lsq2x2_cx)(in) = "
       //          << (*E2Ddata.node[inode].lsq2x2_cx)(in) << endl;
@@ -807,6 +976,13 @@ void EulerSolver2D::Solver::lsq_gradients_nc(
 
    (*E2Ddata.node[inode].gradw)(ivar,ix) = ax;  //<-- du(ivar)/dx
    (*E2Ddata.node[inode].gradw)(ivar,iy) = ay;  //<-- du(ivar)/dy
+   
+   // if (inode >= E2Ddata.nnodes-1) {
+   //    std::cout << "ix = " << ix << "\n";
+   //    std::cout << "iy = " << iy << "\n";
+   //    std::cout << "inode = " << inode << "\n";
+   // }
+
 
 }// end lsq_gradients_nc
 //--------------------------------------------------------------------------------
@@ -866,10 +1042,10 @@ void EulerSolver2D::Solver::lsq_gradients2_nc(
          //    cout << "(*E2Ddata.node[inode].lsq5x5_cx)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cx)(ii) << endl;
          //    cout << "(*E2Ddata.node[inode].lsq5x5_cy)(ii) = " << (*E2Ddata.node[inode].lsq5x5_cy)(ii) << endl;
          // }
-         if (inode<E2Ddata.maxit-0) {
-            cout << " = " << ax << endl;
-            cout << " = " << ay << endl;
-         }
+         // if (inode<E2Ddata.maxit-0) {
+         //    cout << " = " << ax << endl;
+         //    cout << " = " << ay << endl;
+         // }
 
       } // end loop nghbr_nghbr
 
@@ -877,6 +1053,12 @@ void EulerSolver2D::Solver::lsq_gradients2_nc(
 
    (*E2Ddata.node[inode].gradw)(ivar,ix) = ax;  //<-- dw(ivar)/dx;
    (*E2Ddata.node[inode].gradw)(ivar,iy) = ay;  //<-- dw(ivar)/dy;
+
+   // if (inode >= E2Ddata.nnodes-1) {
+   //    std::cout << "ix = " << ix << "\n";
+   //    std::cout << "iy = " << iy << "\n";
+   //    std::cout << "inode = " << inode << "\n";
+   // }
 
 } //end lsq_gradients2_nc
 //--------------------------------------------------------------------------------
@@ -1074,7 +1256,7 @@ void EulerSolver2D::Solver::lsq02_5x5_coeff2_nc(
                
                dx = E2Ddata.node[in].x - E2Ddata.node[i].x;
                dy = E2Ddata.node[in].y - E2Ddata.node[i].y;
-               if (i < E2Ddata.maxit-1 & ell < E2Ddata.maxit-1) {
+               if (i < E2Ddata.maxit-1 && ell < E2Ddata.maxit-1) {
                   cout << " --------------E2Ddata.node[in].nghbr)(ell) == i " << endl;
                   cout << " (*E2Ddata.node[in].nghbr)(ell) = " << (*E2Ddata.node[in].nghbr)(ell) << " i = " << i << endl;
                   cout << " dx = " << dx << endl;

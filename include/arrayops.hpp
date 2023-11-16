@@ -12,6 +12,20 @@
 
 #include <cmath>
 
+// addition of Array2Ds + scalar
+template <class T>
+Array2D<T> 
+operator+(const Array2D<T>& a, T const& b) {
+
+    Array2D<T> result(a.nrows,a.ncols);
+
+    int size = a.storage_size;
+    for(size_t i=0; i < size; i++) {
+    	result.array[i] = a.array[i] + b;
+    }
+    return result;
+}
+
 // addition of two Array2Ds
 template <class T>
 Array2D<T> 
@@ -30,6 +44,20 @@ operator+(const Array2D<T>& a, const Array2D<T>& b) {
 
 
 
+// subtraction of Array2Ds - scalar
+template <class T>
+Array2D<T> 
+operator-(const Array2D<T>& a, T const& b) {
+
+    Array2D<T> result(a.nrows,a.ncols);
+
+    int size = a.storage_size;
+    for(size_t i=0; i < size; i++) {
+    	result.array[i] = a.array[i] - b;
+    }
+    return result;
+}
+
 // subtraction of two Array2Ds
 template <class T>
 Array2D<T> 
@@ -47,7 +75,6 @@ operator-(const Array2D<T>& a, const Array2D<T>& b) {
 }
 
 
-
 // multiplication of scalar and Array2D
 template<typename T>
 Array2D<T> 
@@ -61,7 +88,7 @@ operator*(T const& s, Array2D<T> const& a)
 }
 
 
-// multiplication of two Array2Ds
+// elementwise multiplication of two Array2Ds
 template <class T>
 Array2D<T> 
 operator*(const Array2D<T>& a, const Array2D<T>& b) {
@@ -78,7 +105,7 @@ operator*(const Array2D<T>& a, const Array2D<T>& b) {
 }
 
 
-// division of an Array2D by a scalar
+// elementwise division of an Array2D by a scalar
 template<typename T>
 Array2D<T> 
 operator/(Array2D<T> const& a , T const& s )
@@ -571,6 +598,18 @@ Array2D<T> Array2D<T>::inverse() const {
 //     return mat;
 // }
 
+
+// overload negation
+template<typename T>
+Array2D<T> 
+operator-(Array2D<T> const& a)
+{
+    Array2D<T> result(a.nrows,a.ncols);
+    for (size_t k = 0; k<a.size(); ++k) {
+        result.array[k] = -1.0*a.array[k];
+    }
+    return result;
+}
 
 
 #endif //__ARRAYOPS_TEMPLATE_INCLUDED__

@@ -383,10 +383,10 @@ public:
       }
       //  to be read from a boundary grid file
       char bc_type[80];     //type of boundary condition
-      int nbnodes; //# of boundary nodes
+      size_t nbnodes; //# of boundary nodes
       Array2D<int>* bnode;  //list of boundary nodes
       //  to be constructed in the code
-      int nbfaces; //# of boundary faces
+      size_t nbfaces; //# of boundary faces
       Array2D<real>* bfnx;  //x-component of the face outward normal
       Array2D<real>* bfny;  //y-component of the face outward normal
       Array2D<real>* bfn;   //magnitude of the face normal vector
@@ -494,7 +494,7 @@ namespace EulerSolver2D{
     //  Parameters
 
     //Number of equtaions/variables in the target equtaion.
-    int nq; 
+    size_t nq; 
 
     //LSQ gradient related parameteres:
     std::string     gradient_type;  // "linear"; or for node-centered schemes can use "quadratic2"
@@ -506,7 +506,7 @@ namespace EulerSolver2D{
     std::string limiter_type;  //Choice of a limiter
 
     //Unsteady schemes (e.g., RK2)
-    int time_step_max; //Maximum physical time steps
+    size_t time_step_max; //Maximum physical time steps
     real CFL;           //CFL number for a physical time step
     real t_final;       //Final time for unsteady computation
 
@@ -517,29 +517,29 @@ namespace EulerSolver2D{
     real gamma = 1.4;
 
     //  Node data
-    int                              nnodes; //total number of nodes
+    size_t                              nnodes; //total number of nodes
     node_type* node;   //array of nodes
 
     //  Element data (element=cell)
-    int                              ntria;   //total number of triangler elements
-    int                              nquad;   //total number of quadrilateral elements
-    int                              nelms;   //total number of elements
+    size_t                              ntria;   //total number of triangler elements
+    size_t                              nquad;   //total number of quadrilateral elements
+    size_t                              nelms;   //total number of elements
     elm_type*  elm;     //array of elements
 
     //  Edge data
-    int                              nedges;  //total number of edges
+    size_t                              nedges;  //total number of edges
     edge_type* edge;    //array of edges
 
     //  Boundary data
-    int                               nbound; //total number of boundary types
+    size_t                               nbound; //total number of boundary types
     bgrid_type* bound;  //array of boundary segments
 
     //  Face data (cell-centered scheme only)
-    int                               nfaces; //total number of cell-faces
+    size_t                               nfaces; //total number of cell-faces
     face_type*  face;   //array of cell-faces
 
     //debug
-    int maxit = 2;
+    size_t maxit = 2;
 
   };
   

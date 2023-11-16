@@ -334,7 +334,7 @@ float EulerSolver1D::Solver::timestep(float cfl, float dx, float gamma, int ncel
     for ( int i = 1; i < ncells; ++i ) {
         u = cell[i].w(1);                          //Velocity
         c = sqrt(gamma*cell[i].w(2)/cell[i].w(0)); //Speed of sound
-        max_speed = max( max_speed, abs(u)+c );
+        max_speed = std::max( max_speed, abs(u)+c );
 
         dt = cfl*dx/max_speed; //CFL condition: dt = CFL*dx/max_wavespeed, CFL <= 1.
     }
