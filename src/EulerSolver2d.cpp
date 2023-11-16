@@ -492,7 +492,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
 
       
-//  Compute the numerical flux for given wL and wR.
+   //  Compute the numerical flux for given wL and wR.
 
    //  (1) Roe flux (carbuncle is expected for strong shocks)
    if     (E2Ddata.inviscid_flux == "roe") {
@@ -508,7 +508,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
    } else if (E2Ddata.inviscid_flux =="rhll") {
       
       //TLM todo: implement the rotated rhll flux:
-      //rotated_rhll(wL,wR,n12, num_flux,wsn);
+      rotated_rhll(E2Ddata,wL,wR,n12, num_flux,wsn);
 
    } else {
       
@@ -519,10 +519,54 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
    }
 
+   //  Add the flux multiplied by the magnitude of the directed area vector to node1,
+   //  and accumulate the max wave speed quantity for use in the time step calculation.
+
+   (*E2Ddata.node[node1].res) = (*E2Ddata.node[node1].res)  +  num_flux * mag_n12;
+   E2Ddata.node[node1].wsn = E2Ddata.node[node1].wsn  +       wsn * mag_n12;
+
+   // Subtract the flux multiplied by the magnitude of the directed area vector from node2,
+   // and accumulate the max wave speed quantity for use in the time step calculation.
+   //
+   // NOTE: Subtract because the outward face normal is -n12 for the node2.
+
+   (*E2Ddata.node[node2].res) = (*E2Ddata.node[node2].res)  -  num_flux * mag_n12;
+   E2Ddata.node[node2].wsn = E2Ddata.node[node2].wsn  +       wsn * mag_n12;
+
+  
+   //--------------------------------------------------------------------------------
+   } //end loop edges
+   //--------------------------------------------------------------------------------
 
 
 
-   }
+
+
+   //-------------------------------------------------------------------------
+   //Close with the boundary flux using the element-based formula that is
+   //exact for linear fluxes (See Nishikawa AIAA2010-5093 for boundary weights
+   //that ensure the linear exactness for 2D/3D elements).
+   //
+   //     |  Interior Domain          |
+   //     |        .........          |
+   //     |        .       .          |
+   //     |        .       .          |
+   //     o--o--o-----o---------o--o--o  <- Boundary segment
+   //                 n1   |   n2
+   //                      v
+   //                    n12 (unit face normal vector)
+   //
+   //NOTE: We visit each boundary face, defined by the nodes n1 and n2,
+   //      and compute the flux across the boundary face: left half for node1,
+   //      and the right half for node2. In the above figure, the dots indicate
+   //      the control volume around the node n1. Clearly, the flux across the
+   //      left half of the face contributes to the node n1. Similarly for n2.
+   //
+   //
+   //--------------------------------------------------------------------------------
+   
+
+
 
 }
 
@@ -548,7 +592,6 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 //  ------------------------------------------------------------------------------
 // 
 // *******************************************************************************
-//roe(primL, primR, njk,  flux, wsn)
 void EulerSolver2D::Solver::roe(EulerSolver2D::MainData2D& E2Ddata,
                                                       const Array2D<real>& primL,
                                                       const Array2D<real>& primR,
@@ -681,9 +724,39 @@ void EulerSolver2D::Solver::roe(EulerSolver2D::MainData2D& E2Ddata,
    flux = half * (fL + fR - diss);
    wsn = half*(abs(un) + a);  //Normal max wave speed times half
 
-
 }  
 
+
+//*****************************************************************************
+//* -- Rotated-RHLL Flux Function ---
+//*
+//* H. Nishikawa and K. Kitamura, Very Simple, Carbuncle-Free, Boundary-Layer
+//* Resolving, Rotated-Hybrid Riemann Solvers,
+//* Journal of Computational Physics, 227, pp. 2560-2581, 2008.
+//*
+//* Robust Riemann solver for nonlinear instability (carbuncle).
+//*
+//* NOTE: 3D version of this subroutine is available for download at
+//*       http://cfdbooks.com/cfdcodes.html
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:   primL(1:5) =  left state (rhoL, uL, vL, pL)
+//*           primR(1:5) = right state (rhoR, uR, vR, pR)
+//*               njk(2) = Face normal (L -> R). Must be a unit vector.
+//*
+//* Output:    flux(1:5) = numerical flux
+//*                  wsn = half the max wave speed
+//*                        (to be used for time step calculations)
+//* ------------------------------------------------------------------------------
+//*
+//*****************************************************************************
+void EulerSolver2D::Solver::rotated_rhll(EulerSolver2D::MainData2D& E2Ddata,
+                                                      const Array2D<real>& primL,
+                                                      const Array2D<real>& primR,
+                                                      const Array2D<real>& njk,
+                                                      Array2D<real>& flux,
+                                                      real wsn) {
+   }
 
 //********************************************************************************
 //* -- vanAlbada Slope Limiter Function--

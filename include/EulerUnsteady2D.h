@@ -208,6 +208,12 @@ public:
             const Array2D<real>& primL, const Array2D<real>& primR,
             const Array2D<real>& njk,
             Array2D<real>& flux, real wsn);
+            
+    //rotated rhll flux
+    void rotated_rhll( EulerSolver2D::MainData2D& E2Ddata,
+            const Array2D<real>& primL, const Array2D<real>& primR,
+            const Array2D<real>& njk,
+            Array2D<real>& flux, real wsn);
 
     //vanAlbada slope limiter (muscl type)
     Array2D<real> va_slope_limiter( EulerSolver2D::MainData2D& E2Ddata,

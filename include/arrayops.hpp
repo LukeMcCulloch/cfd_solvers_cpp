@@ -86,6 +86,16 @@ operator*(T const& s, Array2D<T> const& a)
     }
     return result;
 }
+template<typename T>
+Array2D<T> 
+operator*(Array2D<T> const& a, T const& s)
+{
+    Array2D<T> result(a.nrows,a.ncols);
+    for (size_t k = 0; k<a.size(); ++k) {
+        result.array[k] = s*a.array[k];
+    }
+    return result;
+}
 
 
 // elementwise multiplication of two Array2Ds
