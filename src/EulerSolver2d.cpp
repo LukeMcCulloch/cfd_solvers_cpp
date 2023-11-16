@@ -112,7 +112,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    time = zero;
 
 
-   for ( int i_time_step = 0; i_time_step < 2; ++i_time_step ) {
+   for ( int i_time_step = 0; i_time_step < 10; ++i_time_step ) {
       
       //------------------------------------------------------
       // Two-stage Runge-Kutta scheme: u^n is saved as u0(:,:)
@@ -131,9 +131,9 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       
       if (i_time_step==1) {
          std::cout << "Density    X-momentum  Y-momentum   Energy" << std::endl;
-         std::cout << "t= " << time << "steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << res_norm(1,0) << res_norm(2,0) << res_norm(3,0) << std::endl;
+         std::cout << "t= " << time << "steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << " " << res_norm(1,0) << " " << res_norm(2,0) << " " << res_norm(3,0) << std::endl;
       } else { 
-         std::cout << "t= " << time << " steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << res_norm(1,0) << res_norm(2,0) << res_norm(3,0) << std::endl;
+         std::cout << "t= " << time << " steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << " " << res_norm(1,0) << " " << res_norm(2,0) << " " << res_norm(3,0) << std::endl;
       }
 
 
@@ -158,7 +158,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       
       // Update the solution
       // 1st Stage => u^* = u^n - dt/dx*Res(u^n)
-      //update_solution(one,dt,CFL)
+      update_solution(E2Ddata, one,dt,E2Ddata.CFL);
 
       //-----------------------------
       //- 2nd Stage of Runge-Kutta:
@@ -168,12 +168,15 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       compute_residual_ncfv(E2Ddata);
 
       //   Compute 1/2*(u^n + u^*)
-      // for (size_t i=0; i<E2Ddata.nnodes; ++i) {
-      //    node(i)%u = half*( node(i)%u + u0(i,:) )
-      // }//end do
+      for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+         (*E2Ddata.node[i].u)(0) = half*( (*E2Ddata.node[i].u)(0) + u0(i,0) );
+         (*E2Ddata.node[i].u)(1) = half*( (*E2Ddata.node[i].u)(1) + u0(i,1) );
+         (*E2Ddata.node[i].u)(2) = half*( (*E2Ddata.node[i].u)(2) + u0(i,2) );
+         (*E2Ddata.node[i].u)(3) = half*( (*E2Ddata.node[i].u)(3) + u0(i,3) );
+      }//end do
 
       //   2nd Stage => u^{n+1} = 1/2*(u^n + u^*) - 1/2*dt/dx*Res(u^*)
-      //update_solution(half,dt,CFL)
+      update_solution(E2Ddata, half,dt,E2Ddata.CFL);
 
       time = time + dt;
 
@@ -849,7 +852,6 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
    // Switch the residual sign.
 
-   //nodes3 : do i = 1, nnodes
    for (size_t i=0; i<E2Ddata.nnodes; ++i) {
 
       (*E2Ddata.node[i].res) = -(*E2Ddata.node[i].res);
@@ -860,6 +862,44 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 }
 
 
+
+
+//********************************************************************************
+//* This subroutine updates the solution.
+//*
+//* ------------------------------------------------------------------------------
+//*  Input:       coeff = coefficient for RK time-stepping
+//*                  dt = global time step (not used if local time stepping)
+//*                 CFL = CFL number
+//*          node(:)res = the residual
+//*
+//* Output:   node(:)u  = updated conservative variables 
+//*           node(:)w  = updated primitive variables 
+//* ------------------------------------------------------------------------------
+//*
+//********************************************************************************
+void EulerSolver2D::Solver::update_solution( EulerSolver2D::MainData2D& E2Ddata, 
+                                             real coeff, real dt, real CFL){
+   //
+
+   for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+
+      //   Solution change based on the global time stepping 
+      (*E2Ddata.node[i].du) = (CFL*coeff*dt/E2Ddata.node[i].vol) * (*E2Ddata.node[i].res);
+
+      //   Solution update
+      (*E2Ddata.node[i].u) = (*E2Ddata.node[i].u) + (*E2Ddata.node[i].du); // make changes                                // Make sure zero y-momentum.
+      (*E2Ddata.node[i].w) = u2w( (*E2Ddata.node[i].u) , E2Ddata );// Update primitive variables
+          
+   }
+
+   
+   // Check the density/pressure positivity.
+   //
+   //  NOTE: Well, let's just print the warning message.
+   //        We may stop immediately, though.
+
+}
 
 //********************************************************************************
 //* This subroutine computes the residual norms: L1, L2, L_infty

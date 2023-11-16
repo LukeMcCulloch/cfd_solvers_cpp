@@ -201,9 +201,11 @@ public:
 
 
     void initial_solution_shock_diffraction( EulerSolver2D::MainData2D& E2Ddata);
+    
     void compute_residual_ncfv( EulerSolver2D::MainData2D& E2Ddata);
     void residual_norm( EulerSolver2D::MainData2D& E2Ddata, Array2D<real>& res_norm_data);
-    
+    void update_solution( EulerSolver2D::MainData2D& E2Ddata, 
+                                             real coeff, real dt, real CFL);
     //roe flux
     void roe( EulerSolver2D::MainData2D& E2Ddata,
             const Array2D<real>& primL, const Array2D<real>& primR,
