@@ -286,6 +286,7 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
    for (size_t i = 0; i < nnodes; i++) {
       std::getline(infile, line);
       std::istringstream iss(line);
+      //std::cout << i <<"\n";
       iss >> node[i].x >> node[i].y ;
       // could declare here:
       // node[i].u     = new Array2D<real>(nq,1);
@@ -328,10 +329,16 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x, y, z;
          in >> x >> y >> z;       //now read the whitespace-separated ints
-         // Fix indices for 0 indexed code//
+         // TLM note:  Fix indices for 0 indexed code//
+         // TLM note:  for working with fortran generated grids
          (*elm[i].vtx)(0) = x-1;
          (*elm[i].vtx)(1) = y-1;
          (*elm[i].vtx)(2) = z-1;
+         
+         // // TLM note:  or work with 0 indexed grids
+         // (*elm[i].vtx)(0) = x;
+         // (*elm[i].vtx)(1) = y;
+         // (*elm[i].vtx)(2) = z;
          //cout << (*elm[i].vtx).ncols << endl;
          
          // if (i<20) cout << "\nInput = " << (*elm[i].vtx)(0) <<
@@ -364,11 +371,19 @@ void EulerSolver2D::MainData2D::read_grid(std::string datafile_grid_in,
 
          int x1,x2,x3,x4;
          in >> x1 >> x2 >> x3 >> x4;       //now read the whitespace-separated ...ints
-         // Fix indices for 0 indexed code//
-         (*elm[ntria+i-1].vtx)(0) = x1-1;
-         (*elm[ntria+i-1].vtx)(1) = x2-1;
-         (*elm[ntria+i-1].vtx)(2) = x3-1;
-         (*elm[ntria+i-1].vtx)(3) = x4-1;
+         
+         // TLM note:  Fix indices for 0 indexed code//
+         // TLM note:  for working with fortran generated grids
+         (*elm[ntria+i].vtx)(0) = x1-1;
+         (*elm[ntria+i].vtx)(1) = x2-1;
+         (*elm[ntria+i].vtx)(2) = x3-1;
+         (*elm[ntria+i].vtx)(3) = x4-1;
+         
+         // // TLM note:   or use 0 indexed grid...
+         // (*elm[ntria+i-1].vtx)(0) = x1;
+         // (*elm[ntria+i-1].vtx)(1) = x2;
+         // (*elm[ntria+i-1].vtx)(2) = x3;
+         // (*elm[ntria+i-1].vtx)(3) = x4;
          // if (i<20) cout << "\nx, y, z = " << x1 <<"  " << x2 << "  " << x3 << x4;
          // if (i<20) cout << "\nelm x, elm y, elm z = " << (*elm[i].vtx)(0,0) <<"  " << (*elm[i].vtx)(1,0) << "  " << (*elm[i].vtx)(2,0)<< "  " << (*elm[i].vtx)(3,0);
          // if (i<20) cout << "\nelm x, elm y, elm z = " << (*elm[i].vtx)(0) <<"  " << (*elm[i].vtx)(1) << "  " << (*elm[i].vtx)(2) << "  " << (*elm[i].vtx)(3);
@@ -597,38 +612,6 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 //       \      |        / (x,y) \     vol: volume of element
 //        o-----o       o---------o
 
-//   elements : do i = 1, nelms
-
-   // for ( int i = 0; i < nelms; ++i ) {
-   //    v1 = (*elm[i].vtx)(0,0);
-   //    v2 = (*elm[i].vtx)(1,0);
-   //    v3 = (*elm[i].vtx)(2,0);
-   //    node[v1].nelms = node[v1].nelms + 1;
-   //    node[v2].nelms = node[v2].nelms + 1;
-   //    node[v3].nelms = node[v3].nelms + 1;
-
-   // }
-   // for ( int i = 0; i < nelms; ++i ) {
-   //    v1 = (*elm[i].vtx)(0,0);
-   //    v2 = (*elm[i].vtx)(1,0);
-   //    v3 = (*elm[i].vtx)(2,0);
-   //    node[v1].elm = new Array2D<int>(node[v1].nelms, 1);
-   //    node[v2].elm = new Array2D<int>(node[v2].nelms, 1);
-   //    node[v3].elm = new Array2D<int>(node[v3].nelms, 1);
-   // }
-
-   //dummy allocations:
-   // node[v1].elm = new Array2D<int>(1, 1);
-   // node[v2].elm = new Array2D<int>(1, 1);
-   // node[v3].elm = new Array2D<int>(1, 1);
-   for ( int i = 0; i < nelms; ++i ) {
-      v1 = (*elm[i].vtx)(0,0);
-      v2 = (*elm[i].vtx)(1,0);
-      v3 = (*elm[i].vtx)(2,0);
-      // node[v1].elm = new Array2D<int>(1, 1);
-      // node[v2].elm = new Array2D<int>(1, 1);
-      // node[v3].elm = new Array2D<int>(1, 1);
-   }
 
    for ( int i = 0; i < nelms; ++i ) {
 
@@ -651,57 +634,63 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
       * should use std::containers
       */
 
-      // save and reallocate:
+      // append to list:
       node[v1].nelms = node[v1].nelms + 1;
       node[v1].elm.append(i);
 
 
 
-      // save and reallocate:
+      // append to list:
       node[v2].nelms = node[v2].nelms + 1;
       node[v2].elm.append(i);
 
 
 
-      // save and reallocate:
+      // append to list:
       node[v3].nelms = node[v3].nelms + 1;
       node[v3].elm.append(i);
 
 
       // Compute the cell center and cell volume.
-      //tri_or_quad : if (elm(i).nvtx==3) then
       if (elm[i].nvtx==3) {
 
          // Triangle centroid and volume
          elm[i].x   = third*(x1+x2+x3);
          elm[i].y   = third*(y1+y2+y3);
-         //cout << " tri area -1" << endl;
+         
          elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3);
       }
       else if (elm[i].nvtx==4) {
 
-         cout << "need to fix reallocator for 4th node \n";
-         std::exit(0);
-   //   this is a quad. Get the 4th vertex.
-         v4 = (*elm[i].vtx)(4,0);
+         //fixed  for 4th node 
+
+         //   this is a quad. Get the 4th vertex.
+         v4 = (*elm[i].vtx)(3);
+         //  Distribution of element number to the 4th node of the quadrilateral
+         //append to list
+         node[v4].nelms = node[v4].nelms + 1;//node[v3].nelms +1; was the bug!
+         node[v4].elm.append(i);
+         
          x4 = node[v4].x;
          y4 = node[v4].y;
-   //   Centroid: median dual
-   //   (Note: There is an alternative. See Appendix B in Nishikawa AIAA2010-5093.)
+         
+         //   Centroid: median dual
+         //   (Note: There is an alternative. See Appendix B in Nishikawa AIAA2010-5093.)
          xm1 = half*(x1+x2);
          ym1 = half*(y1+y2);
          xm2 = half*(x3+x4);
          ym2 = half*(y3+y4);
          elm[i].x   = half*(xm1+xm2);
          elm[i].y   = half*(ym1+ym2);
-   //   Volume is computed as a sum of two triangles: 1-2-3 and 1-3-4.
-         //cout << " tri area 0" << endl;
+
+         //   Volume is computed as a sum of two triangles: 1-2-3 and 1-3-4.
+
          elm[i].vol = tri_area(x1,x2,x3,y1,y2,y3) + \
                      tri_area(x1,x3,x4,y1,y3,y4);
 
          xc = elm[i].x;
          yc = elm[i].y;
-         //cout << " tri area 1" << endl;
+         
          if (tri_area(x1,x2,xc,y1,y2,yc)<=zero) {
             cout << " Centroid outside the quad element 12c: i=" << i << endl;
             cout << "  (x1,y1)=" << x1 << y1  << endl;
@@ -745,10 +734,6 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
             std::exit(0);
          }
 
-      //  Distribution of element number to the 4th node of the quadrilateral
-         node[v4].nelms = node[v3].nelms + 1;
-         node[v4].elm.append(i);
-
       }//    endif tri_or_quad
       else {
          cout << "ERROR: not a tri or quad" << endl;
@@ -778,73 +763,73 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          node[v2].vol = node[v2].vol + third*elm[i].vol;
          node[v3].vol = node[v3].vol + third*elm[i].vol;
 
-      }  else if (elm[i].nvtx==4) {
-            v4 = (*elm[i].vtx)(4,0);
+      } else if (elm[i].nvtx==4) {
+         v4 = (*elm[i].vtx)(3);
 
-            x1 = node[v1].x;
-            x2 = node[v2].x;
-            x3 = node[v3].x;
-            x4 = node[v4].x;
-            xc = elm[i].x;
+         x1 = node[v1].x;
+         x2 = node[v2].x;
+         x3 = node[v3].x;
+         x4 = node[v4].x;
+         xc = elm[i].x;
 
-            y1 = node[v1].y;
-            y2 = node[v2].y;
-            y3 = node[v3].y;
-            y4 = node[v4].y;
-            yc = elm[i].y;
+         y1 = node[v1].y;
+         y2 = node[v2].y;
+         y3 = node[v3].y;
+         y4 = node[v4].y;
+         yc = elm[i].y;
 
    // - Vertex 1
-            xj = node[v1].x;
-            yj = node[v1].y;
-            xm1 = half*(xj+x2);
-            ym1 = half*(yj+y2);
-            xm2 = half*(xj+x4);
-            ym2 = half*(yj+y4);
+         xj = node[v1].x;
+         yj = node[v1].y;
+         xm1 = half*(xj+x2);
+         ym1 = half*(yj+y2);
+         xm2 = half*(xj+x4);
+         ym2 = half*(yj+y4);
 
    //   Median volume is computed as a sum of two triangles.
-            node[v1].vol = node[v1].vol + \
-                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                           tri_area(xj,xc,xm2,yj,yc,ym2);
+         node[v1].vol = node[v1].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
 
    // - Vertex 2
-            xj = node[v2].x;
-            yj = node[v2].y;
-            xm1 = half*(xj+x3);
-            ym1 = half*(yj+y3);
-            xm2 = half*(xj+x1);
-            ym2 = half*(yj+y1);
+         xj = node[v2].x;
+         yj = node[v2].y;
+         xm1 = half*(xj+x3);
+         ym1 = half*(yj+y3);
+         xm2 = half*(xj+x1);
+         ym2 = half*(yj+y1);
 
    //   Median volume is computed as a sum of two triangles.
-            node[v2].vol = node[v2].vol + \
-                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                           tri_area(xj,xc,xm2,yj,yc,ym2);
+         node[v2].vol = node[v2].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
 
    // - Vertex 3
-            xj = node[v3].x;
-            yj = node[v3].y;
-            xm1 = half*(xj+x4);
-            ym1 = half*(yj+y4);
-            xm2 = half*(xj+x2);
-            ym2 = half*(yj+y2);
+         xj = node[v3].x;
+         yj = node[v3].y;
+         xm1 = half*(xj+x4);
+         ym1 = half*(yj+y4);
+         xm2 = half*(xj+x2);
+         ym2 = half*(yj+y2);
 
    //   Median volume is computed as a sum of two triangles.
-            node[v3].vol = node[v3].vol + \
-                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                           tri_area(xj,xc,xm2,yj,yc,ym2);
+         node[v3].vol = node[v3].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
 
       // - Vertex 4
-            xj = node[v4].x;
-            yj = node[v4].y;
-            xm1 = half*(xj+x1);
-            ym1 = half*(yj+y1);
-            xm2 = half*(xj+x3);
-            ym2 = half*(yj+y3);
+         xj = node[v4].x;
+         yj = node[v4].y;
+         xm1 = half*(xj+x1);
+         ym1 = half*(yj+y1);
+         xm2 = half*(xj+x3);
+         ym2 = half*(yj+y3);
 
    //   Median volume is computed as a sum of two triangles.
-            node[v4].vol = node[v4].vol + \
-                           tri_area(xj,xm1,xc,yj,ym1,yc) + \
-                           tri_area(xj,xc,xm2,yj,yc,ym2);
-   
+         node[v4].vol = node[v4].vol + \
+                        tri_area(xj,xm1,xc,yj,ym1,yc) + \
+                        tri_area(xj,xc,xm2,yj,yc,ym2);
+
       }//    endif tri_or_quadv
 
    }//   end do elementsv
@@ -891,16 +876,17 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
       }
 
-      (*elm[   i].nghbr) = -1;
+      (*elm[i].nghbr) = -1;
 
    }
-int nbrprint = 2;
-// Begin constructing the element-neighbor data
+   int nbrprint = 2;
+   // Begin constructing the element-neighbor data
    cout << "Begin constructing the element-neighbor data \n" << endl;
-   //elements2 : do i = 1, nelms
+   
    for (size_t i = 0; i < nelms; i++) {
 
-      //elm_vertex : do k = 1, elm(i).nvtx
+         //cout << " 00nn \n";  
+      
       for (size_t k = 0; k < elm[i].nvtx; k++) {
          //   Get the face of the element i:
          //
@@ -911,6 +897,8 @@ int nbrprint = 2;
          //           o---------o
          //
          //TLM warning:  fixed step out of bounds
+         
+         //cout << " nn0 \n";
          if (k  < elm[i].nvtx-1) vL = (*elm[i].vtx)(k+1); //k+1 - 1.. nope, K goes from 0
          if (k == elm[i].nvtx-1) vL = (*elm[i].vtx)(0); //1-1
          vR = (*elm[i].vtx)(k);
@@ -918,6 +906,7 @@ int nbrprint = 2;
          //   Loop over the surrounding elements of the node vR,
          //   and find the element neighbor from them.
          found = false;
+         //cout << " nn1 \n";
          //elms_around_vR
          for (size_t j = 0; j < node[vR].nelms; j++) {
             jelm = node[vR].elm(j);
@@ -925,18 +914,24 @@ int nbrprint = 2;
             // if (i < nbrprint) cout <<  " i = " << i <<  " j = " << j << endl;
             // if (i < nbrprint) cout << "vR = " << vR << " " << "   jelm = " << node[vR].elm(j) << endl;
             //if (i < nbrprint) cout << "vR , jelm = "<< vR << "   " << jelm << endl;
+            //cout <<  " i = " << i <<  " j = " << j << endl;
+            //cout << "vR = " << vR << " " << "   jelm = " << node[vR].elm(j) << endl;
 
             //edge_matching
             for (size_t ii = 0; ii < elm[jelm].nvtx; ii++) {
                
+         //cout << " nn2.1 \n";
                v1 = (*elm[jelm].vtx)(ii);
                //cout << ii << endl;
                if (ii  > 0) { 
+         //cout << " nn2.1 \n";
                   v2 = (*elm[jelm].vtx)(ii-1); 
                }
                if (ii == 0) { 
+         //cout << " nn2.2 \n";
                   v2 = (*elm[jelm].vtx)(elm[jelm].nvtx-1); 
                } //TLM fix: array bounds overrun fixed here
+         //cout << " nn3 \n";
                
                // if (i < nbrprint)  cout << " v = " << vR 
                //                         << "  " << v1 
@@ -947,29 +942,40 @@ int nbrprint = 2;
                   found = true;
                   
                   im = ii+1;
+         //cout << " nn4 \n";
                   if (im > (elm[jelm].nvtx-1)) { 
-                     im = im - (elm[jelm].nvtx-0); 
+         //cout << " nn5 \n";
+                     im = im - (elm[jelm].nvtx-0); //TLM note: indications of a struggle
                   }
                   // if (i < nbrprint)  cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   break; //exit edge_matching  |
-               } //endif       
+               } //endif     
+         //cout << " nn6 \n";  
 
             } //end do     edge_matching   <---V
 
       //if (found) exit elms_around_vR
       if (found) {break;}
+         //cout << " nn7 \n";  
 
       } //end do elms_around_vR
 
-      // Q: why is this k+2 when we already loop all the way to nvtx?
+   
+         //cout << " done with elms around vR \n";
+      // Q: why is this k+2 when we already loop all the way to nvtx?  //TLM note: more indications of a struggle here
+         //cout << " k = " << k << " \n";
       in = k + 2; 
+      
+         //cout << " elemi 1 \n"; 
       if (in > elm[i].nvtx-1) { in = in - elm[i].nvtx-0; } // A: simple fix here: in > elm[i].nvtx had to be ammended and not [0,1,2](3) => 2 len=3
       // i.e. if n > 2, then c = 3; so subtract 3 (i.e. nvtx) to get back to zero
       if (found) {
+         //cout << " elemi 2 \n";
          (*elm[   i].nghbr)(in) = jelm;
          (*elm[jelm].nghbr)(im) = i;
       }
       else {
+         //cout << " elemi 3 \n";
          (*elm[   i].nghbr)(in) = -1; //boundary
       }
 
@@ -1067,7 +1073,7 @@ cout << "DONE constructing the element-neighbor data " << endl;
 // Construct the edge data:
 //  two end nodes (n1, n2), and left and right elements (e1, e2)
 
-   int maxprint = 1;
+   int maxprint = -1;//debug set this to a small +number and uncomment the print lines using it
 
    //elements3 : do i = 1, nelms
    for (size_t i = 0; i < nelms; i++) {
@@ -1246,16 +1252,16 @@ cout << "DONE constructing the element-neighbor data " << endl;
       //cout << " edge dav before division = " << edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
       edge[i].dav = edge[i].dav / edge[i].da;
       
-      if (i<maxprint) {
-         cout << "printing edge[i].dav \n";
-         print(edge[i].dav);
-         cout << " edge dav after division = " <<  edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
-         if (edge[i].da < 1.e-5) {
-            cout << "ERROR: collapsed edge" << endl;
-            //std::exit(0);
-         }
-         //pi += 1;
-      }
+      // if (i<maxprint) {
+      //    cout << "printing edge[i].dav \n";
+      //    print(edge[i].dav);
+      //    cout << " edge dav after division = " <<  edge[i].dav(0) <<  " " << edge[i].dav(1) << endl;
+      //    if (edge[i].da < 1.e-5) {
+      //       cout << "ERROR: collapsed edge" << endl;
+      //       //std::exit(0);
+      //    }
+      //    //pi += 1;
+      // }
       // Edge vector
       edge[i].ev(0) = node[n2].x - node[n1].x;
       edge[i].ev(1) = node[n2].y - node[n1].y;

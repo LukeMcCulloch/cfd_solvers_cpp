@@ -131,7 +131,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       
       if (i_time_step==1) {
          std::cout << "Density    X-momentum  Y-momentum   Energy" << std::endl;
-         std::cout << "t= " << time << "steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << " " << res_norm(1,0) << " " << res_norm(2,0) << " " << res_norm(3,0) << std::endl;
+         std::cout << "t= " << time << " steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << " " << res_norm(1,0) << " " << res_norm(2,0) << " " << res_norm(3,0) << std::endl;
       } else { 
          std::cout << "t= " << time << " steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << " " << res_norm(1,0) << " " << res_norm(2,0) << " " << res_norm(3,0) << std::endl;
       }
