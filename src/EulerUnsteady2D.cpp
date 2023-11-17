@@ -266,6 +266,7 @@ void program_2D_euler_rk2(){
    std::string  datafile_tec      = "project_tecplot.dat";  //Tecplot file for viewing the result.
 
 
+
 //--------------------------------------------------------------------------------
 // Input Parameters
 
@@ -326,8 +327,8 @@ void program_2D_euler_rk2(){
 // (6) Compute the solution (March in time to the final time)
    E2Dsolver.euler_solver_main(E2Ddata);
 
-// // (7) Write out the tecplot data file (Solutions at nodes)
-//       write_tecplot_file(datafile_tec);
+// (7) Write out the tecplot data file (Solutions at nodes)
+      E2Ddata.write_tecplot_file(datafile_tec);
 
 }
 

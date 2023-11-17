@@ -84,6 +84,8 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    //int i_time_step; //Number of time steps
    int i;
 
+   std::string  timestep_tec      = "shock_tecplot.dat"; 
+
    // // Allocate the temporary solution array needed for the Runge-Kutta method.
    // allocate(u0(nnodes,4));
 
@@ -180,10 +182,11 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
 
       time = time + dt;
 
-      // if (mod(i_time_step,5) .eq. 0.0) {
-      //    write(picCount,*) i_time_step
-      //    write_tecplot_file('shock_time_s_'//trim(adjustl(picCount))//'.dat');
-      // }
+      //if ( i_time_step % 5 .eq. 0.0) {
+         //write(picCount,*) i_time_step
+         timestep_tec = "shock_time_s_"+ std::to_string(i_time_step) + ".dat";
+         E2Ddata.write_tecplot_file(timestep_tec);
+      //}
 
 
    }//end loop time_step
@@ -892,6 +895,9 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       // Local time step: dt = volume/sum(0.5*max_wave_speed*face_area).
 
       E2Ddata.node[i].dt = E2Ddata.node[i].vol / E2Ddata.node[i].wsn;
+      // std::cout << " E2Ddata.node[i].vol = " << E2Ddata.node[i].vol << "\n";
+      // std::cout << " E2Ddata.node[i].wsn = " << E2Ddata.node[i].wsn << "\n";
+      // std::cout << " E2Ddata.node[i].dt = " << E2Ddata.node[i].dt << "\n";
 
       // Keep the minimum dt
 
@@ -904,6 +910,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
    // Global time-step
 
+      std::cout << " dt_min = " << dt_min << "\n";
    dt = dt_min;
 
  }

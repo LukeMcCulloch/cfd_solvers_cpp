@@ -2597,29 +2597,44 @@ void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) 
    //outfile.open ("tria_grid_tecplot.dat");
    outfile.open (datafile);
    outfile << "title = \"grid\" \n";
-   outfile << "variables = \"x\" \"y\" \n";
-   outfile << "zone N="  << nnodes << ",E= " << ntria+nquad << ",ET=quadrilateral,F=FEPOINT \n";
+
+   outfile << "variables = \"x\" , \"y\" , \"rho\" , \"u\" , \"v\" , \"p\" , \"mach\"\n";
+
+   outfile << "zone N= "  << nnodes << " E= " << ntria+nquad << " et= quadrilateral, f= fepoint \n";
+
    //--------------------------------------------------------------------------------
+   // Nodal quantities: x, y, rho, u, v, p, Mach number
    for (int i=0; i<nnodes; ++i) {
+
+      real mach = std::sqrt(    
+        ( (*node[i].w)(2)*(*node[i].w)(2)  + (*node[i].w)(1) *(*node[i].w)(1) ) /
+        ( gamma * (*node[i].w)(1) *(*node[i].w)(3) / (*node[i].w)(1) *(*node[i].w)(0)  )
+      );
+
       outfile  << node[i].x << '\t' 
-               << node[i].y << "\n"; 
+               << node[i].y << "\t" 
+               << (*node[i].w)(0) << "\t" 
+               << (*node[i].w)(1) << "\t" 
+               << (*node[i].w)(2) << "\t" 
+               << (*node[i].w)(3) << "\t" 
+               << mach << "\n" ; 
    }
    //--------------------------------------------------------------------------------
    for ( int i = 0; i < nelms; ++i ) {
       //Triangles
       if (elm[i].nvtx==3) {
-         outfile  << (*elm[i].vtx)(0,0) << '\t' 
-                  << (*elm[i].vtx)(1,0) << '\t' 
-                  << (*elm[i].vtx)(2,0) << '\t' 
-                  << (*elm[i].vtx)(2,0) <<  "\n"; //The last one is a dummy.
+         outfile  << (*elm[i].vtx)(0) + 1 << '\t' 
+                  << (*elm[i].vtx)(1) + 1 << '\t' 
+                  << (*elm[i].vtx)(2) + 1 << '\t' 
+                  << (*elm[i].vtx)(2) + 1 <<  "\n"; //The last one is a dummy.
       }
 
       //Quadrilaterals
       else if (elm[i].nvtx==4) {
-         outfile  << (*elm[i].vtx)(0,0) << '\t' 
-                  << (*elm[i].vtx)(1,0) << '\t' 
-                  << (*elm[i].vtx)(2,0) << '\t' 
-                  << (*elm[i].vtx)(3,0) <<  "\n"; //The last one is a dummy.
+         outfile  << (*elm[i].vtx)(0) + 1 << '\t' 
+                  << (*elm[i].vtx)(1) + 1 << '\t' 
+                  << (*elm[i].vtx)(2) + 1 << '\t' 
+                  << (*elm[i].vtx)(3) + 1 <<  "\n"; 
 
       }
    }
@@ -2628,16 +2643,17 @@ void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) 
 
 
 
-    // ofstream outfile;
-    // outfile.open ("tria_grid_tecplot.dat");
-    // for (int i=1; i<ncells+1; ++i){
-    //     outfile << std::setprecision(16) << cell[i].xc << '\t'
-    //             << std::setprecision(16) << cell[i].w(0) << '\t'
-    //             << std::setprecision(16) << cell[i].w(1) << '\t'
-    //             << std::setprecision(16) << cell[i].w(2) << '\t'
-    //             << std::setprecision(16) << entropy <<  "\n";
-    // }
-    // outfile.close();
+   //  ofstream outfile;
+   //  outfile.open ("tria_grid_tecplot.dat");
+   //  for (int i=1; i<ncells+1; ++i){
+   //      outfile << std::setprecision(16) << cell[i].xc << '\t'
+   //              << std::setprecision(16) << cell[i].w(0) << '\t'
+   //              << std::setprecision(16) << cell[i].w(1) << '\t'
+   //              << std::setprecision(16) << cell[i].w(2) << '\t'
+   //              << std::setprecision(16) << cell[i].w(3) << '\t'
+   //              << std::setprecision(16) << entropy <<  "\n";
+   //  }
+   //  outfile.close();
 
 }
 //--------------------------------------------------------------------------------
