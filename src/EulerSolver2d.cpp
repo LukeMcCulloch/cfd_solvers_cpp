@@ -127,16 +127,20 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       //- 1st Stage of Runge-Kutta:
       //-----------------------------
       compute_residual_ncfv(E2Ddata);
+
       
       //   Compute Res(u^n)
       residual_norm(E2Ddata, res_norm);
       
-      if (i_time_step==1) {
+      if (i_time_step==0) {
+         timestep_tec = "shock_time_s_"+ std::to_string(i_time_step-1) + ".dat";
+         E2Ddata.write_tecplot_file(timestep_tec);
          std::cout << "Density    X-momentum  Y-momentum   Energy" << std::endl;
          std::cout << "t= " << time << " steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << " " << res_norm(1,0) << " " << res_norm(2,0) << " " << res_norm(3,0) << std::endl;
       } else { 
          std::cout << "t= " << time << " steps= " << i_time_step << " L1(res)= " << res_norm(0,0) << " " << res_norm(1,0) << " " << res_norm(2,0) << " " << res_norm(3,0) << std::endl;
       }
+
 
 
       
@@ -151,6 +155,9 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
          u0(i,2) = (*E2Ddata.node[i].u)(2);
          u0(i,3) = (*E2Ddata.node[i].u)(3);
       }
+      
+         timestep_tec = "bc_update_"+ std::to_string(i_time_step) + ".dat";
+         E2Ddata.write_tecplot_file(timestep_tec);
 
       //   Compute the time step (local and global)
       compute_time_step(E2Ddata, dt);
@@ -352,12 +359,12 @@ void EulerSolver2D::Solver::initial_solution_shock_diffraction(
 
       // Set the initial solution: set the pre-shock state inside the domain.
 
-      E2Ddata.node[i].w[0] = rho0;
-      E2Ddata.node[i].w[0] = u0;
-      E2Ddata.node[i].w[0] = v0;
-      E2Ddata.node[i].w[0] = p0;
+      (*E2Ddata.node[i].w)(0) = rho0;
+      (*E2Ddata.node[i].w)(1) = u0;
+      (*E2Ddata.node[i].w)(2) = v0;
+      (*E2Ddata.node[i].w)(3) = p0;
       (*E2Ddata.node[i].u) = w2u( (*E2Ddata.node[i].w), E2Ddata);
-
+      //
    }
  }  // end function initial_solution_shock_diffraction
 
@@ -458,10 +465,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       node1   = E2Ddata.edge[i].n1;  // Left node of the edge
       node2   = E2Ddata.edge[i].n2;  // Right node of the edge
       n12     = E2Ddata.edge[i].dav; // This is the directed area vector (unit vector) 
-      // std::cout << "E2Ddata.edge[i].dav(1) = " << E2Ddata.edge[i].dav(0) << "\n";
-      // std::cout << "E2Ddata.edge[i].dav(2) = " << E2Ddata.edge[i].dav(1) << "\n";
-      // std::cout << "n12 = " << n12(0) << "\n";
-      // std::cout << "n12 = " << n12(1) << "\n";
+      
       mag_n12 = E2Ddata.edge[i].da;  // Magnitude of the directed area vector
       e12     = E2Ddata.edge[i].ev;  // This is the vector along the edge (uniti vector)
       mag_e12 = E2Ddata.edge[i].e;   // Magnitude of the edge vector (Length of the edge)
@@ -490,10 +494,10 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       //    // std::cout << "dwR = \n";
       //    // dwR.print();
          
-      //    std::cout << "wL = \n";
-      //    wL.print();
-      //    std::cout << "wR = \n";
-      //    wR.print();
+      //    // std::cout << "wL = \n";
+      //    // wL.print();
+      //    // std::cout << "wR = \n";
+      //    // wR.print();
 
       // }
 
@@ -592,11 +596,45 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
    (*E2Ddata.node[node2].res) = (*E2Ddata.node[node2].res)  -  num_flux * mag_n12;
    E2Ddata.node[node2].wsn = E2Ddata.node[node2].wsn  +       wsn * mag_n12;
 
+
+
+   // std::cout << "E2Ddata.edge[i].dav(1) = " << E2Ddata.edge[i].dav(0) << "\n";
+   // std::cout << "E2Ddata.edge[i].dav(2) = " << E2Ddata.edge[i].dav(1) << "\n";
+   // std::cout << "n12 = " << n12(0) << "\n";
+   // std::cout << "n12 = " << n12(1) << "\n";
+   // std::cout << "ix = " << ix << "\n";
+   // std::cout << "iy = " << iy << "\n";
+
+   // std::cout << "node1 = " << node1 << "\n";
+   // std::cout << "node2 = " << node2 << "\n";
+   // std::cout << "mag_n12 = " << mag_n12 << "\n";
+   // std::cout << "num_flux = \n";
+   // num_flux.print();
+   // std::cout << "wave speed = " << wsn << "\n";
+   // std::cout << "res[node1] =  \n";
+   // (*E2Ddata.node[node1].res).print();
+   // std::cout << "res[node2] =  \n";
+   // (*E2Ddata.node[node2].res).print();
+   // std::cout << "w[node1] = " << E2Ddata.node[node1].wsn << "\n";
+   // std::cout << "w[node1] = " << E2Ddata.node[node2].wsn << "\n";
+   // std::cout << "--------------------------- \n\n";
+
+   // std::cout << "dwL = \n";
+   // dwL.print();
+   // std::cout << "dwR = \n";
+   // dwR.print();
+   
+   // std::cout << "wL = \n";
+   // wL.print();
+   // std::cout << "wR = \n";
+   // wR.print();
+
   
    //--------------------------------------------------------------------------------
    } //end loop edges
    //--------------------------------------------------------------------------------
 
+   //std::exit(0);
 
 
 
@@ -1022,7 +1060,7 @@ void EulerSolver2D::Solver::roe(EulerSolver2D::MainData2D& E2Ddata,
                                                       const Array2D<real>& primR,
                                                       const Array2D<real>& njk,
                                                       Array2D<real>& flux,
-                                                      real wsn) {
+                                                      real& wsn) {
 
    
    //Local variables
@@ -1149,6 +1187,11 @@ void EulerSolver2D::Solver::roe(EulerSolver2D::MainData2D& E2Ddata,
    flux = half * (fL + fR - diss);
    wsn = half*(abs(un) + a);  //Normal max wave speed times half
 
+   // std::cout << "--------------------------- \n\n";
+   // std::cout << "num_flux = \n";
+   // flux.print();
+   // std::cout << "wsn = " << wsn << "\n";
+   // std::cout << "--------------------------- \n\n";
 }  
 
 
