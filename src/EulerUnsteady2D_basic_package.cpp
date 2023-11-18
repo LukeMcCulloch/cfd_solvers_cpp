@@ -2606,9 +2606,9 @@ void EulerSolver2D::MainData2D::write_tecplot_file(const std::string& datafile) 
    // Nodal quantities: x, y, rho, u, v, p, Mach number
    for (int i=0; i<nnodes; ++i) {
 
-      real mach = std::sqrt(    
-        ( (*node[i].w)(2)*(*node[i].w)(2)  + (*node[i].w)(1) *(*node[i].w)(1) ) /
-        ( gamma * (*node[i].w)(1) *(*node[i].w)(3) / (*node[i].w)(1) *(*node[i].w)(0)  )
+      real mach = std::sqrt(
+        ( (*node[i].w)(1)*(*node[i].w)(1)  + (*node[i].w)(2) *(*node[i].w)(2) ) /
+        ( gamma * (*node[i].w)(3) / (*node[i].w)(0)  )
       );
 
       outfile  << node[i].x << '\t' 
