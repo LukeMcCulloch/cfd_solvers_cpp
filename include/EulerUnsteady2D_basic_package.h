@@ -74,6 +74,8 @@ classes:
 #include <vector> 
 using std::vector;
 
+#include <string> 
+
 
 //#include <fstream>
 
@@ -382,7 +384,8 @@ public:
         delete kth_nghbr_of_2;
       }
       //  to be read from a boundary grid file
-      char bc_type[80];     //type of boundary condition
+      //char bc_type[80];     //type of boundary condition
+      std::string bc_type;
       size_t nbnodes; //# of boundary nodes
       Array2D<int>* bnode;  //list of boundary nodes
       //  to be constructed in the code

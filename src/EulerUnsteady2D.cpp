@@ -280,14 +280,14 @@ void program_2D_euler_rk2(){
                                              //    (Specify M_inf here for other problems.)
                 E2Ddata.gamma = 1.4;         // Ratio of specific heats
                   E2Ddata.CFL = 0.95;        // CFL number
-              E2Ddata.t_final = 0.18;        // Final time to stop the calculation.
+              E2Ddata.t_final = 0.7;        // Final time to stop the calculation.
         E2Ddata.time_step_max = 5000;        // Max time steps (just a big enough number)
         E2Ddata.inviscid_flux = "roe";      // "rhll" = Rotated-RHLL      , "roe"  = Roe flux
          E2Ddata.limiter_type = "vanalbada"; // = Van Albada limiter, "none" = No limiter
                    E2Ddata.nq = 4;           // The number of equtaions/variables in the target equtaion.
     E2Ddata.gradient_type     = "linear";    // "linear" or "quadratic2 for a quadratic LSQ.
-    E2Ddata.gradient_weight   = "none";      // or "inverse_distance"
-    E2Ddata.gradient_weight_p =  EulerSolver2D::one;  // or any other real value
+    E2Ddata.gradient_weight   = "none";      // "none" or "inverse_distance"
+    E2Ddata.gradient_weight_p =  EulerSolver2D::one;//EulerSolver2D::one;  // or any other real value
 //--------------------------------------------------------------------------------
 // Solve the Euler equations and write the output datafile.
 //

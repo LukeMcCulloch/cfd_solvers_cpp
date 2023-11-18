@@ -945,7 +945,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
          //cout << " nn4 \n";
                   if (im > (elm[jelm].nvtx-1)) { 
          //cout << " nn5 \n";
-                     im = im - (elm[jelm].nvtx-0); //TLM note: indications of a struggle
+                     im = im - (elm[jelm].nvtx-0); //TLM note: indications of a struggle back in 2020
                   }
                   // if (i < nbrprint)  cout << "found v1==VR, v2==VL " << v1 << " " << vR << "   " << v2 << " " <<  vL << endl;
                   break; //exit edge_matching  |
@@ -962,7 +962,7 @@ void EulerSolver2D::MainData2D::construct_grid_data(){
 
    
          //cout << " done with elms around vR \n";
-      // Q: why is this k+2 when we already loop all the way to nvtx?  //TLM note: more indications of a struggle here
+      // Q: why is this k+2 when we already loop all the way to nvtx?  //TLM note: more indications of a struggle here, back in 2020
          //cout << " k = " << k << " \n";
       in = k + 2; 
       
@@ -1608,8 +1608,8 @@ cout << "DONE constructing the element-neighbor data " << endl;
             // cout << "bound[i].nbnodes = " << bound[i].nbnodes << endl;
          }
 
-         (*bound[i].bfn)(j,0)  =  std::sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
-         (*bound[i].bfnx)(j,0) = -(y1-y2) / (*bound[i].bfn)(j);
+         (*bound[i].bfn)(j)  =  std::sqrt( (x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) );
+         (*bound[i].bfnx)(j) = -(y1-y2) / (*bound[i].bfn)(j);
          (*bound[i].bfny)(j) =  (x1-x2) / (*bound[i].bfn)(j);
 
       }
@@ -1707,8 +1707,8 @@ cout << "DONE constructing the element-neighbor data " << endl;
                im = ii+1;
                if (im > elm[ielm].nvtx-1 ) { im = im - (elm[ielm].nvtx-0); }//return to 0? (cannot use im = 0; }//)
               
-               vt1 = (*elm[ielm].vtx)(in); //(in); //TLM these are bad
-               vt2 = (*elm[ielm].vtx)(im); //TLM these are bad
+               vt1 = (*elm[ielm].vtx)(in); //(in); //TLM these are bad ?? 2020
+               vt2 = (*elm[ielm].vtx)(im); //TLM these are bad ?? 2020
 
 
                // if (j < 2) cout << " v = " << vt1 << "  " << v1 << "  " << vt2 << "  " << v2 << endl;

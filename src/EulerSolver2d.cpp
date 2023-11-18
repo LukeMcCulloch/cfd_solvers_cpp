@@ -114,7 +114,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    time = zero;
 
 
-   for ( int i_time_step = 0; i_time_step < 10; ++i_time_step ) {
+   for ( int i_time_step = 0; i_time_step < E2Ddata.time_step_max; ++i_time_step ) {
       
       //------------------------------------------------------
       // Two-stage Runge-Kutta scheme: u^n is saved as u0(:,:)
@@ -145,9 +145,8 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
 
       
       //   Stop if the final time is reached.
-      // if ( abs(time-t_final) < 1.0e-12_p2 ) exit time_step  //tlm todo exit loop
+      if ( std::abs(time-E2Ddata.t_final) < 1.0e-8 ) break;//exit time_step
 
-      // }
 
       for (size_t i=0; i<E2Ddata.nnodes; ++i) {
          u0(i,0) = (*E2Ddata.node[i].u)(0);
@@ -156,11 +155,12 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
          u0(i,3) = (*E2Ddata.node[i].u)(3);
       }
       
-         timestep_tec = "bc_update_"+ std::to_string(i_time_step) + ".dat";
-         E2Ddata.write_tecplot_file(timestep_tec);
+         //timestep_tec = "bc_update_"+ std::to_string(i_time_step) + ".dat";
+         //E2Ddata.write_tecplot_file(timestep_tec);
 
       //   Compute the time step (local and global)
-      compute_time_step(E2Ddata, dt);
+      dt = compute_time_step(E2Ddata);
+      //std::cout << " compute_time_step dt = " << dt << "\n";
       //   Adjust dt so as to finish exactly at the final time
       if (time + dt > E2Ddata.t_final) dt = E2Ddata.t_final - time;
 
@@ -189,11 +189,11 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
 
       time = time + dt;
 
-      //if ( i_time_step % 5 .eq. 0.0) {
+      if ( i_time_step == 0 || i_time_step % 5 == 0.0) {
          //write(picCount,*) i_time_step
          timestep_tec = "shock_time_s_"+ std::to_string(i_time_step) + ".dat";
          E2Ddata.write_tecplot_file(timestep_tec);
-      //}
+      }
 
 
    }//end loop time_step
@@ -282,7 +282,7 @@ void EulerSolver2D::Solver::eliminate_normal_mass_flux( EulerSolver2D::MainData2
             n12(0) = (*E2Ddata.bound[i].bnx)(j);
             n12(1) = (*E2Ddata.bound[i].bny)(j);
 
-            normal_mass_flux = (*E2Ddata.node[inode].u)(0)*n12(0) + (*E2Ddata.node[inode].u)(1)*n12(0); //tlm fixed
+            normal_mass_flux = (*E2Ddata.node[inode].u)(1)*n12(0) + (*E2Ddata.node[inode].u)(2)*n12(1); //tlm fixed
 
             (*E2Ddata.node[inode].u)(1) = (*E2Ddata.node[inode].u)(1) - normal_mass_flux * n12(0);
             (*E2Ddata.node[inode].u)(2) = (*E2Ddata.node[inode].u)(2) - normal_mass_flux * n12(1);
@@ -505,6 +505,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       //limiter : if (trim(limiter_type) == "none") then
       if (E2Ddata.limiter_type == "none") {
+         //std::cout << "limiter = none \n";
 
          //  Simple linear extrapolation
          wL = (*E2Ddata.node[node1].w) + dwL;
@@ -513,6 +514,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       //  (2) UMUSCL-type limiters: simple 1D limiting.
       } else if (E2Ddata.limiter_type == "vanalbada") {
+         //std::cout << "limiter = vanalbada \n";
 
          //       In 1D: dwp = w_{j+1}-w_j, dwm = w_j-w_{j-1} => limited_slope = limiter(dwm,dwp)
          //
@@ -543,10 +545,10 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       //  (3) No other limiters available.
       } else {
 
-      //std::cout << " Invalid input for limiter_type = ", E2Ddata.limiter_type << std::endl;
-      std::cout << " Choose none or vanalbada, and try again."<< "\n";
-      std::cout <<  " ... Stop."<< "\n";
-      //stop
+         //std::cout << " Invalid input for limiter_type = ", E2Ddata.limiter_type << std::endl;
+         std::cout << " Choose none or vanalbada, and try again."<< "\n";
+         std::cout <<  " ... Stop."<< "\n";
+         std::exit(0);
 
       } //endif limiter
 
@@ -555,79 +557,81 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
 
       
-   //  Compute the numerical flux for given wL and wR.
+      //  Compute the numerical flux for given wL and wR.
 
-   //  (1) Roe flux (carbuncle is expected for strong shocks)
-   if     (E2Ddata.inviscid_flux == "roe") {
+      //  (1) Roe flux (carbuncle is expected for strong shocks)
+      if     (E2Ddata.inviscid_flux == "roe") {
+         //std::cout << "flux = roe \n";
+         
+         roe(E2Ddata,wL,wR,n12, num_flux,wsn);
+         // if (node1 >= E2Ddata.nnodes-1) {
+         //    std::cout << "num_flux = \n";
+         //    num_flux.print();
+         //    std::cout << "wsn = " << wsn << "\n";
+         // }
+
+      //  (2) Rotated-RHLL flux (no carbuncle is expected for strong shocks)
+      } else if (E2Ddata.inviscid_flux =="rhll") {
+         //std::cout << "flux = rhll \n";
+         
+         //TLM todo: implement the rotated rhll flux:
+         rotated_rhll(E2Ddata,wL,wR,n12, num_flux,wsn);
+
+      } else {
+         
+         std::cout <<  " Invalid input for inviscid_flux = " << E2Ddata.inviscid_flux << std::endl;
+         std::cout <<  " Choose roe or rhll, and try again." << std::endl;
+         std::cout <<  " ... Stop. \n";
+         //stop
+
+      } //endif flux
+
+      //  Add the flux multiplied by the magnitude of the directed area vector to node1,
+      //  and accumulate the max wave speed quantity for use in the time step calculation.
+
+      (*E2Ddata.node[node1].res) = (*E2Ddata.node[node1].res)  +  num_flux * mag_n12;
+      E2Ddata.node[node1].wsn = E2Ddata.node[node1].wsn  +       wsn * mag_n12;
+
+      // Subtract the flux multiplied by the magnitude of the directed area vector from node2,
+      // and accumulate the max wave speed quantity for use in the time step calculation.
+      //
+      // NOTE: Subtract because the outward face normal is -n12 for the node2.
+
+      (*E2Ddata.node[node2].res) = (*E2Ddata.node[node2].res)  -  num_flux * mag_n12;
+      E2Ddata.node[node2].wsn = E2Ddata.node[node2].wsn  +       wsn * mag_n12;
+
+
+
+      // std::cout << "E2Ddata.edge[i].dav(1) = " << E2Ddata.edge[i].dav(0) << "\n";
+      // std::cout << "E2Ddata.edge[i].dav(2) = " << E2Ddata.edge[i].dav(1) << "\n";
+      // std::cout << "n12 = " << n12(0) << "\n";
+      // std::cout << "n12 = " << n12(1) << "\n";
+      // std::cout << "ix = " << ix << "\n";
+      // std::cout << "iy = " << iy << "\n";
+
+      // std::cout << "node1 = " << node1 << "\n";
+      // std::cout << "node2 = " << node2 << "\n";
+      // std::cout << "mag_n12 = " << mag_n12 << "\n";
+      // std::cout << "num_flux = \n";
+      // num_flux.print();
+      // std::cout << "wave speed = " << wsn << "\n";
+      // std::cout << "res[node1] =  \n";
+      // (*E2Ddata.node[node1].res).print();
+      // std::cout << "res[node2] =  \n";
+      // (*E2Ddata.node[node2].res).print();
+      // std::cout << "w[node1] = " << E2Ddata.node[node1].wsn << "\n";
+      // std::cout << "w[node1] = " << E2Ddata.node[node2].wsn << "\n";
+      // std::cout << "--------------------------- \n\n";
+
+      // std::cout << "dwL = \n";
+      // dwL.print();
+      // std::cout << "dwR = \n";
+      // dwR.print();
       
-      roe(E2Ddata,wL,wR,n12, num_flux,wsn);
-      // if (node1 >= E2Ddata.nnodes-1) {
-      //    std::cout << "num_flux = \n";
-      //    num_flux.print();
-      //    std::cout << "wsn = " << wsn << "\n";
-      // }
-
-   //  (2) Rotated-RHLL flux (no carbuncle is expected for strong shocks)
-   } else if (E2Ddata.inviscid_flux =="rhll") {
-      
-      //TLM todo: implement the rotated rhll flux:
-      rotated_rhll(E2Ddata,wL,wR,n12, num_flux,wsn);
-
-   } else {
-      
-      std::cout <<  " Invalid input for inviscid_flux = " << E2Ddata.inviscid_flux << std::endl;
-      std::cout <<  " Choose roe or rhll, and try again." << std::endl;
-      std::cout <<  " ... Stop. \n";
-      //stop
-
-   }
-
-   //  Add the flux multiplied by the magnitude of the directed area vector to node1,
-   //  and accumulate the max wave speed quantity for use in the time step calculation.
-
-   (*E2Ddata.node[node1].res) = (*E2Ddata.node[node1].res)  +  num_flux * mag_n12;
-   E2Ddata.node[node1].wsn = E2Ddata.node[node1].wsn  +       wsn * mag_n12;
-
-   // Subtract the flux multiplied by the magnitude of the directed area vector from node2,
-   // and accumulate the max wave speed quantity for use in the time step calculation.
-   //
-   // NOTE: Subtract because the outward face normal is -n12 for the node2.
-
-   (*E2Ddata.node[node2].res) = (*E2Ddata.node[node2].res)  -  num_flux * mag_n12;
-   E2Ddata.node[node2].wsn = E2Ddata.node[node2].wsn  +       wsn * mag_n12;
-
-
-
-   // std::cout << "E2Ddata.edge[i].dav(1) = " << E2Ddata.edge[i].dav(0) << "\n";
-   // std::cout << "E2Ddata.edge[i].dav(2) = " << E2Ddata.edge[i].dav(1) << "\n";
-   // std::cout << "n12 = " << n12(0) << "\n";
-   // std::cout << "n12 = " << n12(1) << "\n";
-   // std::cout << "ix = " << ix << "\n";
-   // std::cout << "iy = " << iy << "\n";
-
-   // std::cout << "node1 = " << node1 << "\n";
-   // std::cout << "node2 = " << node2 << "\n";
-   // std::cout << "mag_n12 = " << mag_n12 << "\n";
-   // std::cout << "num_flux = \n";
-   // num_flux.print();
-   // std::cout << "wave speed = " << wsn << "\n";
-   // std::cout << "res[node1] =  \n";
-   // (*E2Ddata.node[node1].res).print();
-   // std::cout << "res[node2] =  \n";
-   // (*E2Ddata.node[node2].res).print();
-   // std::cout << "w[node1] = " << E2Ddata.node[node1].wsn << "\n";
-   // std::cout << "w[node1] = " << E2Ddata.node[node2].wsn << "\n";
-   // std::cout << "--------------------------- \n\n";
-
-   // std::cout << "dwL = \n";
-   // dwL.print();
-   // std::cout << "dwR = \n";
-   // dwR.print();
-   
-   // std::cout << "wL = \n";
-   // wL.print();
-   // std::cout << "wR = \n";
-   // wR.print();
+      // std::cout << "wL = \n";
+      // wL.print();
+      // std::cout << "wR = \n";
+      // wR.print();
 
   
    //--------------------------------------------------------------------------------
@@ -663,13 +667,27 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
    //--------------------------------------------------------------------------------
    for (size_t i=0; i<E2Ddata.nbound; ++i) { //bc_loop
       //--------------------------------------------------------------------------------
+      // std::cout << "doing boundary " << i << "\n"; 
+      // std::cout << "E2Ddata.bound[i].bc_type " << E2Ddata.bound[i].bc_type << "\n"; 
+      // bool check = E2Ddata.bound[i].bc_type == "freestream" ;
+      // std::cout << "E2Ddata.bound[i].bc_type == freestream ? " << check << "\n";
 
+      // int res = E2Ddata.bound[i].bc_type.compare("freestream");
+      // if (res == 0)
+      //    std::cout << "\nBoth the input strings are equal." << std::endl;
+      // else if (res < 0)
+      //    std::cout << "\nString 1 is smaller as compared to String 2." << std::endl;
+      // else
+      //    std::cout << "\nString 1 is greater as compared to String 2." << std::endl;
+      //    std::exit(0);
+      
       //------------------------------------------------
       //  BC: Upwind flux via freestream values
       //
       //      NOTE: If the final solution at the boundary node is far from
       //            the freestream values, then the domain is probably is not large enough.
       if (E2Ddata.bound[i].bc_type == "freestream") {
+         //std::cout << "bc = freestream \n";
          for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { //freestream condition
 
             n1 = (*E2Ddata.bound[i].bnode)(j  );  //Left node
@@ -737,6 +755,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       if ( (E2Ddata.bound[i].bc_type == "slip_wall")  || ((E2Ddata.bound[i].bc_type == "outflow_supersonic") ) ) {
          
+         //std::cout << "bc = outflow_supersonic or slip wall \n";
          for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { //slip wall(part of it anyway) and outflow supersonic
             
             //bnodes_slip_wall
@@ -792,13 +811,14 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       } else if (E2Ddata.bound[i].bc_type == "outflow_back_pressure") {
 
+         //std::cout << "bc = outflow_back_pressure \n";
          //bnodes_outflow : do j = 1, E2Ddata.bound[i].nbfaces
          for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { 
 
             n1 = (*E2Ddata.bound[i].bnode)(j);   // Left node
             n2 = (*E2Ddata.bound[i].bnode)(j+1); // Right node
             n12(0) = (*E2Ddata.bound[i].bfnx)(j);
-            n12(2) = (*E2Ddata.bound[i].bfny)(j);
+            n12(1) = (*E2Ddata.bound[i].bfny)(j);
             mag_e12 = (*E2Ddata.bound[i].bfn)(j)*half;
 
             //   1. Left node
@@ -858,32 +878,53 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
          //only_slip_wall : if (trim(E2Ddata.bound[i].bc_type) == "slip_wall") then
       if (E2Ddata.bound[i].bc_type == "slip_wall") {
+         //std::cout << "bc = slip_wall \n";
+
 
          //bnodes_slip_wall2 : do j = 1, E2Ddata.bound[i].nbnodes
-         for (size_t j=0; j<E2Ddata.bound[i].nbnodes; ++j) { 
+         //for (size_t j=0; j<E2Ddata.bound[i].nbnodes; ++j) { //tlm bug found?::this produces one to many j !!
+         for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { 
+         
+            //std::cout << "j = " << j << " \n";
 
             n1 = (*E2Ddata.bound[i].bnode)(j);   // Left node
+            //std::cout << "n1 = " << n1 << " \n";
+
+
+            //std::cout << "(*E2Ddata.bound[i].bfnx)(j) = " << (*E2Ddata.bound[i].bfnx)(j) << " \n";
             n12(0) = (*E2Ddata.bound[i].bfnx)(j);
-            n12(2) = (*E2Ddata.bound[i].bfny)(j);
+            //std::cout << "n12 = " << n12(0) << " \n";
+
+            
+            //std::cout << "(*E2Ddata.bound[i].bfny)(j) = " << (*E2Ddata.bound[i].bfny)(j) << " \n";
+            n12(1) = (*E2Ddata.bound[i].bfny)(j);
+            //std::cout << "n12 = " << n12(1) << " \n";
+            //n12.print();
+            
+            //std::cout << "got normals on the slip wall \n";
+            //std::cout << "-----------------------------\n";
 
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // THIS IS A SPECIAL TREATMENT FOR SHOCK DIFFRACTION PROBLEM.
             // Same as in the subroutine "eliminate_normal_mass_flux" above.
 
             if (i==1 && j==0) {
-               std::cout << "shock y mmtm 0, n1 = " << n1 << "\n";
+               //std::cout << "shock y mmtm 0, n1 = " << n1 << "\n";
                (*E2Ddata.node[n1].res)(2) = zero; // Make sure no updates to y-momentum.
-               //cycle bnodes_slip_wall2 // That's all we neeed. Go to the next. TLM TODO: c++ cycle
+               //cycle 
+               continue; // That's all we neeed. Go to the next bnodes_slip_wall2 
             }//endif
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             //    Subtract the normal component of the mass flow for tangency, so that
             //    normal mass flow through the boundary will not be created at nodes
             //    after the solution update.
+            //std::cout << "zeroing the momentum.... \n";
                
             norm_momentum = (*E2Ddata.node[n1].res)(1)*n12(0) + (*E2Ddata.node[n1].res)(2)*n12(1);
             (*E2Ddata.node[n1].res)(1) = (*E2Ddata.node[n1].res)(1) - norm_momentum*n12(0);
             (*E2Ddata.node[n1].res)(2) = (*E2Ddata.node[n1].res)(2) - norm_momentum*n12(1);
+            //std::cout << "zeroed the momentum \n";
 
          } //end loop bnodes_slip_wall2
 
@@ -919,7 +960,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 //*       For steady problems, it can be used to accelerate the convergence.
 //*
 //********************************************************************************
- void EulerSolver2D::Solver::compute_time_step( EulerSolver2D::MainData2D& E2Ddata,real dt) {
+ real EulerSolver2D::Solver::compute_time_step( EulerSolver2D::MainData2D& E2Ddata) {
 
    //Local variables
    real dt_min;
@@ -948,8 +989,9 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
    // Global time-step
 
-      std::cout << " dt_min = " << dt_min << "\n";
-   dt = dt_min;
+   //std::cout << " dt_min = " << dt_min << "\n";
+   //dt = dt_min;
+   return dt_min;
 
  }
 //--------------------------------------------------------------------------------
@@ -974,9 +1016,12 @@ void EulerSolver2D::Solver::update_solution( EulerSolver2D::MainData2D& E2Ddata,
    //
 
    for (size_t i=0; i<E2Ddata.nnodes; ++i) {
+      
+   //(*E2Ddata.node[i].res).print();
 
       //   Solution change based on the global time stepping 
       (*E2Ddata.node[i].du) = (CFL*coeff*dt/E2Ddata.node[i].vol) * (*E2Ddata.node[i].res);
+
 
       //   Solution update
       (*E2Ddata.node[i].u) = (*E2Ddata.node[i].u) + (*E2Ddata.node[i].du); // make changes                                // Make sure zero y-momentum.
@@ -1275,7 +1320,7 @@ Array2D<real>  EulerSolver2D::Solver::w2u(const Array2D<real>& w,
    u(0) = w(0);
    u(1) = w(0)*w(1);
    u(2) = w(0)*w(2);
-   u(3) = w(3)/(E2Ddata.gamma-one)+half*w(1)*(w(2)*w(2)+w(3)*w(3));
+   u(3) = w(3)/(E2Ddata.gamma-one)+half*w(0)*(w(1)*w(1)+w(2)*w(2));
 
    return u;
 
