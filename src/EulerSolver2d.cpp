@@ -167,6 +167,13 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       // Update the solution
       // 1st Stage => u^* = u^n - dt/dx*Res(u^n)
       update_solution(E2Ddata, one,dt,E2Ddata.CFL);
+      
+
+
+      timestep_tec = "shock_u_star_"+ std::to_string(i_time_step) + ".dat";
+      E2Ddata.write_tecplot_file(timestep_tec);
+      //std::exit(0);
+
 
       //-----------------------------
       //- 2nd Stage of Runge-Kutta:
@@ -1266,7 +1273,7 @@ void EulerSolver2D::Solver::rotated_rhll(EulerSolver2D::MainData2D& E2Ddata,
                                                       const Array2D<real>& primR,
                                                       const Array2D<real>& njk,
                                                       Array2D<real>& flux,
-                                                      real wsn) {
+                                                      real& wsn) {
    }
 
 //********************************************************************************
