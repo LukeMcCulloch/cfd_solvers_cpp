@@ -97,8 +97,8 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
    cout << "                    CFL = " <<  E2Ddata.CFL << " \n";
    cout << "             final time = " <<  E2Ddata.t_final << " \n";
    cout << "          time_step_max = " <<  E2Ddata.time_step_max << " \n";
-   cout << "          inviscid_flux = " <<  trim(E2Ddata.inviscid_flux) << " \n";
-   cout << "           limiter_type = " <<  trim(E2Ddata.limiter_type) << " \n";
+   cout << "          inviscid_flux = " <<  E2Ddata.inviscid_flux << " \n";
+   cout << "           limiter_type = " <<  E2Ddata.limiter_type << " \n";
    cout << " \n";
 
    //--------------------------------------------------------------------------------
@@ -148,6 +148,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       if ( std::abs(time-E2Ddata.t_final) < 1.0e-8 ) break;//exit time_step
 
 
+      //   Save off the previous solution (to be used in the 2nd stage).
       for (size_t i=0; i<E2Ddata.nnodes; ++i) {
          u0(i,0) = (*E2Ddata.node[i].u)(0);
          u0(i,1) = (*E2Ddata.node[i].u)(1);
@@ -155,8 +156,6 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
          u0(i,3) = (*E2Ddata.node[i].u)(3);
       }
       
-         //timestep_tec = "bc_update_"+ std::to_string(i_time_step) + ".dat";
-         //E2Ddata.write_tecplot_file(timestep_tec);
 
       //   Compute the time step (local and global)
       dt = compute_time_step(E2Ddata);
@@ -189,11 +188,11 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
 
       time = time + dt;
 
-      if ( i_time_step == 0 || i_time_step % 5 == 0.0) {
+      //if ( i_time_step == 0 || i_time_step % 5 == 0.0) {
          //write(picCount,*) i_time_step
          timestep_tec = "shock_time_s_"+ std::to_string(i_time_step) + ".dat";
          E2Ddata.write_tecplot_file(timestep_tec);
-      }
+      //}
 
 
    }//end loop time_step
@@ -269,7 +268,7 @@ void EulerSolver2D::Solver::eliminate_normal_mass_flux( EulerSolver2D::MainData2
             //
             if (i==1 && j==0) {
                inode                       = (*E2Ddata.bound[i].bnode)(j);
-               (*E2Ddata.node[inode].u)(1) = zero;                                  // Make sure zero y-momentum.
+               (*E2Ddata.node[inode].u)(2) = zero;                                     // Make sure zero y-momentum.
                (*E2Ddata.node[inode].w)    = u2w( (*E2Ddata.node[inode].u) , E2Ddata );// Update primitive variables
                
                continue; // cycle bnodes_slip_wall // That's all we neeed. Go to the next.
@@ -335,27 +334,29 @@ void EulerSolver2D::Solver::initial_solution_shock_diffraction(
    real M_shock, u_shock, rho0, u0, v0, p0;
    real gamma = E2Ddata.gamma;
 
+   
+   // Pre-shock state: uniform state; no disturbance has reahced yet.
+
+   rho0  = one;
+   u0    = zero;
+   v0    = zero;
+   p0    = one/gamma;
+
+// Incoming shock speed
+
+   M_shock = 5.09;
+   u_shock = M_shock * sqrt(gamma*p0/rho0);
+
+   // Post-shock state: These values will be used in the inflow boundary condition.
+   E2Ddata.rho_inf = rho0 * (gamma + one)*M_shock*M_shock/( (gamma - one)*M_shock*M_shock + two );
+   E2Ddata.p_inf =   p0 * (   two*gamma*M_shock*M_shock - (gamma - one) )/(gamma + one);
+   E2Ddata.u_inf = (one - rho0/E2Ddata.rho_inf)*u_shock;
+   E2Ddata.M_inf = E2Ddata.u_inf / sqrt(gamma*E2Ddata.p_inf/E2Ddata.rho_inf);
+   E2Ddata.v_inf = zero;
+
+
    //loop nnodes
    for (size_t i = 0; i < E2Ddata.nnodes; i++) {
-
-      // Pre-shock state: uniform state; no disturbance has reahced yet.
-
-      rho0  = one;
-      u0    = zero;
-      v0    = zero;
-      p0    = one/gamma;
-
-   // Incoming shock speed
-
-      M_shock = 5.09;
-      u_shock = M_shock * sqrt(gamma*p0/rho0);
-
-      // Post-shock state: These values will be used in the inflow boundary condition.
-       E2Ddata.rho_inf = rho0 * (gamma + one)*M_shock*M_shock/( (gamma - one)*M_shock*M_shock + two );
-         E2Ddata.p_inf =   p0 * (   two*gamma*M_shock*M_shock - (gamma - one) )/(gamma + one);
-         E2Ddata.u_inf = (one - rho0/E2Ddata.rho_inf)*u_shock;
-         E2Ddata.M_inf = E2Ddata.u_inf / sqrt(gamma*E2Ddata.p_inf/E2Ddata.rho_inf);
-         E2Ddata.v_inf = zero;
 
       // Set the initial solution: set the pre-shock state inside the domain.
 
@@ -476,8 +477,8 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       //        So, it is equivalent to the solution difference.
 
       for  (int j=0; j< E2Ddata.nq; ++j){ 
-         dwL = (*E2Ddata.node[node1].gradw)(j,ix)*e12(ix) + (*E2Ddata.node[node1].gradw)(j,iy) * e12(iy) *half*mag_e12;
-         dwR = (*E2Ddata.node[node2].gradw)(j,ix)*e12(ix) + (*E2Ddata.node[node2].gradw)(j,iy) * e12(iy) *half*mag_e12;
+         dwL = ( (*E2Ddata.node[node1].gradw)(j,ix)*e12(ix) + (*E2Ddata.node[node1].gradw)(j,iy) * e12(iy) )*half*mag_e12;
+         dwR = ( (*E2Ddata.node[node2].gradw)(j,ix)*e12(ix) + (*E2Ddata.node[node2].gradw)(j,iy) * e12(iy) )*half*mag_e12;
       }
       //  It is now limiter time!
       
@@ -527,19 +528,16 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
          //            so that the average (dwm+dwp)/2 will be the central-difference just like in 1D.
 
          //     Edge derivative
-         //dwij = half*(node(node2)%w - node(node1)%w)
          dwij = half*( (*E2Ddata.node[node2].w) - (*E2Ddata.node[node1].w) );
 
          // //     Left face value (wL) with the Van Albada limiter
          dwm  = two*dwL-dwij;
          dwp  = dwij;
-         //wL  = node(node1)%w + va_slope_limiter(dwm,dwp,mag_e12)
          wL  = (*E2Ddata.node[node1].w) + va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
 
          //     Right face value (wR) with the Van Albada limiter
          dwm  = -(two*dwR-dwij);
          dwp  = -dwij;
-         //wR  = node(node2)%w + va_slope_limiter(dwm,dwp,mag_e12)
          wR = (*E2Ddata.node[node2].w) + va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
 
       //  (3) No other limiters available.
