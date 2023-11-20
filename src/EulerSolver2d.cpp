@@ -208,11 +208,11 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
 
       time = time + dt;
 
-      //if ( i_time_step == 0 || i_time_step % 5 == 0.0) {
+      if ( i_time_step == 0 || i_time_step % 5 == 0.0) {
          //write(picCount,*) i_time_step
          timestep_tec = "shock_time_s_"+ std::to_string(i_time_step) + ".dat";
          E2Ddata.write_tecplot_file(timestep_tec);
-      //}
+      }
 
 
    }//end loop time_step
@@ -560,8 +560,27 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
          wL  = (*E2Ddata.node[node1].w) + va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
          
 
-      // auto dummy = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+
       // if (node1 == 5151 && node2 == 5050) {
+         
+      //    auto dummy = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+      //    real h = mag_e12;
+      //    real eps2 = (0.3 * h)*(0.3 * h)*(0.3 * h);
+      //    auto vdat1 = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+      //    auto vdat2 = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+      //    auto da = dwm;
+      //    auto db = dwp;
+      //    vdat1(0) = copysign(1.0,dwm(0)*dwp(0));
+      //    vdat1(1) = copysign(1.0,dwm(1)*dwp(1));
+      //    vdat1(2) = copysign(1.0,dwm(2)*dwp(2));
+      //    vdat1(3) = copysign(1.0,dwm(3)*dwp(3));
+      //    for (size_t j=0; j<E2Ddata.nq; ++j){
+      //       vdat2(j) = half*( vdat1(j) + one ) *
+      //       ( (db(j)*db(j) + eps2)*da(j) + (da(j)*da(j) + eps2)*db(j) ) /
+      //       ( da(j)*da(j) + db(j)*da(j) + two*eps2 );
+      //    }
+      
+      //    std::cout << "---------------------------------------- \n";
       //    std::cout << "interior flux, limiter stuff \n";
       //    std::cout << "node1 = " << node1 << "\n";
       //    std::cout << "node2 = " << node2 << "\n";
@@ -570,13 +589,23 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       //    std::cout << " dwp  = \n";
       //    dwp.print();
       //    std::cout << "copysign :: " << "\n";
-      //    for (size_t i=0; i<E2Ddata.nq; ++i){
-      //       std::cout << copysign(1.0,dwm(i)*dwp(i)) << "\n";
+      //    for (size_t j=0; j<E2Ddata.nq; ++j){
+      //       std::cout << copysign(1.0,dwm(j)*dwp(j)) << "\n";
       //    }
       //    std::cout << "pow = " << pow(3, (0.3 * mag_e12) ) << "\n";
       //    std::cout << "pow = " << (0.3 * mag_e12)*(0.3 * mag_e12)*(0.3 * mag_e12) << "\n";
       //    std::cout << "mag_e12 = " << mag_e12 << "\n";
-      //    std::cout << "va_slope_limiter = \n";
+      //    for (size_t j=0; j<E2Ddata.nq; ++j){
+      //       std::cout << "va_slope_limiter, line 1 = " << half*( vdat1(j) + one ) << "\n";
+      //    }
+      //    for (size_t j=0; j<E2Ddata.nq; ++j){
+      //       std::cout << "va_slope_limiter, line 2 = " << ( (db(j)*db(j) + eps2)*da(j) + (da(j)*da(j) + eps2)*db(j) ) << "\n";
+      //    }
+      //    for (size_t j=0; j<E2Ddata.nq; ++j){
+      //       std::cout << "va_slope_limiter, line 3 = " <<  da(j)*da(j) << "   ,   "<< db(j)*da(j)  << "   ,   "  << two*eps2 << "   ,   " <<( da(j)*da(j) + db(j)*da(j) + two*eps2 ) << "\n";
+      //    }
+      //    std::cout << "va_slope_limiter = "<< vdat2(0) << " , " << vdat2(1) << " , " << vdat2(2) << " , " << vdat2(3) <<"\n";
+      //    std::cout << "va_slope_limiter, actual  = \n";
       //    dummy.print();
       //    std::cout << "(node[node1].w) =  \n";
       //    (*E2Ddata.node[node1].w).print();
@@ -589,6 +618,59 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
          dwp  = -dwij;
          wR = (*E2Ddata.node[node2].w) + va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
 
+         
+         // if (node1 == 5151 && node2 == 5050) {
+
+         //    auto dummy = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+         //    real h = mag_e12;
+         //    real eps2 = (0.3 * h)*(0.3 * h)*(0.3 * h);
+         //    auto vdat1 = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+         //    auto vdat2 = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+         //    auto da = dwm;
+         //    auto db = dwp;
+         //    vdat1(0) = copysign(1.0,dwm(0)*dwp(0));
+         //    vdat1(1) = copysign(1.0,dwm(1)*dwp(1));
+         //    vdat1(2) = copysign(1.0,dwm(2)*dwp(2));
+         //    vdat1(3) = copysign(1.0,dwm(3)*dwp(3));
+         //    for (size_t j=0; j<E2Ddata.nq; ++j){
+         //       vdat2(j) = half*( vdat1(j) + one ) * 
+         //       ( (db(j)*db(j) + eps2)*da(j) + (da(j)*da(j) + eps2)*db(j) ) /
+         //       ( da(j)*da(j) + db(j)*da(j) + two*eps2 );
+         //    }
+
+         //    std::cout << "interior flux, limiter stuff \n";
+         //    std::cout << "node1 = " << node1 << "\n";
+         //    std::cout << "node2 = " << node2 << "\n";
+         //    std::cout << " dwm= \n";
+         //    dwm.print();
+         //    std::cout << " dwp  = \n";
+         //    dwp.print();
+         //    std::cout << "copysign :: " << "\n";
+         //    for (size_t j=0; j<E2Ddata.nq; ++j){
+         //       std::cout << copysign(1.0,dwm(j)*dwp(j)) << "\n";
+         //    }
+         //    std::cout << "pow = " << pow(3, (0.3 * mag_e12) ) << "\n";
+         //    std::cout << "pow = " << (0.3 * mag_e12)*(0.3 * mag_e12)*(0.3 * mag_e12) << "\n";
+         //    std::cout << "mag_e12 = " << mag_e12 << "\n";
+         //    for (size_t j=0; j<E2Ddata.nq; ++j){
+         //       std::cout << "va_slope_limiter, line 1 = " << half*( vdat1(j) + one ) << "\n";
+         //    }
+         //    for (size_t j=0; j<E2Ddata.nq; ++j){
+         //       std::cout << "va_slope_limiter, line 2 = " << ( (db(j)*db(j) + eps2)*da(j) + (da(j)*da(j) + eps2)*db(j) ) << "\n";
+         //    }
+         //    for (size_t j=0; j<E2Ddata.nq; ++j){
+         //       //std::cout << "va_slope_limiter, line 3 = " << ( da(j)*da(j) + db(j)*da(j) + two*eps2 ) << "\n";
+         //       std::cout << "va_slope_limiter, line 3 = " <<  da(j)*da(j) << "   ,   "<< db(j)*da(j)  << "   ,   "  << two*eps2 << "   ,   " <<( da(j)*da(j) + db(j)*da(j) + two*eps2 ) << "\n";
+         //    }
+         //    std::cout << "va_slope_limiter = "<< vdat2(0) << " , " << vdat2(1) << " , " << vdat2(2) << " , " << vdat2(3) <<"\n";
+         //    std::cout << "va_slope_limiter, actual  = \n";
+         //    dummy.print();
+         //    std::cout << "(node[node1].w) =  \n";
+         //    (*E2Ddata.node[node1].w).print();
+         //    std::cout << "(node[node2].w) =  \n";
+         //    (*E2Ddata.node[node2].w).print();
+         // }
+
       //  (3) No other limiters available.
       } else {
 
@@ -599,29 +681,6 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       } //endif limiter
 
-      // auto dummy = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
-      // if (node1 == 5151 && node2 == 5050) {
-      //    std::cout << "interior flux, limiter stuff \n";
-      //    std::cout << "node1 = " << node1 << "\n";
-      //    std::cout << "node2 = " << node2 << "\n";
-      //    std::cout << " dwm= \n";
-      //    dwm.print();
-      //    std::cout << " dwp  = \n";
-      //    dwp.print();
-      //    std::cout << "copysign :: " << "\n";
-      //    for (size_t i=0; i<E2Ddata.nq; ++i){
-      //       std::cout << copysign(1.0,dwm(i)*dwp(i)) << "\n";
-      //    }
-      //    std::cout << "pow = " << pow(3, (0.3 * mag_e12) ) << "\n";
-      //    std::cout << "pow = " << (0.3 * mag_e12)*(0.3 * mag_e12)*(0.3 * mag_e12) << "\n";
-      //    std::cout << "mag_e12 = " << mag_e12 << "\n";
-      //    std::cout << "va_slope_limiter = \n";
-      //    dummy.print();
-      //    std::cout << "(node[node1].w) =  \n";
-      //    (*E2Ddata.node[node1].w).print();
-      //    std::cout << "(node[node2].w) =  \n";
-      //    (*E2Ddata.node[node2].w).print();
-      // }
 
 
 
@@ -702,7 +761,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       // std::cout << "ix = " << ix << "\n";
       // std::cout << "iy = " << iy << "\n";
 
-      // // if (flag == 2) {
+
       // if (node1 == 5151 && node2 == 5050) {
       //    std::cout << "interior flux \n";
       //    std::cout << "node1 = " << node1 << "\n";
@@ -817,7 +876,6 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             E2Ddata.node[n2].wsn = E2Ddata.node[n2].wsn + wsn*mag_e12;
 
 
-      //if (flag == 1) {
       // if (j == E2Ddata.bound[i].nbfaces-1){
       //    std::cout << "\n\nboundary type = " << E2Ddata.bound[i].bc_type << "\n";
       //    std::cout << "v1 = " << n1 << "\n";
@@ -861,9 +919,9 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             }
 
             
-      // //if (flag == 1) {
-      // if (j == E2Ddata.bound[i].nbfaces-1){
+      //if (flag == 1) {
 
+      // if (j == E2Ddata.bound[i].nbfaces-1){
       //    std::cout << "boundary type = " << E2Ddata.bound[i].bc_type << "\n";
       //    std::cout << "v1 = " << n1 << "\n";
       //    std::cout << "v2 = " << n2 << "\n";
@@ -998,7 +1056,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       } else if (E2Ddata.bound[i].bc_type == "outflow_back_pressure") {
 
-         //std::cout << "bc = outflow_back_pressure \n";
+         std::cout << "bc = outflow_back_pressure \n";
          //bnodes_outflow : do j = 1, E2Ddata.bound[i].nbfaces
          for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { 
 
@@ -1100,8 +1158,7 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
 
          //bnodes_slip_wall2 : do j = 1, E2Ddata.bound[i].nbnodes
-         //for (size_t j=0; j<E2Ddata.bound[i].nbnodes; ++j) { //tlm bug found?::this produces one to many j !!
-         for (size_t j=0; j<E2Ddata.bound[i].nbfaces; ++j) { 
+         for (size_t j=0; j<E2Ddata.bound[i].nbnodes; ++j) {
          
             //std::cout << "j = " << j << " \n";
 
@@ -1109,13 +1166,13 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             //std::cout << "n1 = " << n1 << " \n";
 
 
-            //std::cout << "(*E2Ddata.bound[i].bfnx)(j) = " << (*E2Ddata.bound[i].bfnx)(j) << " \n";
-            n12(0) = (*E2Ddata.bound[i].bfnx)(j);
+            //std::cout << "(*E2Ddata.bound[i].bfnx)(j) = " << (*E2Ddata.bound[i].bnx)(j) << " \n";
+            n12(0) = (*E2Ddata.bound[i].bnx)(j);
             //std::cout << "n12 = " << n12(0) << " \n";
 
             
-            //std::cout << "(*E2Ddata.bound[i].bfny)(j) = " << (*E2Ddata.bound[i].bfny)(j) << " \n";
-            n12(1) = (*E2Ddata.bound[i].bfny)(j);
+            //std::cout << "(*E2Ddata.bound[i].bfny)(j) = " << (*E2Ddata.bound[i].bny)(j) << " \n";
+            n12(1) = (*E2Ddata.bound[i].bny)(j);
             //std::cout << "n12 = " << n12(1) << " \n";
             //n12.print();
             
@@ -1537,10 +1594,10 @@ Array2D<real> EulerSolver2D::Solver::va_slope_limiter(EulerSolver2D::MainData2D&
    eps2 = (0.3 * h)*(0.3 * h)*(0.3 * h);
 
    // TLM todo: implement a vector (array) version of copysign and make the code below a 1 liner. 
-   for (size_t i=0; i<E2Ddata.nq; ++i){
-      va_slope_limiter_data(i) = half*( copysign( 1.0,da(i)*db(i) ) + one ) * 
-           ( (db(i)*db(i) + eps2)*da(i) + (da(i)*da(i) + eps2)*db(i) ) /
-           ( da(i)*da(i) + db(i)*da(i) + two*eps2 );
+   for (size_t j=0; j<E2Ddata.nq; ++j){
+      va_slope_limiter_data(j) = half*( copysign( 1.0,da(j)*db(j) ) + one ) * 
+           ( (db(j)*db(j) + eps2)*da(j) + (da(j)*da(j) + eps2)*db(j) ) /
+           ( da(j)*da(j) + db(j)*db(j) + two*eps2 );
    }
    return va_slope_limiter_data;
 }
