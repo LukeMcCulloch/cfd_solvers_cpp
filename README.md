@@ -9,6 +9,9 @@ Here is shocked flow entering a box and reflecting off the sides:
 
 ![ShockTube1D](pics/internal_shock_reflection.png)
 
+* van Albada limiter
+* Roe flux
+
 # 1-D 
 
 Here is the Shock Tube solution computed with the 1D partition of this code:
