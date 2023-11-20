@@ -154,6 +154,7 @@
 
 // math
 #include <math.h>       /* copysign */
+//#include <cmath.h>
 
 //======================================
 // my simple array class template (type)
@@ -202,7 +203,7 @@ public:
 
     void initial_solution_shock_diffraction( EulerSolver2D::MainData2D& E2Ddata);
     
-    void compute_residual_ncfv( EulerSolver2D::MainData2D& E2Ddata);
+    void compute_residual_ncfv( EulerSolver2D::MainData2D& E2Ddata, int flag);
     void residual_norm( EulerSolver2D::MainData2D& E2Ddata, Array2D<real>& res_norm_data);
     void update_solution( EulerSolver2D::MainData2D& E2Ddata, 
                                              real coeff, real dt, real CFL);

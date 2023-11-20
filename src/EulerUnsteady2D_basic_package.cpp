@@ -78,6 +78,9 @@
 // string trimfunctions
 #include "StringOps.h" 
 
+
+#include <math.h>       // sqrt
+
 using std::cout;
 using std::endl;
 

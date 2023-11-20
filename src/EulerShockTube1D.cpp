@@ -89,6 +89,7 @@
 #include <fstream>      // write to file
 #include <iomanip>    // std::setprecision - only works for output :(
 #include <math.h>       // sqrt 
+//#include <cmath.h>
 //=================================
 #include <cstring> //needed for memset
 #include <string.h>
