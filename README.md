@@ -8,3 +8,10 @@ I rolled my own arrays for this.  Probably want to update with Eigen, but allow 
 Here is the Shock Tube solution computed with the 1D partition of this code:
 
 ![ShockTube1D](pics/ShockTube1D.png)
+
+
+# 2-D 
+
+Here is the supersonic flow entering a box and reflecting off the sides:
+
+![ShockTube1D](pics/internal_shock_reflection.png)
