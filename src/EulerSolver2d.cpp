@@ -189,6 +189,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       compute_residual_ncfv(E2Ddata, 2);
       //compute_residual_ncfv(E2Ddata, 2);
       //std::exit(0);
+      //if (i_time_step==500) std::exit(0);
 
       //   Compute 1/2*(u^n + u^*)
       for (size_t i=0; i<E2Ddata.nnodes; ++i) {
@@ -995,16 +996,17 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             //   3. Add contributions to the two nodes (See Nishikawa AIAA2010-5093)
             boundary_elm = (*E2Ddata.bound[i].belm)(j);
             
-            // if (n1 == 5050 || n2 == 5050){
-            //    std::cout << "\n\nboundary type = " << E2Ddata.bound[i].bc_type << "\n";
-            //    std::cout << "v1 = " << n1 << "\n";
-            //    std::cout << "v2 = " << n2 << "\n";
-            //    std::cout << "\n residuals before update: \n";
-            //    std::cout << "res[n1] =  \n";
-            //    (*E2Ddata.node[n1].res).print();
-            //    std::cout << "res[n2] =  \n";
-            //    (*E2Ddata.node[n2].res).print();
-            // }
+            //fixed wall 1.0
+            //if (n1 == 5050 || n2 == 5050){
+               // std::cout << "\n\nboundary type = " << E2Ddata.bound[i].bc_type << "\n";
+               // std::cout << "v1 = " << n1 << "\n";
+               // std::cout << "v2 = " << n2 << "\n";
+               // std::cout << "\n residuals before update: \n";
+               // std::cout << "res[n1] =  \n";
+               // (*E2Ddata.node[n1].res).print();
+               // std::cout << "res[n2] =  \n";
+               // (*E2Ddata.node[n2].res).print();
+            //}
 
             if     (E2Ddata.elm[boundary_elm].nvtx == 3) { //Triangle
 
@@ -1022,26 +1024,26 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
             }
             
-      // if (n1 == 5050 || n2 == 5050){
-
-      //    std::cout << "boundary type = " << E2Ddata.bound[i].bc_type << "\n";
-      //    std::cout << "v1 = " << n1 << "\n";
-      //    std::cout << "v2 = " << n2 << "\n";
-      //    std::cout << "n12 = \n";
-      //    n12.print();
-      //    std::cout << "mag_n12 = " << mag_n12 << "\n";
-      //    std::cout << "num_flux = \n";
-      //    num_flux.print();
-      //    std::cout << "wave speed = " << wsn << "\n";
-      //    std::cout << "\n residuals after update: \n";
-      //    std::cout << "res[n1] =  \n";
-      //    (*E2Ddata.node[n1].res).print();
-      //    std::cout << "res[n2] =  \n";
-      //    (*E2Ddata.node[n2].res).print();
-      //    std::cout << "w[n1] = " << E2Ddata.node[n1].wsn << "\n";
-      //    std::cout << "w[n2] = " << E2Ddata.node[n2].wsn << "\n";
-      //    std::cout << "--------------------------- \n\n";
-      // }
+            //fixed wall 1.5
+            //if (n1 == 5050 || n2 == 5050){
+               // std::cout << "boundary type = " << E2Ddata.bound[i].bc_type << "\n";
+               // std::cout << "v1 = " << n1 << "\n";
+               // std::cout << "v2 = " << n2 << "\n";
+               // std::cout << "n12 = \n";
+               // n12.print();
+               // std::cout << "mag_n12 = " << mag_n12 << "\n";
+               // std::cout << "num_flux = \n";
+               // num_flux.print();
+               // std::cout << "wave speed = " << wsn << "\n";
+               // std::cout << "\n residuals after update: \n";
+               // std::cout << "res[n1] =  \n";
+               // (*E2Ddata.node[n1].res).print();
+               // std::cout << "res[n2] =  \n";
+               // (*E2Ddata.node[n2].res).print();
+               // std::cout << "w[n1] = " << E2Ddata.node[n1].wsn << "\n";
+               // std::cout << "w[n2] = " << E2Ddata.node[n2].wsn << "\n";
+               // std::cout << "--------------------------- \n\n";
+            //}
 
          } //end do bnodes_slip_wall
       
@@ -1180,14 +1182,14 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             //std::cout << "-----------------------------\n";
 
             // if (n1 == 5151 || n1 == 5050) {
-            //    std::cout << " Fixing Res special\n";
-            //    std::cout << "v1 = " << n1 << "\n";
-            //    // std::cout << "n12 = \n";
-            //    // n12.print();
-            //    // std::cout << "mag_n12 = " << mag_n12 << "\n";
-            //    std::cout << "before fix!  res[n1] =  \n";
-            //    (*E2Ddata.node[n1].res).print();
-            //    std::cout << "--------------------------- \n\n";
+               // std::cout << "--------------------------- \n\n";
+               // std::cout << " Fixing Res special\n";
+               // std::cout << "v1 = " << n1 << "\n";
+               // // std::cout << "n12 = \n";
+               // // n12.print();
+               // // std::cout << "mag_n12 = " << mag_n12 << "\n";
+               // std::cout << "before fix!  res[n1] =  \n";
+               // (*E2Ddata.node[n1].res).print();
             // }
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // THIS IS A SPECIAL TREATMENT FOR SHOCK DIFFRACTION PROBLEM.
@@ -1215,13 +1217,14 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             // if (flag == 2) {
             
             // if (n1 == 5151 || n1 == 5050) {
-            //    std::cout << "v1 = " << n1 << "\n";
-            //    // std::cout << "n12 = \n";
-            //    // n12.print();
-            //    // std::cout << "mag_n12 = " << mag_n12 << "\n";
-            //    std::cout << "after fix!  res[n1] =  \n";
-            //    (*E2Ddata.node[n1].res).print();
-            //    std::cout << "--------------------------- \n\n";
+               // std::cout << "v1 = " << n1 << "\n";
+               // // std::cout << "n12 = \n";
+               // // n12.print();
+               // // std::cout << "mag_n12 = " << mag_n12 << "\n";
+               // std::cout << "after fix!  res[n1] =  \n";
+               // (*E2Ddata.node[n1].res).print();
+               // std::cout << "--------------------------- \n\n";
+               // std::cout << "--------------------------- \n\n";
             // }
 
          } //end loop bnodes_slip_wall2
