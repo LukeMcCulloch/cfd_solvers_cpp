@@ -176,8 +176,8 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       
 
 
-      timestep_tec = "shock_u_star_"+ std::to_string(i_time_step) + ".dat";
-      E2Ddata.write_tecplot_file(timestep_tec);
+      // timestep_tec = "shock_u_star_"+ std::to_string(i_time_step) + ".dat";
+      // E2Ddata.write_tecplot_file(timestep_tec);
       //std::exit(0);
 
 
@@ -188,7 +188,7 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       //   Compute Res(u^*)
       compute_residual_ncfv(E2Ddata, 2);
       //compute_residual_ncfv(E2Ddata, 2);
-      std::exit(0);
+      //std::exit(0);
 
       //   Compute 1/2*(u^n + u^*)
       for (size_t i=0; i<E2Ddata.nnodes; ++i) {
@@ -199,8 +199,8 @@ void EulerSolver2D::Solver::euler_solver_main(EulerSolver2D::MainData2D& E2Ddata
       }//end do
       
 
-      timestep_tec = "shock_u_half"+ std::to_string(i_time_step) + ".dat";
-      E2Ddata.write_tecplot_file(timestep_tec);
+      //timestep_tec = "shock_u_half"+ std::to_string(i_time_step) + ".dat";
+      //E2Ddata.write_tecplot_file(timestep_tec);
       //std::exit(0);
 
       //   2nd Stage => u^{n+1} = 1/2*(u^n + u^*) - 1/2*dt/dx*Res(u^*)
@@ -558,6 +558,31 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
          dwm  = two*dwL-dwij;
          dwp  = dwij;
          wL  = (*E2Ddata.node[node1].w) + va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+         
+
+      // auto dummy = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+      // if (node1 == 5151 && node2 == 5050) {
+      //    std::cout << "interior flux, limiter stuff \n";
+      //    std::cout << "node1 = " << node1 << "\n";
+      //    std::cout << "node2 = " << node2 << "\n";
+      //    std::cout << " dwm= \n";
+      //    dwm.print();
+      //    std::cout << " dwp  = \n";
+      //    dwp.print();
+      //    std::cout << "copysign :: " << "\n";
+      //    for (size_t i=0; i<E2Ddata.nq; ++i){
+      //       std::cout << copysign(1.0,dwm(i)*dwp(i)) << "\n";
+      //    }
+      //    std::cout << "pow = " << pow(3, (0.3 * mag_e12) ) << "\n";
+      //    std::cout << "pow = " << (0.3 * mag_e12)*(0.3 * mag_e12)*(0.3 * mag_e12) << "\n";
+      //    std::cout << "mag_e12 = " << mag_e12 << "\n";
+      //    std::cout << "va_slope_limiter = \n";
+      //    dummy.print();
+      //    std::cout << "(node[node1].w) =  \n";
+      //    (*E2Ddata.node[node1].w).print();
+      //    std::cout << "(node[node2].w) =  \n";
+      //    (*E2Ddata.node[node2].w).print();
+      // }
 
          //     Right face value (wR) with the Van Albada limiter
          dwm  = -(two*dwR-dwij);
@@ -574,7 +599,29 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
       } //endif limiter
 
-
+      // auto dummy = va_slope_limiter(E2Ddata, dwm,dwp,mag_e12);
+      // if (node1 == 5151 && node2 == 5050) {
+      //    std::cout << "interior flux, limiter stuff \n";
+      //    std::cout << "node1 = " << node1 << "\n";
+      //    std::cout << "node2 = " << node2 << "\n";
+      //    std::cout << " dwm= \n";
+      //    dwm.print();
+      //    std::cout << " dwp  = \n";
+      //    dwp.print();
+      //    std::cout << "copysign :: " << "\n";
+      //    for (size_t i=0; i<E2Ddata.nq; ++i){
+      //       std::cout << copysign(1.0,dwm(i)*dwp(i)) << "\n";
+      //    }
+      //    std::cout << "pow = " << pow(3, (0.3 * mag_e12) ) << "\n";
+      //    std::cout << "pow = " << (0.3 * mag_e12)*(0.3 * mag_e12)*(0.3 * mag_e12) << "\n";
+      //    std::cout << "mag_e12 = " << mag_e12 << "\n";
+      //    std::cout << "va_slope_limiter = \n";
+      //    dummy.print();
+      //    std::cout << "(node[node1].w) =  \n";
+      //    (*E2Ddata.node[node1].w).print();
+      //    std::cout << "(node[node2].w) =  \n";
+      //    (*E2Ddata.node[node2].w).print();
+      // }
 
 
 
@@ -621,16 +668,16 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
          (*E2Ddata.node[n2].res).print();
       */
 
-      if (node1 == 5151 && node2 == 5050) {
-         std::cout << "interior flux \n";
-         std::cout << "node1 = " << node1 << "\n";
-         std::cout << "node2 = " << node2 << "\n";
-         std::cout << "\n residuals before update: \n";
-         std::cout << "res[node1] =  \n";
-         (*E2Ddata.node[node1].res).print();
-         std::cout << "res[node2] =  \n";
-         (*E2Ddata.node[node2].res).print();
-      }
+      // if (node1 == 5151 && node2 == 5050) {
+      //    std::cout << "interior flux \n";
+      //    std::cout << "node1 = " << node1 << "\n";
+      //    std::cout << "node2 = " << node2 << "\n";
+      //    std::cout << "\n residuals before update: \n";
+      //    std::cout << "res[node1] =  \n";
+      //    (*E2Ddata.node[node1].res).print();
+      //    std::cout << "res[node2] =  \n";
+      //    (*E2Ddata.node[node2].res).print();
+      // }
 
       //  Add the flux multiplied by the magnitude of the directed area vector to node1,
       //  and accumulate the max wave speed quantity for use in the time step calculation.
@@ -655,44 +702,34 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
       // std::cout << "ix = " << ix << "\n";
       // std::cout << "iy = " << iy << "\n";
 
-      // if (flag == 2) {
-      if (node1 == 5151 && node2 == 5050) {
-         std::cout << "interior flux \n";
-         std::cout << "node1 = " << node1 << "\n";
-         std::cout << "node2 = " << node2 << "\n";
-         std::cout << "mag_n12 = " << mag_n12 << "\n";
-         std::cout << "num_flux = \n";
-         num_flux.print();
-         std::cout << "wave speed = " << wsn << "\n";
+      // // if (flag == 2) {
+      // if (node1 == 5151 && node2 == 5050) {
+      //    std::cout << "interior flux \n";
+      //    std::cout << "node1 = " << node1 << "\n";
+      //    std::cout << "node2 = " << node2 << "\n";
+      //    std::cout << "mag_n12 = " << mag_n12 << "\n";
+      //    std::cout << "num_flux = \n";
+      //    num_flux.print();
+      //    std::cout << "wave speed = " << wsn << "\n";
          
-         std::cout << "dwL = \n";
-         dwL.print();
-         std::cout << "dwR = \n";
-         dwR.print();
+      //    std::cout << "dwL = \n";
+      //    dwL.print();
+      //    std::cout << "dwR = \n";
+      //    dwR.print();
          
-         std::cout << "wL = \n";
-         wL.print();
-         std::cout << "wR = \n";
-         wR.print();
+      //    std::cout << "wL = \n";
+      //    wL.print();
+      //    std::cout << "wR = \n";
+      //    wR.print();
 
-         std::cout << "res[node1] =  \n";
-         (*E2Ddata.node[node1].res).print();
-         std::cout << "res[node2] =  \n";
-         (*E2Ddata.node[node2].res).print();
-         std::cout << "w[node1] = " << E2Ddata.node[node1].wsn << "\n";
-         std::cout << "w[node1] = " << E2Ddata.node[node2].wsn << "\n";
-         std::cout << "--------------------------- \n\n";
-      }
-
-      // std::cout << "dwL = \n";
-      // dwL.print();
-      // std::cout << "dwR = \n";
-      // dwR.print();
-      
-      // std::cout << "wL = \n";
-      // wL.print();
-      // std::cout << "wR = \n";
-      // wR.print();
+      //    std::cout << "res[node1] =  \n";
+      //    (*E2Ddata.node[node1].res).print();
+      //    std::cout << "res[node2] =  \n";
+      //    (*E2Ddata.node[node2].res).print();
+      //    std::cout << "w[node1] = " << E2Ddata.node[node1].wsn << "\n";
+      //    std::cout << "w[node1] = " << E2Ddata.node[node2].wsn << "\n";
+      //    std::cout << "--------------------------- \n\n";
+      // }
 
   
    //--------------------------------------------------------------------------------
@@ -781,26 +818,26 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
 
       //if (flag == 1) {
-      if (j == E2Ddata.bound[i].nbfaces-1){
-         std::cout << "\n\nboundary type = " << E2Ddata.bound[i].bc_type << "\n";
-         std::cout << "v1 = " << n1 << "\n";
-         std::cout << "v2 = " << n2 << "\n";
-         std::cout << "\n residuals before update: \n";
-         std::cout << "res[n1] =  \n";
-         (*E2Ddata.node[n1].res).print();
-         std::cout << "res[n2] =  \n";
-         (*E2Ddata.node[n2].res).print();
+      // if (j == E2Ddata.bound[i].nbfaces-1){
+      //    std::cout << "\n\nboundary type = " << E2Ddata.bound[i].bc_type << "\n";
+      //    std::cout << "v1 = " << n1 << "\n";
+      //    std::cout << "v2 = " << n2 << "\n";
+      //    std::cout << "\n residuals before update: \n";
+      //    std::cout << "res[n1] =  \n";
+      //    (*E2Ddata.node[n1].res).print();
+      //    std::cout << "res[n2] =  \n";
+      //    (*E2Ddata.node[n2].res).print();
 
-         // std::cout << "dwL = \n";
-         // dwL.print();
-         // std::cout << "dwR = \n";
-         // dwR.print();
+      //    // std::cout << "dwL = \n";
+      //    // dwL.print();
+      //    // std::cout << "dwR = \n";
+      //    // dwR.print();
          
-         // std::cout << "wL = \n";
-         // wL.print();
-         // std::cout << "wR = \n";
-         // wR.print();
-      }
+      //    // std::cout << "wL = \n";
+      //    // wL.print();
+      //    // std::cout << "wR = \n";
+      //    // wR.print();
+      // }
 
 
             //   3. Add contributions to the two nodes (See Nishikawa AIAA2010-5093)
@@ -824,37 +861,37 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             }
 
             
-      //if (flag == 1) {
-      if (j == E2Ddata.bound[i].nbfaces-1){
+      // //if (flag == 1) {
+      // if (j == E2Ddata.bound[i].nbfaces-1){
 
-         std::cout << "boundary type = " << E2Ddata.bound[i].bc_type << "\n";
-         std::cout << "v1 = " << n1 << "\n";
-         std::cout << "v2 = " << n2 << "\n";
-         std::cout << "n12 = \n";
-         n12.print();
-         std::cout << "mag_n12 = " << mag_n12 << "\n";
-         std::cout << "num_flux = \n";
-         num_flux.print();
-         std::cout << "wave speed = " << wsn << "\n";
-         std::cout << "\n residuals after update: \n";
-         std::cout << "res[n1] =  \n";
-         (*E2Ddata.node[n1].res).print();
-         std::cout << "res[n2] =  \n";
-         (*E2Ddata.node[n2].res).print();
-         std::cout << "w[n1] = " << E2Ddata.node[n1].wsn << "\n";
-         std::cout << "w[n2] = " << E2Ddata.node[n2].wsn << "\n";
-         std::cout << "--------------------------- \n\n";
+      //    std::cout << "boundary type = " << E2Ddata.bound[i].bc_type << "\n";
+      //    std::cout << "v1 = " << n1 << "\n";
+      //    std::cout << "v2 = " << n2 << "\n";
+      //    std::cout << "n12 = \n";
+      //    n12.print();
+      //    std::cout << "mag_n12 = " << mag_n12 << "\n";
+      //    std::cout << "num_flux = \n";
+      //    num_flux.print();
+      //    std::cout << "wave speed = " << wsn << "\n";
+      //    std::cout << "\n residuals after update: \n";
+      //    std::cout << "res[n1] =  \n";
+      //    (*E2Ddata.node[n1].res).print();
+      //    std::cout << "res[n2] =  \n";
+      //    (*E2Ddata.node[n2].res).print();
+      //    std::cout << "w[n1] = " << E2Ddata.node[n1].wsn << "\n";
+      //    std::cout << "w[n2] = " << E2Ddata.node[n2].wsn << "\n";
+      //    std::cout << "--------------------------- \n\n";
 
-         // std::cout << "dwL = \n";
-         // dwL.print();
-         // std::cout << "dwR = \n";
-         // dwR.print();
+      //    // std::cout << "dwL = \n";
+      //    // dwL.print();
+      //    // std::cout << "dwR = \n";
+      //    // dwR.print();
          
-         // std::cout << "wL = \n";
-         // wL.print();
-         // std::cout << "wR = \n";
-         // wR.print();
-      }
+      //    // std::cout << "wL = \n";
+      //    // wL.print();
+      //    // std::cout << "wR = \n";
+      //    // wR.print();
+      // }
 
          }  //end do bnodes_numerical_flux_via_freestream
 
@@ -900,16 +937,16 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             //   3. Add contributions to the two nodes (See Nishikawa AIAA2010-5093)
             boundary_elm = (*E2Ddata.bound[i].belm)(j);
             
-            if (n1 == 5050 || n2 == 5050){
-               std::cout << "\n\nboundary type = " << E2Ddata.bound[i].bc_type << "\n";
-               std::cout << "v1 = " << n1 << "\n";
-               std::cout << "v2 = " << n2 << "\n";
-               std::cout << "\n residuals before update: \n";
-               std::cout << "res[n1] =  \n";
-               (*E2Ddata.node[n1].res).print();
-               std::cout << "res[n2] =  \n";
-               (*E2Ddata.node[n2].res).print();
-            }
+            // if (n1 == 5050 || n2 == 5050){
+            //    std::cout << "\n\nboundary type = " << E2Ddata.bound[i].bc_type << "\n";
+            //    std::cout << "v1 = " << n1 << "\n";
+            //    std::cout << "v2 = " << n2 << "\n";
+            //    std::cout << "\n residuals before update: \n";
+            //    std::cout << "res[n1] =  \n";
+            //    (*E2Ddata.node[n1].res).print();
+            //    std::cout << "res[n2] =  \n";
+            //    (*E2Ddata.node[n2].res).print();
+            // }
 
             if     (E2Ddata.elm[boundary_elm].nvtx == 3) { //Triangle
 
@@ -927,26 +964,26 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
 
             }
             
-      if (n1 == 5050 || n2 == 5050){
+      // if (n1 == 5050 || n2 == 5050){
 
-         std::cout << "boundary type = " << E2Ddata.bound[i].bc_type << "\n";
-         std::cout << "v1 = " << n1 << "\n";
-         std::cout << "v2 = " << n2 << "\n";
-         std::cout << "n12 = \n";
-         n12.print();
-         std::cout << "mag_n12 = " << mag_n12 << "\n";
-         std::cout << "num_flux = \n";
-         num_flux.print();
-         std::cout << "wave speed = " << wsn << "\n";
-         std::cout << "\n residuals after update: \n";
-         std::cout << "res[n1] =  \n";
-         (*E2Ddata.node[n1].res).print();
-         std::cout << "res[n2] =  \n";
-         (*E2Ddata.node[n2].res).print();
-         std::cout << "w[n1] = " << E2Ddata.node[n1].wsn << "\n";
-         std::cout << "w[n2] = " << E2Ddata.node[n2].wsn << "\n";
-         std::cout << "--------------------------- \n\n";
-      }
+      //    std::cout << "boundary type = " << E2Ddata.bound[i].bc_type << "\n";
+      //    std::cout << "v1 = " << n1 << "\n";
+      //    std::cout << "v2 = " << n2 << "\n";
+      //    std::cout << "n12 = \n";
+      //    n12.print();
+      //    std::cout << "mag_n12 = " << mag_n12 << "\n";
+      //    std::cout << "num_flux = \n";
+      //    num_flux.print();
+      //    std::cout << "wave speed = " << wsn << "\n";
+      //    std::cout << "\n residuals after update: \n";
+      //    std::cout << "res[n1] =  \n";
+      //    (*E2Ddata.node[n1].res).print();
+      //    std::cout << "res[n2] =  \n";
+      //    (*E2Ddata.node[n2].res).print();
+      //    std::cout << "w[n1] = " << E2Ddata.node[n1].wsn << "\n";
+      //    std::cout << "w[n2] = " << E2Ddata.node[n2].wsn << "\n";
+      //    std::cout << "--------------------------- \n\n";
+      // }
 
          } //end do bnodes_slip_wall
       
@@ -1085,16 +1122,16 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             //std::cout << "got normals on the slip wall \n";
             //std::cout << "-----------------------------\n";
 
-            if (n1 == 5151 || n1 == 5050) {
-               std::cout << " Fixing Res special\n";
-               std::cout << "v1 = " << n1 << "\n";
-               // std::cout << "n12 = \n";
-               // n12.print();
-               // std::cout << "mag_n12 = " << mag_n12 << "\n";
-               std::cout << "before fix!  res[n1] =  \n";
-               (*E2Ddata.node[n1].res).print();
-               std::cout << "--------------------------- \n\n";
-            }
+            // if (n1 == 5151 || n1 == 5050) {
+            //    std::cout << " Fixing Res special\n";
+            //    std::cout << "v1 = " << n1 << "\n";
+            //    // std::cout << "n12 = \n";
+            //    // n12.print();
+            //    // std::cout << "mag_n12 = " << mag_n12 << "\n";
+            //    std::cout << "before fix!  res[n1] =  \n";
+            //    (*E2Ddata.node[n1].res).print();
+            //    std::cout << "--------------------------- \n\n";
+            // }
             //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // THIS IS A SPECIAL TREATMENT FOR SHOCK DIFFRACTION PROBLEM.
             // Same as in the subroutine "eliminate_normal_mass_flux" above.
@@ -1120,15 +1157,15 @@ void EulerSolver2D::Solver::compute_residual_ncfv( EulerSolver2D::MainData2D& E2
             
             // if (flag == 2) {
             
-            if (n1 == 5151 || n1 == 5050) {
-               std::cout << "v1 = " << n1 << "\n";
-               // std::cout << "n12 = \n";
-               // n12.print();
-               // std::cout << "mag_n12 = " << mag_n12 << "\n";
-               std::cout << "after fix!  res[n1] =  \n";
-               (*E2Ddata.node[n1].res).print();
-               std::cout << "--------------------------- \n\n";
-            }
+            // if (n1 == 5151 || n1 == 5050) {
+            //    std::cout << "v1 = " << n1 << "\n";
+            //    // std::cout << "n12 = \n";
+            //    // n12.print();
+            //    // std::cout << "mag_n12 = " << mag_n12 << "\n";
+            //    std::cout << "after fix!  res[n1] =  \n";
+            //    (*E2Ddata.node[n1].res).print();
+            //    std::cout << "--------------------------- \n\n";
+            // }
 
          } //end loop bnodes_slip_wall2
 
@@ -1496,13 +1533,14 @@ Array2D<real> EulerSolver2D::Solver::va_slope_limiter(EulerSolver2D::MainData2D&
    Array2D<real> va_slope_limiter_data(4,1);
    real eps2;
    
-   eps2 = pow(3, (0.3 * h) );
+   //eps2 = std::pow(3, (0.3 * h) );
+   eps2 = (0.3 * h)*(0.3 * h)*(0.3 * h);
 
    // TLM todo: implement a vector (array) version of copysign and make the code below a 1 liner. 
    for (size_t i=0; i<E2Ddata.nq; ++i){
-      va_slope_limiter_data(i) = half*( copysign(1.0,da(i)*db(i)) + one ) * 
+      va_slope_limiter_data(i) = half*( copysign( 1.0,da(i)*db(i) ) + one ) * 
            ( (db(i)*db(i) + eps2)*da(i) + (da(i)*da(i) + eps2)*db(i) ) /
-           (da(i)*da(i) + db(i)*da(i) + two*eps2);
+           ( da(i)*da(i) + db(i)*da(i) + two*eps2 );
    }
    return va_slope_limiter_data;
 }
