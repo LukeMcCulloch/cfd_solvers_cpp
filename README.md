@@ -18,4 +18,5 @@ Here is the Shock Tube solution computed with the 1D partition of this code:
 
 ![ShockTube1D](pics/ShockTube1D.png)
 
-
+* minmod limiter
+* Roe flux
