@@ -5,7 +5,7 @@ I rolled my own arrays for this.  Probably want to update with Eigen, but allow 
 
 # 2-D unstructured mesh
 
-Here is the supersonic flow entering a box and reflecting off the sides:
+Here is shocked flow entering a box and reflecting off the sides:
 
 ![ShockTube1D](pics/internal_shock_reflection.png)
 
